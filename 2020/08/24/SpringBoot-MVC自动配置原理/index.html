@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="官方文档官方文档说明了SpringBoot对我们的SpringMVC还做了哪些配置，包括如何扩展，如何定制。地址:https:&#x2F;&#x2F;docs.spring.io&#x2F;spring-boot&#x2F;docs&#x2F;2.2.5.RELEASE&#x2F;reference&#x2F;htmlsingle&#x2F;#boot-features-spring-mvc-auto-configuration">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot-MVC自动配置原理 ">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/08/24/SpringBoot-MVC%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="官方文档官方文档说明了SpringBoot对我们的SpringMVC还做了哪些配置，包括如何扩展，如何定制。地址:https:&#x2F;&#x2F;docs.spring.io&#x2F;spring-boot&#x2F;docs&#x2F;2.2.5.RELEASE&#x2F;reference&#x2F;htmlsingle&#x2F;#boot-features-spring-mvc-auto-configuration">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-24T08:03:49.000Z">
+<meta property="article:modified_time" content="2020-08-24T08:14:33.534Z">
+<meta property="article:author" content="fubuking">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/08/24/SpringBoot-MVC%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E5%8E%9F%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SpringBoot-MVC自动配置原理  | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">5</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">5</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">29</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/08/24/SpringBoot-MVC%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SpringBoot-MVC自动配置原理 
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-08-24 16:03:49 / 修改时间：16:14:33" itemprop="dateCreated datePublished" datetime="2020-08-24T16:03:49+08:00">2020-08-24</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/08/24/SpringBoot-MVC%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E5%8E%9F%E7%90%86/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/24/SpringBoot-MVC%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E5%8E%9F%E7%90%86/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h1><p>官方文档说明了SpringBoot对我们的SpringMVC还做了哪些配置，包括如何扩展，如何定制。<br>地址:<br><a href="https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/#boot-features-spring-mvc-auto-configuration" target="_blank" rel="noopener">https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/#boot-features-spring-mvc-auto-configuration</a></p>
+<a id="more"></a>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">Spring MVC Auto-configuration</span><br><span class="line">// Spring Boot为Spring MVC提供了自动配置，它可以很好地与大多数应用程序一起工作。</span><br><span class="line">Spring Boot provides auto-configuration for Spring MVC that works well <span class="keyword">with</span> most applications.</span><br><span class="line">// 自动配置在Spring默认设置的基础上添加了以下功能：</span><br><span class="line">The <span class="keyword">auto</span>-configuration adds the <span class="keyword">following</span> features <span class="keyword">on</span> top <span class="keyword">of</span> Spring’s <span class="keyword">defaults</span>:</span><br><span class="line">// 包含视图解析器</span><br><span class="line">Inclusion <span class="keyword">of</span> ContentNegotiatingViewResolver <span class="keyword">and</span> BeanNameViewResolver beans.</span><br><span class="line">// 支持静态资源文件夹的路径，以及webjars</span><br><span class="line">Support <span class="keyword">for</span> serving <span class="keyword">static</span> resources, <span class="keyword">including</span> support <span class="keyword">for</span> WebJars </span><br><span class="line">// 自动注册了Converter：</span><br><span class="line">// 转换器，这就是我们网页提交数据到后台自动封装成为对象的东西，比如把<span class="string">"1"</span>字符串自动转换为<span class="built_in">int</span>类型</span><br><span class="line">// Formatter：【格式化器，比如页面给我们了一个<span class="number">2019</span><span class="number">-8</span><span class="number">-10</span>，它会给我们自动格式化为<span class="built_in">Date</span>对象】</span><br><span class="line"><span class="keyword">Automatic</span> registration <span class="keyword">of</span> Converter, GenericConverter, <span class="keyword">and</span> Formatter beans.</span><br><span class="line">// HttpMessageConverters</span><br><span class="line">// SpringMVC用来转换<span class="keyword">Http</span>请求和响应的的，比如我们要把一个<span class="keyword">User</span>对象转换为<span class="keyword">JSON</span>字符串，可以去看官网文档解释；</span><br><span class="line">Support <span class="keyword">for</span> HttpMessageConverters (covered later <span class="keyword">in</span> this <span class="keyword">document</span>).</span><br><span class="line">// 定义错误代码生成规则的</span><br><span class="line"><span class="keyword">Automatic</span> registration <span class="keyword">of</span> MessageCodesResolver (covered later <span class="keyword">in</span> this <span class="keyword">document</span>).</span><br><span class="line">// 首页定制</span><br><span class="line"><span class="keyword">Static</span> index.html support.</span><br><span class="line">// 图标定制</span><br><span class="line">Custom Favicon support (covered later <span class="keyword">in</span> this <span class="keyword">document</span>).</span><br><span class="line">// 初始化数据绑定器：帮我们把请求数据绑定到JavaBean中！</span><br><span class="line"><span class="keyword">Automatic</span> <span class="keyword">use</span> <span class="keyword">of</span> a ConfigurableWebBindingInitializer bean (covered later <span class="keyword">in</span> this <span class="keyword">document</span>).</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">如果您希望保留Spring Boot MVC功能，并且希望添加其他MVC配置（拦截器、格式化程序、视图控制器和其他功能），则可以添加自己</span></span><br><span class="line"><span class="comment">的@configuration类，类型为webmvcconfiguer，但不添加@EnableWebMvc。如果希望提供</span></span><br><span class="line"><span class="comment">RequestMappingHandlerMapping、RequestMappingHandlerAdapter或ExceptionHandlerExceptionResolver的自定义</span></span><br><span class="line"><span class="comment">实例，则可以声明WebMVCregistrationAdapter实例来提供此类组件。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">If</span> you want <span class="keyword">to</span> <span class="keyword">keep</span> Spring Boot MVC features <span class="keyword">and</span> you want <span class="keyword">to</span> <span class="keyword">add</span> additional MVC configuration </span><br><span class="line">(interceptors, formatters, <span class="keyword">view</span> controllers, <span class="keyword">and</span> other features), you can <span class="keyword">add</span> your own </span><br><span class="line">@Configuration <span class="keyword">class</span> <span class="keyword">of</span> <span class="keyword">type</span> WebMvcConfigurer but <span class="keyword">without</span> @EnableWebMvc. <span class="keyword">If</span> you wish <span class="keyword">to</span> provide </span><br><span class="line">custom instances <span class="keyword">of</span> RequestMappingHandlerMapping, RequestMappingHandlerAdapter, <span class="keyword">or</span> </span><br><span class="line">ExceptionHandlerExceptionResolver, you can <span class="keyword">declare</span> a WebMvcRegistrationsAdapter <span class="keyword">instance</span> <span class="keyword">to</span> provide such components.</span><br><span class="line"></span><br><span class="line">// 如果您想完全控制Spring MVC，可以添加自己的@Configuration，并用@EnableWebMvc进行注释。</span><br><span class="line"><span class="keyword">If</span> you want <span class="keyword">to</span> take <span class="keyword">complete</span> control <span class="keyword">of</span> Spring MVC, you can <span class="keyword">add</span> your own @Configuration annotated <span class="keyword">with</span> @EnableWebMvc.</span><br></pre></td></tr></table></figure>
+<h1 id="ContentNegotiatingViewResolver内容协商视图解析器"><a href="#ContentNegotiatingViewResolver内容协商视图解析器" class="headerlink" title="ContentNegotiatingViewResolver内容协商视图解析器"></a>ContentNegotiatingViewResolver内容协商视图解析器</h1><p>自动配置了ViewResolver，就是SpringMVC的视图解析器；<br>即根据方法的返回值取得视图对象（View），然后由视图对象决定如何渲染（转发，重定向）。<br>源码：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@Bean</span><br><span class="line">@<span class="constructor">ConditionalOnBean(ViewResolver.<span class="params">class</span>)</span></span><br><span class="line">@<span class="constructor">ConditionalOnMissingBean(<span class="params">name</span> = <span class="string">"viewResolver"</span>, <span class="params">value</span> = ContentNegotiatingViewResolver.<span class="params">class</span>)</span></span><br><span class="line">public ContentNegotiatingViewResolver view<span class="constructor">Resolver(BeanFactory <span class="params">beanFactory</span>)</span> &#123;</span><br><span class="line">    ContentNegotiatingViewResolver resolver = <span class="keyword">new</span> <span class="constructor">ContentNegotiatingViewResolver()</span>;</span><br><span class="line">    resolver.set<span class="constructor">ContentNegotiationManager(<span class="params">beanFactory</span>.<span class="params">getBean</span>(ContentNegotiationManager.<span class="params">class</span>)</span>);</span><br><span class="line">    <span class="comment">// ContentNegotiatingViewResolver使用所有其他视图解析器来定位视图，因此它应该具有较高的优先级</span></span><br><span class="line">    resolver.set<span class="constructor">Order(Ordered.HIGHEST_PRECEDENCE)</span>;</span><br><span class="line">    return resolver;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以点进这类看看！找到对应的解析视图的代码；</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">@Nullable <span class="comment">// 注解说明：@Nullable 即参数可为null</span></span><br><span class="line">public View resolve<span class="constructor">ViewName(String <span class="params">viewName</span>, Locale <span class="params">locale</span>)</span> throws Exception &#123;</span><br><span class="line">    RequestAttributes attrs = <span class="module-access"><span class="module"><span class="identifier">RequestContextHolder</span>.</span></span>get<span class="constructor">RequestAttributes()</span>;</span><br><span class="line">    <span class="module-access"><span class="module"><span class="identifier">Assert</span>.</span></span>state(attrs instanceof ServletRequestAttributes, <span class="string">"No current ServletRequestAttributes"</span>);</span><br><span class="line">    List&lt;MediaType&gt; requestedMediaTypes = this.get<span class="constructor">MediaTypes(((ServletRequestAttributes)</span>attrs).get<span class="constructor">Request()</span>);</span><br><span class="line">    <span class="keyword">if</span> (requestedMediaTypes != null) &#123;</span><br><span class="line">        <span class="comment">// 获取候选的视图对象</span></span><br><span class="line">        List&lt;View&gt; candidateViews = this.get<span class="constructor">CandidateViews(<span class="params">viewName</span>, <span class="params">locale</span>, <span class="params">requestedMediaTypes</span>)</span>;</span><br><span class="line">        <span class="comment">// 选择一个最适合的视图对象，然后把这个对象返回</span></span><br><span class="line">        View bestView = this.get<span class="constructor">BestView(<span class="params">candidateViews</span>, <span class="params">requestedMediaTypes</span>, <span class="params">attrs</span>)</span>;</span><br><span class="line">        <span class="keyword">if</span> (bestView != null) &#123;</span><br><span class="line">            return bestView;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// .....</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们继续点进去看，他是怎么获得候选的视图的。<br>getCandidateViews中看到他是把所有的视图解析器拿来，进行while循环，挨个解析！</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Iterator</span> var5 = <span class="keyword">this</span>.viewResolvers.iterator();</span><br></pre></td></tr></table></figure>
+<p>所以得出结论：ContentNegotiatingViewResolver 这个视图解析器就是用来组合所有的视图解析器的<br>我们再去研究下他的组合逻辑，看到有个属性viewResolvers，看看它是在哪里进行赋值的！</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">protected void init<span class="constructor">ServletContext(ServletContext <span class="params">servletContext</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 这里它是从beanFactory工具中获取容器中的所有视图解析器</span></span><br><span class="line">    <span class="comment">// ViewRescolver.class 把所有的视图解析器来组合的</span></span><br><span class="line">    Collection&lt;ViewResolver&gt; matchingBeans = <span class="module-access"><span class="module"><span class="identifier">BeanFactoryUtils</span>.</span></span>beans<span class="constructor">OfTypeIncludingAncestors(<span class="params">this</span>.<span class="params">obtainApplicationContext</span>()</span>, <span class="module-access"><span class="module"><span class="identifier">ViewResolver</span>.</span></span><span class="keyword">class</span>).values<span class="literal">()</span>;</span><br><span class="line">    ViewResolver viewResolver;</span><br><span class="line">    <span class="keyword">if</span> (this.viewResolvers<span class="operator"> == </span>null) &#123;</span><br><span class="line">        this.viewResolvers = <span class="keyword">new</span> <span class="constructor">ArrayList(<span class="params">matchingBeans</span>.<span class="params">size</span>()</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...............</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果想要使用自己定制化的东西，我们只需要给容器中添加这个组件就好了！剩下的事情SpringBoot就会帮我们做了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span> <span class="comment">//放到bean中</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ViewResolver <span class="title">myViewResolver</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> MyViewResolver();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//我们写一个静态内部类，视图解析器就需要实现ViewResolver接口</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MyViewResolver</span> <span class="keyword">implements</span> <span class="title">ViewResolver</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">resolveViewName</span><span class="params">(String s, Locale locale)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="修改SpringBoot的默认配置"><a href="#修改SpringBoot的默认配置" class="headerlink" title="修改SpringBoot的默认配置"></a>修改SpringBoot的默认配置</h1><p>SpringBoot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（如果用户自己配置@bean），如果有就用用户配置的，如果没有就用自动配置的；<br>如果有些组件可以存在多个，比如我们的视图解析器，就将用户配置的和自己默认的组合起来！<br>扩展使用SpringMVC官方文档如下：<br>If you want to keep Spring Boot MVC features and you want to add additional MVC configuration (interceptors, formatters, view controllers, and other features), you can add your own @Configuration class of type WebMvcConfigurer but without @EnableWebMvc. If you wish to provide custom instances of RequestMappingHandlerMapping, RequestMappingHandlerAdapter, or ExceptionHandlerExceptionResolver, you can declare a WebMvcRegistrationsAdapter instance to provide such components.<br>我们要做的就是编写一个@Configuration注解类，并且类型要为WebMvcConfigurer，还不能标注@EnableWebMvc注解；    </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//应为类型要求为WebMvcConfigurer，所以我们实现其接口</span></span><br><span class="line"><span class="comment">//可以使用自定义类扩展MVC的功能</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyMvcConfig</span> <span class="keyword">implements</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addViewControllers</span><span class="params">(ViewControllerRegistry registry)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 浏览器发送/test ， 就会跳转到test页面；</span></span><br><span class="line">        registry.addViewController(<span class="string">"/test"</span>).setViewName(<span class="string">"test"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以去分析一下原理：<br>1、WebMvcAutoConfiguration 是 SpringMVC的自动配置类，里面有一个类WebMvcAutoConfigurationAdapter<br>2、这个类上有一个注解，在做其他自动配置时会导入：@Import(EnableWebMvcConfiguration.class)<br>3、我们点进EnableWebMvcConfiguration这个类看一下，它继承了一个父类：DelegatingWebMvcConfiguration<br>这个父类中有这样一段代码：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">DelegatingWebMvcConfiguration</span> <span class="keyword">extends</span> <span class="title">WebMvcConfigurationSupport</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">WebMvcConfigurerComposite</span> configurers = <span class="keyword">new</span> <span class="type">WebMvcConfigurerComposite</span>();</span><br><span class="line">    </span><br><span class="line">  <span class="comment">// 从容器中获取所有的webmvcConfigurer</span></span><br><span class="line">    <span class="meta">@Autowired</span>(required = <span class="literal">false</span>)</span><br><span class="line">    public void setConfigurers(<span class="type">List</span>&lt;<span class="type">WebMvcConfigurer</span>&gt; configurers) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="type">CollectionUtils</span>.isEmpty(configurers)) &#123;</span><br><span class="line">            <span class="keyword">this</span>.configurers.addWebMvcConfigurers(configurers);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以在这个类中去寻找一个我们刚才设置的viewController当做参考，发现它调用了一个</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">addViewControllers</span><span class="params">(ViewControllerRegistry registry)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.configurers.addViewControllers(registry);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>点进去看一下</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addViewControllers</span>(<span class="params">ViewControllerRegistry registry</span>)</span> &#123;</span><br><span class="line">    Iterator var2 = <span class="keyword">this</span>.delegates.iterator();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(var2.hasNext()) &#123;</span><br><span class="line">        <span class="comment">// 将所有的WebMvcConfigurer相关配置来一起调用！包括我们自己配置的和Spring给我们配置的</span></span><br><span class="line">        WebMvcConfigurer <span class="keyword">delegate</span> = (WebMvcConfigurer)var2.next();</span><br><span class="line">        <span class="keyword">delegate</span>.addViewControllers(registry);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以得出结论：所有的WebMvcConfiguration都会被作用，不止Spring自己的配置类，我们自己的配置类当然也会被调用；</p>
+
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/23/SpringBoot-Web%E5%BC%80%E5%8F%91%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E5%A4%84%E7%90%86/" rel="prev" title="SpringBoot-Web开发静态资源处理">
+      <i class="fa fa-chevron-left"></i> SpringBoot-Web开发静态资源处理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/25/SpringBoot-%E6%95%B4%E5%90%88JDBC/" rel="next" title="SpringBoot-整合JDBC">
+      SpringBoot-整合JDBC <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#官方文档"><span class="nav-number">1.</span> <span class="nav-text">官方文档</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ContentNegotiatingViewResolver内容协商视图解析器"><span class="nav-number">2.</span> <span class="nav-text">ContentNegotiatingViewResolver内容协商视图解析器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#修改SpringBoot的默认配置"><span class="nav-number">3.</span> <span class="nav-text">修改SpringBoot的默认配置</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="概述SpringMVC是基于spring的一个框架，实际上就是spring的一个模块，专门是做web开发的。可以理解是servlet的一个升级。web开发底层是servlet，框架是在servlet基础上面加入一些功能，让你做web开发方便。        SpringMVC就是一个Spring。Spring是容器，ioc能够管理对象，使用bean，@Component, @Repository,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringMVC-概述">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/07/14/SpringMVC-%E6%A6%82%E8%BF%B0/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="概述SpringMVC是基于spring的一个框架，实际上就是spring的一个模块，专门是做web开发的。可以理解是servlet的一个升级。web开发底层是servlet，框架是在servlet基础上面加入一些功能，让你做web开发方便。        SpringMVC就是一个Spring。Spring是容器，ioc能够管理对象，使用bean，@Component, @Repository,">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-14T13:47:55.000Z">
+<meta property="article:modified_time" content="2020-07-15T09:10:14.650Z">
+<meta property="article:author" content="fubuking">
+<meta property="article:tag" content="SpringMVC">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/07/14/SpringMVC-%E6%A6%82%E8%BF%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SpringMVC-概述 | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">5</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">5</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">29</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/07/14/SpringMVC-%E6%A6%82%E8%BF%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SpringMVC-概述
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-14 21:47:55" itemprop="dateCreated datePublished" datetime="2020-07-14T21:47:55+08:00">2020-07-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-15 17:10:14" itemprop="dateModified" datetime="2020-07-15T17:10:14+08:00">2020-07-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringMVC/" itemprop="url" rel="index"><span itemprop="name">SpringMVC</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/07/14/SpringMVC-%E6%A6%82%E8%BF%B0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/14/SpringMVC-%E6%A6%82%E8%BF%B0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>SpringMVC是基于spring的一个框架，实际上就是spring的一个模块，专门是做web开发的。可以理解是servlet的一个升级。web开发底层是servlet，框架是在servlet基础上面加入一些功能，让你做web开发方便。       </p>
+<p>SpringMVC就是一个Spring。Spring是容器，ioc能够管理对象，使用bean，@Component, @Repository, @Service, @Controller。<br>SpringMVC能够创建对象，放入到容器中（SpringMVC容器），springmvc容器中放的是控制器对象。        </p>
+<a id="more"></a>
+<p>我们要做的是使用@Contorller创建控制器对象，把对象放入到springmvc容器中，把创建的对象作为控制器使用这个控制器对象能接收用户的请求， 显示处理结果，就当做是一个servlet使用。        </p>
+<p>使用@Controller注解创建的是一个普通类的对象，不是Servlet。springmvc赋予了控制器对象一些额外的功能。   </p>
+<p>web开发底层是servlet，springmvc中有一个对象是Servlet： DispatherServlet(中央调度器)。    </p>
+<p>DispatherServlet: 负责接收用户的所有请求，用户把请求给了DispatherServlet，之后DispatherServlet把请求转发给我们的Controller对象， 最后是Controller对象处理请求。   </p>
+<p>index.jsp—–DispatherServlet(Servlet)—-转发，分配给—Controller对象（@Controller注解创建的对象）   </p>
+<h1 id="SpringMVC请求的处理流程"><a href="#SpringMVC请求的处理流程" class="headerlink" title="SpringMVC请求的处理流程"></a>SpringMVC请求的处理流程</h1><ol>
+<li>发起some.do   </li>
+<li>tomcat(web.xml–url-pattern知道 *.do的请求给DispatcherServlet)      </li>
+<li>DispatcherServlet（根据springmvc.xml配置知道 some.do—doSome()）    </li>
+<li>DispatcherServlet把some.do转发个MyController.doSome()方法       </li>
+<li>框架执行doSome（）把得到ModelAndView进行处理， 转发到show.jsp       </li>
+</ol>
+<p>上面的过程简化的方式<br>some.do—DispatcherServlet—MyController             </p>
+<h1 id="创建一个简单的SpringMVC项目"><a href="#创建一个简单的SpringMVC项目" class="headerlink" title="创建一个简单的SpringMVC项目"></a>创建一个简单的SpringMVC项目</h1><p>需求：用户在页面发起一个请求，请求交给springmvc的控制器对象，并显示请求的处理结果（在结果页面显示一个欢迎语句）。  </p>
+<p>实现步骤：        </p>
+<ol>
+<li><p>新建web maven工程       </p>
+</li>
+<li><p>加入依赖     </p>
+</li>
+<li><p>在web.xml中注册springmvc框架的核心对象DispatcherServlet</p>
+<ol>
+<li>DispatcherServlet叫做中央调度器， 是一个servlet， 它的父类是继承HttpServlet            </li>
+<li>DispatcherServlet也叫做前端控制器（front controller）            </li>
+<li>DispatcherServlet负责接收用户提交的请求， 调用其它的控制器对象，并把请求的处理结果显示给用户        </li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">&lt;!--声明，注册springmvc的核心对象DispatcherServlet</span></span><br><span class="line"><span class="comment">        需要在tomcat服务器启动后，创建DispatcherServlet对象的实例。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">        为什么要创建DispatcherServlet对象的实例呢？</span></span><br><span class="line"><span class="comment">        因为DispatcherServlet在他的创建过程中， 会同时创建springmvc容器对象，</span></span><br><span class="line"><span class="comment">        读取springmvc的配置文件，把这个配置文件中的对象都创建好， 当用户发起</span></span><br><span class="line"><span class="comment">        请求时就可以直接使用对象了。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">        servlet的初始化会执行init（）方法。 DispatcherServlet在init（）中&#123;</span></span><br><span class="line"><span class="comment">           //创建容器，读取配置文件</span></span><br><span class="line"><span class="comment">           WebApplicationContext ctx = new ClassPathXmlApplicationContext("springmvc.xml");</span></span><br><span class="line"><span class="comment">           //把容器对象放入到ServletContext中</span></span><br><span class="line"><span class="comment">           getServletContext().setAttribute(key, ctx);</span></span><br><span class="line"><span class="comment">        &#125;</span></span><br><span class="line"><span class="comment">		springmvc创建容器对象时，读取的配置文件默认是</span></span><br><span class="line"><span class="comment">		/WEB-INF/&lt;servlet-name&gt;-servlet.xml .--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>myweb<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!--自定义springmvc读取的配置文件的位置--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!--springmvc的配置文件的位置的属性--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!--指定自定义文件的位置--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>classpath:springmvc.xml<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!--在tomcat启动后，创建Servlet对象</span></span><br><span class="line"><span class="comment">            load-on-startup:表示tomcat启动后创建对象的顺序。它的值是整数，数值越小，</span></span><br><span class="line"><span class="comment">                            tomcat创建对象的时间越早。 大于等于0的整数。</span></span><br><span class="line"><span class="comment">        --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">load-on-startup</span>&gt;</span>1<span class="tag">&lt;/<span class="name">load-on-startup</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>myweb<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">            使用框架的时候， url-pattern可以使用两种值</span></span><br><span class="line"><span class="comment">            1. 使用扩展名方式， 语法 *.xxxx , xxxx是自定义的扩展名。 常用的方式 *.do, *.action, *.mvc等等</span></span><br><span class="line"><span class="comment">               不能使用 *.jsp</span></span><br><span class="line"><span class="comment">               http://localhost:8080/myweb/some.do</span></span><br><span class="line"><span class="comment">               http://localhost:8080/myweb/other.do</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">            2.使用斜杠 "/"</span></span><br><span class="line"><span class="comment">        --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>*.do<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建一个发起请求的页面 index.jsp</p>
+</li>
+<li><p>创建控制器(处理器)类</p>
+<ol>
+<li>在类的上面加入@Controller注解，创建对象，并放入到springmvc容器中</li>
+<li>在类中的方法上面加入@RequestMapping注解    </li>
+</ol>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment"><span class="markdown">/**</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> *  </span>@Controller:创建处理器对象，对象放在springmvc容器中。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> *  </span>位置：在类的上面</span></span></span><br><span class="line"><span class="comment"><span class="markdown"> */</span></span></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">MyController</span> </span>&#123;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">       处理用户提交的请求，springmvc中是使用方法来处理的。</span></span><br><span class="line"><span class="comment">       方法是自定义的， 可以有多种返回值， 多种参数，方法名称自定义。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"><span class="markdown">/**</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     * </span>准备使用doSome方法处理some.do请求。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     * </span>@RequestMapping: 请求映射，作用是把一个请求地址和一个方法绑定在一起。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     *  </span>一个请求指定一个方法处理。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     *  </span>属性：1. value 是一个String，表示请求的uri地址的（some.do）。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     *             </span>2. value的值必须是唯一的， 不能重复。 在使用时，推荐地址以“/”。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     * </span>位置：1.在方法的上面，常用。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     *            </span>2.在类的上面。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     *  </span>说明：使用RequestMapping修饰的方法叫做处理器方法或者控制器方法。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     *  </span>使用@RequestMapping修饰的方法可以处理请求的，类似Servlet中的doGet, doPost。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="code">     *</span></span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     *  </span>返回值：ModelAndView 表示本次请求的处理结果。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     *   </span>Model: 数据，请求处理完成后，要显示给用户的数据。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     *   </span>View: 视图，比如jsp等等。</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="code">     */</span></span></span></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = &#123;<span class="string">"/some.do"</span>,<span class="string">"/first.do"</span>&#125;)</span><br><span class="line">    public ModelAndView doSome()&#123;</span><br><span class="line">    ModelAndView mv  = <span class="keyword">new</span> ModelAndView();</span><br><span class="line">    <span class="comment">//添加数据， 框架在请求的最后把数据放入到request作用域。</span></span><br><span class="line">    <span class="comment">//request.setAttribute("msg","欢迎使用springmvc做web开发");</span></span><br><span class="line">    mv.addObject(<span class="string">"msg"</span>,<span class="string">"欢迎使用springmvc做web开发"</span>);</span><br><span class="line">    mv.addObject(<span class="string">"fun"</span>,<span class="string">"执行的是doSome方法"</span>);</span><br><span class="line">    <span class="comment">//指定视图, 指定视图的完整路径</span></span><br><span class="line">    <span class="comment">//框架对视图执行的forward操作，request.getRequestDispather("/show.jsp).forward(...)</span></span><br><span class="line">    <span class="comment">//mv.setViewName("/show.jsp");</span></span><br><span class="line">    <span class="comment">//mv.setViewName("/WEB-INF/view/show.jsp");</span></span><br><span class="line">    <span class="comment">//mv.setViewName("/WEB-INF/view/other.jsp");</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//当配置了视图解析器后，可以使用逻辑名称（文件名），指定视图</span></span><br><span class="line">    <span class="comment">//框架会使用视图解析器的前缀 + 逻辑名称 + 后缀 组成完成路径， 这里就是字符连接操作</span></span><br><span class="line">    <span class="comment">///<span class="markdown">WEB-INF/view/ + show + .jsp</span></span></span><br><span class="line">    mv.setViewName(<span class="string">"show"</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//返回mv</span></span><br><span class="line">    <span class="keyword">return</span> mv;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>创建一个作为结果的jsp，显示请求的处理结果。    </p>
+</li>
+<li><p>创建springmvc的配置文件（spring的配置文件一样）            </p>
+<ol>
+<li>声明组件扫描器，指定@Contorller注解所在的包名</li>
+<li>声明视图解析器，帮助处理视图的     </li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">&lt;!--声明组件扫描器--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-package</span>=<span class="string">"com.fubuking.controller"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--声明 springmvc框架中的视图解析器， 帮助开发人员设置视图文件的路径--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span>  <span class="attr">class</span>=<span class="string">"org.springframework.web.servlet.view.InternalResourceViewResolver"</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--前缀：视图文件的路径--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"prefix"</span> <span class="attr">value</span>=<span class="string">"/WEB-INF/view/"</span> /&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--后缀：视图文件的扩展名--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"suffix"</span> <span class="attr">value</span>=<span class="string">".jsp"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SpringMVC/" rel="tag"># SpringMVC</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/13/Spring-%E4%BA%8B%E5%8A%A1/" rel="prev" title="Spring-事务">
+      <i class="fa fa-chevron-left"></i> Spring-事务
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/15/SpringMVC-%E6%8E%A5%E6%94%B6%E5%8F%82%E6%95%B0/" rel="next" title="SpringMVC-接收参数">
+      SpringMVC-接收参数 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SpringMVC请求的处理流程"><span class="nav-number">2.</span> <span class="nav-text">SpringMVC请求的处理流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建一个简单的SpringMVC项目"><span class="nav-number">3.</span> <span class="nav-text">创建一个简单的SpringMVC项目</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>

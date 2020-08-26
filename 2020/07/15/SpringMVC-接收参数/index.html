@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="@RequestMapping@RequestMapping:value: 所有请求地址的公共部分，叫做模块名称位置：放在类的上面 123@Controller@RequestMapping(&quot;&#x2F;user&quot;)public class MyController &amp;#123;&amp;#125; @RequestMapping : 请求映射属性：method，表示请求的方式，它的值RequestMethod类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringMVC-接收参数">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/07/15/SpringMVC-%E6%8E%A5%E6%94%B6%E5%8F%82%E6%95%B0/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="@RequestMapping@RequestMapping:value: 所有请求地址的公共部分，叫做模块名称位置：放在类的上面 123@Controller@RequestMapping(&quot;&#x2F;user&quot;)public class MyController &amp;#123;&amp;#125; @RequestMapping : 请求映射属性：method，表示请求的方式，它的值RequestMethod类">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-15T09:12:55.000Z">
+<meta property="article:modified_time" content="2020-07-17T11:26:30.799Z">
+<meta property="article:author" content="fubuking">
+<meta property="article:tag" content="SpringMVC">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/07/15/SpringMVC-%E6%8E%A5%E6%94%B6%E5%8F%82%E6%95%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SpringMVC-接收参数 | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">5</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">5</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">29</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/07/15/SpringMVC-%E6%8E%A5%E6%94%B6%E5%8F%82%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SpringMVC-接收参数
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-15 17:12:55" itemprop="dateCreated datePublished" datetime="2020-07-15T17:12:55+08:00">2020-07-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-17 19:26:30" itemprop="dateModified" datetime="2020-07-17T19:26:30+08:00">2020-07-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringMVC/" itemprop="url" rel="index"><span itemprop="name">SpringMVC</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/07/15/SpringMVC-%E6%8E%A5%E6%94%B6%E5%8F%82%E6%95%B0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/15/SpringMVC-%E6%8E%A5%E6%94%B6%E5%8F%82%E6%95%B0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="RequestMapping"><a href="#RequestMapping" class="headerlink" title="@RequestMapping"></a>@RequestMapping</h1><p>@RequestMapping:<br>value: 所有请求地址的公共部分，叫做模块名称<br>位置：放在类的上面</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@Controller</span></span><br><span class="line"><span class="variable">@RequestMapping</span>(<span class="string">"/user"</span>)</span><br><span class="line">public class MyController &#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>@RequestMapping : 请求映射<br>属性：method，表示请求的方式，它的值RequestMethod类枚举值<br>例如表示get请求方式，RequestMethod.GET<br>post方式，RequestMethod.POST        </p>
+<a id="more"></a>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//指定some.do使用get请求方式</span></span><br><span class="line">    <span class="variable">@RequestMapping</span>(value = <span class="string">"/some.do"</span>,method = RequestMethod.GET)</span><br><span class="line">    public ModelAndView doSome()&#123;  <span class="comment">// doGet()--service请求处</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//指定other.do是post请求方式</span></span><br><span class="line">    <span class="variable">@RequestMapping</span>(value = <span class="string">"/other.do"</span>,method = RequestMethod.POST)&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//不指定请求方式，没有限制</span></span><br></pre></td></tr></table></figure>
+<h1 id="接收请求参数"><a href="#接收请求参数" class="headerlink" title="接收请求参数"></a>接收请求参数</h1><ol>
+<li>接收请求参数，使用的处理器方法的形参<br>1)HttpServletRequest<br>2)HttpServletResponse<br>3)HttpSession<br>4)用户提交的数据    </li>
+<li>接收用户提交的参数<br>1)逐个接收    <figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 逐个接收请求参数：</span></span><br><span class="line"><span class="comment">    * 要求：处理器（控制器）方法的形参名和请求中参数名必须一致。</span></span><br><span class="line"><span class="comment">    *           同名的请求参数赋值给同名的形参</span></span><br><span class="line"><span class="comment">    * 框架接收请求参数</span></span><br><span class="line"><span class="comment">    *   1. 使用request对象接收请求参数</span></span><br><span class="line"><span class="comment">    *       String strName = request.getParameter("name");</span></span><br><span class="line"><span class="comment">    *       String strAge = request.getParameter("age");</span></span><br><span class="line"><span class="comment">    *   2. springmvc框架通过 DispatcherServlet 调用 MyController的doSome()方法</span></span><br><span class="line"><span class="comment">    *       调用方法时，按名称对应，把接收的参数赋值给形参</span></span><br><span class="line"><span class="comment">    *       doSome（strName，Integer.valueOf(strAge)）</span></span><br><span class="line"><span class="comment">    *       框架会提供类型转换的功能，能把String转为 int ，long ， float， double等类型。</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    *  400状态码是客户端错误， 表示提交请求参数过程中，发生了问题。</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   @<span class="constructor">RequestMapping(<span class="params">value</span> = <span class="string">"/receiveproperty.do"</span>)</span></span><br><span class="line">   public ModelAndView <span class="keyword">do</span><span class="constructor">Some(String <span class="params">name</span>, Integer <span class="params">age</span>)</span>&#123;</span><br><span class="line">       <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"doSome, name="</span>+name+<span class="string">"   age="</span>+age);</span><br><span class="line">       <span class="comment">//可以在方法中直接使用 name ，age</span></span><br><span class="line">       ModelAndView mv  = <span class="keyword">new</span> <span class="constructor">ModelAndView()</span>;</span><br><span class="line">       mv.add<span class="constructor">Object(<span class="string">"myname"</span>,<span class="params">name</span>)</span>;</span><br><span class="line">       mv.add<span class="constructor">Object(<span class="string">"myage"</span>,Integer.<span class="params">valueOf</span>(<span class="params">age</span>)</span>);</span><br><span class="line">       <span class="comment">//show是视图文件的逻辑名称（文件名称）</span></span><br><span class="line">       mv.set<span class="constructor">ViewName(<span class="string">"show"</span>)</span>;</span><br><span class="line">       return mv;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 请求中参数名和处理器方法的形参名不一样</span></span><br><span class="line"><span class="comment">    * @RequestParam: 逐个接收请求参数中， 解决请求中参数名形参名不一样的问题</span></span><br><span class="line"><span class="comment">    *      属性：1. value 请求中的参数名称</span></span><br><span class="line"><span class="comment">    *                 2. required 是一个boolean，默认是true</span></span><br><span class="line"><span class="comment">    *                 true：表示请求中必须包含此参数。</span></span><br><span class="line"><span class="comment">    *      位置： 在处理器方法的形参定义的前面</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   @<span class="constructor">RequestMapping(<span class="params">value</span> = <span class="string">"/receiveparam.do"</span>)</span></span><br><span class="line">   public ModelAndView receive<span class="constructor">Param(@RequestParam(<span class="params">value</span> = <span class="string">"rname"</span>,<span class="params">required</span> = <span class="params">false</span>)</span> String name,</span><br><span class="line">                                    @<span class="constructor">RequestParam(<span class="params">value</span> = <span class="string">"rage"</span>,<span class="params">required</span> = <span class="params">false</span>)</span> Integer age)&#123;</span><br><span class="line">       <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"doSome, name="</span>+name+<span class="string">"   age="</span>+age);</span><br><span class="line">       ModelAndView mv  = <span class="keyword">new</span> <span class="constructor">ModelAndView()</span>;</span><br><span class="line">       mv.add<span class="constructor">Object(<span class="string">"myname"</span>,<span class="params">name</span>)</span>;</span><br><span class="line">       mv.add<span class="constructor">Object(<span class="string">"myage"</span>,<span class="params">age</span>)</span>;</span><br><span class="line">       <span class="comment">//show是视图文件的逻辑名称（文件名称）</span></span><br><span class="line">       mv.set<span class="constructor">ViewName(<span class="string">"show"</span>)</span>;</span><br><span class="line">       return mv;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+2)对象接收    <figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 处理器方法形参是java对象， 这个对象的属性名和请求中参数名一样的</span></span><br><span class="line"><span class="comment">     * 框架会创建形参的java对象， 给属性赋值。 请求中的参数是name，框架会调用setName()</span></span><br><span class="line"><span class="comment">     * @return</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    @<span class="constructor">RequestMapping(<span class="params">value</span> = <span class="string">"/receiveobject.do"</span>)</span></span><br><span class="line">    public ModelAndView receive<span class="constructor">Param( Student <span class="params">myStudent</span>)</span>&#123;</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"receiveParam, name="</span>+myStudent.get<span class="constructor">Name()</span>+<span class="string">"   age="</span>+myStudent.get<span class="constructor">Age()</span>);</span><br><span class="line">        ModelAndView mv  = <span class="keyword">new</span> <span class="constructor">ModelAndView()</span>;</span><br><span class="line">        mv.add<span class="constructor">Object(<span class="string">"myname"</span>,<span class="params">myStudent</span>.<span class="params">getName</span>()</span>);</span><br><span class="line">        mv.add<span class="constructor">Object(<span class="string">"myage"</span>,<span class="params">myStudent</span>.<span class="params">getAge</span>()</span>);</span><br><span class="line">        mv.add<span class="constructor">Object(<span class="string">"mystudent"</span>,<span class="params">myStudent</span>)</span>;</span><br><span class="line">        <span class="comment">//show是视图文件的逻辑名称（文件名称）</span></span><br><span class="line">        mv.set<span class="constructor">ViewName(<span class="string">"show"</span>)</span>;</span><br><span class="line">        return mv;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p><strong>注意：</strong><br>在提交请求参数时，get请求方式中文没有乱码。<br>使用post方式提交请求，中文有乱码，需要使用过滤器处理乱码的问题。过滤器可以自定义，也可使用框架中提供的过滤器CharacterEncodingFilter        </p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--注册声明过滤器，解决post请求乱码的问题--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>characterEncodingFilter<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">filter-class</span>&gt;</span>org.springframework.web.filter.CharacterEncodingFilter<span class="tag">&lt;/<span class="name">filter-class</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--设置项目中使用的字符编码--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>encoding<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>utf-8<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--强制请求对象（HttpServletRequest）使用encoding编码的值--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>forceRequestEncoding<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--强制应答对象（HttpServletResponse）使用encoding编码的值--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>forceResponseEncoding<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-mapping</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>characterEncodingFilter<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">           /*:表示强制所有的请求先通过过滤器处理。</span></span><br><span class="line"><span class="comment">        --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">filter-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SpringMVC/" rel="tag"># SpringMVC</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/14/SpringMVC-%E6%A6%82%E8%BF%B0/" rel="prev" title="SpringMVC-概述">
+      <i class="fa fa-chevron-left"></i> SpringMVC-概述
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/15/AJAX-%E6%A6%82%E8%BF%B0/" rel="next" title="AJAX-概述">
+      AJAX-概述 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RequestMapping"><span class="nav-number">1.</span> <span class="nav-text">@RequestMapping</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#接收请求参数"><span class="nav-number">2.</span> <span class="nav-text">接收请求参数</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>

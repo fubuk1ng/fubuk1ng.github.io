@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="基本步骤 新建maven项目 加入依赖   spring依赖 aspectj依赖   创建目标类：接口和他的实现类要做的是给类中的方法增加功能。   创建切面类：普通类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring-使用AspectJ实现AOP">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/07/10/Spring-AspectJ/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="基本步骤 新建maven项目 加入依赖   spring依赖 aspectj依赖   创建目标类：接口和他的实现类要做的是给类中的方法增加功能。   创建切面类：普通类">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-10T11:39:25.000Z">
+<meta property="article:modified_time" content="2020-07-10T14:13:47.573Z">
+<meta property="article:author" content="fubuking">
+<meta property="article:tag" content="Spring">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/07/10/Spring-AspectJ/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Spring-使用AspectJ实现AOP | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">5</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">5</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">29</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/07/10/Spring-AspectJ/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring-使用AspectJ实现AOP
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-07-10 19:39:25 / 修改时间：22:13:47" itemprop="dateCreated datePublished" datetime="2020-07-10T19:39:25+08:00">2020-07-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/07/10/Spring-AspectJ/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/10/Spring-AspectJ/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="基本步骤"><a href="#基本步骤" class="headerlink" title="基本步骤"></a>基本步骤</h1><ol>
+<li>新建maven项目</li>
+<li>加入依赖  <ol>
+<li>spring依赖</li>
+<li>aspectj依赖</li>
+</ol>
+</li>
+<li>创建目标类：接口和他的实现类<br>要做的是给类中的方法增加功能。  </li>
+<li>创建切面类：普通类    <a id="more"></a>
+<ol>
+<li>在类的上面加入 @Aspect  </li>
+<li>在类中定义方法，方法就是切面要执行的功能代码  </li>
+<li>在方法的上面加入aspectj中的通知注解，例如@Before</li>
+<li>指定切入点表达式execution()   </li>
+</ol>
+</li>
+<li>创建spring的配置文件：声明对象，把对象交给容器统一管理  <ol>
+<li>声明目标对象</li>
+<li>声明切面类对象  </li>
+<li>声明aspectj框架中的自动代理生成器标签<br>自动代理生成器：用来完成代理对象的自动创建功能的。<br>注：声明对象可以使用注解或者xml配置文件bean     </li>
+</ol>
+</li>
+<li>创建测试类，从spring容器中获取目标对象（实际就是代理对象）<br>通过代理执行方法，实现aop的功能增强。    </li>
+</ol>
+<h1 id="execution语法"><a href="#execution语法" class="headerlink" title="execution语法"></a>execution语法</h1><p>execution(访问权限 方法返回值 方法声明(参数) 异常类型)<br><strong>execution(public * *(..))</strong><br>指定切入点为：任意公共方法<br><strong>execution(* set*(..))</strong><br>指定切入点为：任何一个以“set”开始的方法。<br><strong>execution(* com.xyz.service.<em>.</em>(..))</strong><br>指定切入点为：定义在 service 包里的任意类的任意方法。<br><strong>execution(* <em>..service.</em>.*(..))</strong><br>指定所有包下的 serivce 子包下所有类（接口）中所有方法为切入点<br><strong>execution(* com.xyz.service..<em>.</em>(..))</strong><br>指定切入点为：定义在 service 包或者子包里的任意类的任意方法。“..”出现在类名中时，后 面必须跟“*”，表示包、子包下的所有类。 </p>
+<h1 id="Aspect"><a href="#Aspect" class="headerlink" title="@Aspect"></a>@Aspect</h1><p>@Aspect是aspectj框架中的注解。<br>作用：表示当前类是切面类。<br>切面类：是用来给业务方法增加功能的类，在这个类中有切面的功能代码。<br>位置：在类定义的上面    </p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@Aspect</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="symbol">MyAspect</span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="JoinPoint"><a href="#JoinPoint" class="headerlink" title="JoinPoint"></a>JoinPoint</h1><p>JoinPoint:业务方法，要加入切面功能的业务方法。<br>作用是：可以在通知方法中获取方法执行时的信息，例如方法名称，方法的实参。<br>如果你的切面功能中需要用到方法的信息，就加入JoinPoint。<br>JoinPoint参数的值是由框架赋予，必须是第一个位置的参数。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@XXX</span><br><span class="line">public void xxx(JoinPoint jp,XXXX xxxx)&#123;</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"方法的签名（定义）="</span>+jp.get<span class="constructor">Signature()</span>);</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"方法的名称="</span>+jp.get<span class="constructor">Signature()</span>.get<span class="constructor">Name()</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Before"><a href="#Before" class="headerlink" title="@Before:"></a>@Before:</h1><p>方法的定义要求：<br>1.公共方法 public<br>2.方法没有返回值<br>3.方法名称自定义<br>4.方法可以有参数，也可以没有参数<br>如果有参数，参数不是自定义的，有几个参数类型可以使用</p>
+<p>属性：value，是切入点表达式，表示切面的功能执行的位置。<br>位置：在方法的上面。<br>特点：<br>1.在目标方法之前先执行的。<br>2.不会改变目标方法的执行结果。<br>3.不会影响目标方法的执行。</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Before</span>(value = <span class="string">"execution(xxx)"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">myBefore</span><span class="params">()</span></span>&#123;</span><br><span class="line"><span class="comment">//就是你切面要执行的功能代码</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="AfterReturning"><a href="#AfterReturning" class="headerlink" title="@AfterReturning"></a>@AfterReturning</h1><p>@AfterReturning:后置通知<br>后置通知定义方法，方法是实现切面功能的。<br>方法的定义要求：<br>1.公共方法 public<br>2.方法没有返回值<br>3.方法名称自定义<br>4.方法有参数的,推荐是Object,参数名自定义  </p>
+<p>属性：<br>1.value 切入点表达式。<br>2.returning 自定义的变量，表示目标方法的返回值。<br>自定义变量名必须和通知方法的形参名一样。<br>位置：在方法定义的上面。<br>特点：<br>1.在目标方法之后执行的。<br>2.能够获取到目标方法的返回值，可以根据这个返回值做不同的处理功能。<br>3.可以修改这个返回值。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@<span class="constructor">AfterReturning(<span class="params">value</span> = <span class="string">"execution(XXX)"</span> <span class="params">returning</span> = <span class="string">"res"</span>)</span>&#123;</span><br><span class="line">public void my<span class="constructor">AfterReturing(JoinPoint <span class="params">jp</span> , Object <span class="params">res</span> )</span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Around"><a href="#Around" class="headerlink" title="@Around"></a>@Around</h1><p>@Around: 环绕通知<br>环绕通知方法的定义格式<br>1.public<br>2.必须有一个返回值，推荐使用Object<br>3.方法名称自定义<br>4.方法有参数，固定的参数 ProceedingJoinPoint  </p>
+<p>属性：value 切入点表达式<br>位置：在方法的定义上面<br>特点：<br>1.它是功能最强的通知。<br>2.在目标方法的前和后都能增强功能。<br>3.控制目标方法是否被调用执行。<br>4.修改原来的目标方法的执行结果。 影响最后的调用结果。<br>环绕通知，等同于jdk动态代理的，InvocationHandler接口。<br>参数：ProceedingJoinPoint 就等同于Method。<br>作用：执行目标方法。<br>返回值：就是目标方法的执行结果，可以被修改。<br>环绕通知：经常做事务，在目标方法之前开启事务，执行目标方法，在目标方法之后提交事务。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@<span class="constructor">Around(<span class="params">value</span> = <span class="string">"execution()"</span>)</span></span><br><span class="line">public Object my<span class="constructor">Around(ProceedingJoinPoint <span class="params">pjp</span>)</span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="AfterThrowing"><a href="#AfterThrowing" class="headerlink" title="@AfterThrowing"></a>@AfterThrowing</h1><p>@AfterThrowing:异常通知<br>异常通知方法的定义格式<br>1.public<br>2.没有返回值<br>3.方法名称自定义<br>4.方法有个一个Exception，如果还有是JoinPoint  </p>
+<p>属性：<br>1.value 切入点表达式<br>2.throwinng 自定义的变量，表示目标方法抛出的异常对象<br>变量名必须和方法的参数名一样<br>特点：<br>1.在目标方法抛出异常时执行的。<br>2.可以做异常的监控程序，监控目标方法执行时是不是有异常。<br>如果有异常，可以发送邮件，短信进行通知。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//执行就是：</span></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">SomeServiceImpl</span>.</span></span><span class="keyword">do</span><span class="constructor">Second(..)</span></span><br><span class="line">&#125;catch(Exception e)&#123;</span><br><span class="line">my<span class="constructor">AfterThrowing(<span class="params">e</span>)</span>;</span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">@<span class="constructor">AfterThrowing(<span class="params">value</span> = <span class="string">"execution()"</span>,<span class="params">throwing</span> = <span class="string">"ex"</span>)</span></span><br><span class="line">public void my<span class="constructor">AfterThrowing(Exception <span class="params">ex</span>)</span>&#123;</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"异常通知："</span>+ex.get<span class="constructor">Message()</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="After"><a href="#After" class="headerlink" title="@After"></a>@After</h1><p>@After :最终通属性： value 切入点表达式知<br>最终通知方法的定义格式<br>1.public<br>2.没有返回值<br>3.方法名称自定义<br>4.方法没有参数，如果还有是JoinPoint    </p>
+<p>属性：value 切入点表达式<br>位置： 在方法的上面<br>特点：<br>1.总是会执行<br>2.在目标方法之后执行的</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">&#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@After(<span class="keyword">value</span> = <span class="string">"execution()"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">myAfter</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">System.<span class="keyword">out</span>.println(<span class="string">"执行最终通知，总是会被执行的代码"</span>);</span><br><span class="line"><span class="comment">//一般做资源清除工作的。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Pointcut"><a href="#Pointcut" class="headerlink" title="@Pointcut"></a>@Pointcut</h1><p>@Pointcut: 定义和管理切入点， 如果你的项目中有多个切入点表达式是重复的，可以复用的。<br>属性：value 切入点表达式<br>位置：在自定义的方法上面<br>特点：当使用@Pointcut定义在一个方法的上面 ，此时这个方法的名称就是切入点表达式的别名。<br>其它的通知中，value属性就可以使用这个方法名称，代替切入点表达式了。</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Pointcut</span>(value = <span class="string">"execution()"</span>)</span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">void</span> <span class="title">mypt</span><span class="params">()</span></span>&#123;</span><br><span class="line"><span class="comment">//无需代码，</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/09/Spring-AOP/" rel="prev" title="Spring-AOP">
+      <i class="fa fa-chevron-left"></i> Spring-AOP
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/11/Spring-%E9%9B%86%E6%88%90MyBatis/" rel="next" title="Spring-集成MyBatis">
+      Spring-集成MyBatis <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基本步骤"><span class="nav-number">1.</span> <span class="nav-text">基本步骤</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#execution语法"><span class="nav-number">2.</span> <span class="nav-text">execution语法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Aspect"><span class="nav-number">3.</span> <span class="nav-text">@Aspect</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JoinPoint"><span class="nav-number">4.</span> <span class="nav-text">JoinPoint</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Before"><span class="nav-number">5.</span> <span class="nav-text">@Before:</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AfterReturning"><span class="nav-number">6.</span> <span class="nav-text">@AfterReturning</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Around"><span class="nav-number">7.</span> <span class="nav-text">@Around</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AfterThrowing"><span class="nav-number">8.</span> <span class="nav-text">@AfterThrowing</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#After"><span class="nav-number">9.</span> <span class="nav-text">@After</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pointcut"><span class="nav-number">10.</span> <span class="nav-text">@Pointcut</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>

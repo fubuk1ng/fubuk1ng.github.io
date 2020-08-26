@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="概述 拦截器是springmvc中的一种对象，需要实现HandlerInterceptor接口。 拦截器和过滤器类似，功能方向侧重点不同。 过滤器是用来过滤器请求参数，设置编码字符集等工作。拦截器是拦截用户的请求，对请求做判断处理的。 拦截器是全局的，可以对多个Controller做拦截。一个项目中可以有0个或多个拦截器， 他们在一起拦截用户的请求。拦截器常用在：用户登录处理，权限检查， 记录日志">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring-拦截器">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/07/19/Spring-%E6%8B%A6%E6%88%AA%E5%99%A8/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="概述 拦截器是springmvc中的一种对象，需要实现HandlerInterceptor接口。 拦截器和过滤器类似，功能方向侧重点不同。 过滤器是用来过滤器请求参数，设置编码字符集等工作。拦截器是拦截用户的请求，对请求做判断处理的。 拦截器是全局的，可以对多个Controller做拦截。一个项目中可以有0个或多个拦截器， 他们在一起拦截用户的请求。拦截器常用在：用户登录处理，权限检查， 记录日志">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-19T11:07:32.000Z">
+<meta property="article:modified_time" content="2020-07-19T11:38:06.749Z">
+<meta property="article:author" content="fubuking">
+<meta property="article:tag" content="SpringMVC">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/07/19/Spring-%E6%8B%A6%E6%88%AA%E5%99%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Spring-拦截器 | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">5</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">5</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">29</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/07/19/Spring-%E6%8B%A6%E6%88%AA%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring-拦截器
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-07-19 19:07:32 / 修改时间：19:38:06" itemprop="dateCreated datePublished" datetime="2020-07-19T19:07:32+08:00">2020-07-19</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringMVC/" itemprop="url" rel="index"><span itemprop="name">SpringMVC</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/07/19/Spring-%E6%8B%A6%E6%88%AA%E5%99%A8/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/19/Spring-%E6%8B%A6%E6%88%AA%E5%99%A8/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><ol>
+<li>拦截器是springmvc中的一种对象，需要实现HandlerInterceptor接口。</li>
+<li>拦截器和过滤器类似，功能方向侧重点不同。 过滤器是用来过滤器请求参数，设置编码字符集等工作。拦截器是拦截用户的请求，对请求做判断处理的。</li>
+<li>拦截器是全局的，可以对多个Controller做拦截。一个项目中可以有0个或多个拦截器， 他们在一起拦截用户的请求。<br>拦截器常用在：用户登录处理，权限检查， 记录日志。    <a id="more"></a>
+
+</li>
+</ol>
+<h1 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h1><ol>
+<li>创建一个普通类，作为拦截器使用<ol>
+<li>实现HandlerInterceptor接口</li>
+<li>实现接口中的三个方法    </li>
+</ol>
+</li>
+<li>在springmvc配置文件中，声明拦截器，让框架知道拦截器的存在。<ol>
+<li>组件扫描器，扫描@Controller注解</li>
+<li>声明拦截器，并指定拦截的请求uri地址</li>
+</ol>
+</li>
+</ol>
+<h1 id="preHandle"><a href="#preHandle" class="headerlink" title="preHandle"></a>preHandle</h1><p>preHandle叫做预处理方法。是整个项目的入口，门户。当preHandle返回true 请求可以被处理。preHandle返回false，请求到此方法就截止。<br>参数： Object handler，被拦截的控制器对象<br>返回值boolean:<br>true：请求是通过了拦截器的验证，可以执行处理器方法。<br>false：请求没有通过拦截器的验证，请求到达拦截器就截止了。请求没有被处理。<br>特点：<br>1.方法在控制器方法（MyController的doSome）之前先执行的。 用户的请求首先到达此方法。<br>2.在这个方法中可以获取请求的信息， 验证请求是否符合要求。可以验证用户是否登录， 验证用户是否有权限访问某个连接地址(url)。 如果验证失败，可以截断请求，请求不能被处理。如果验证成功，可以放行请求，此时控制器方法才能执行。    </p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//拦截器类：拦截用户的请求。</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyInterceptor</span> <span class="keyword">implements</span> <span class="title">HandlerInterceptor</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object <span class="keyword">handler</span>)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        btime = System.currentTimeMillis();</span><br><span class="line">        System.out.println(<span class="string">"拦截器的MyInterceptor的preHandle()"</span>);</span><br><span class="line">        <span class="comment">//计算的业务逻辑，根据计算结果，返回true或者false</span></span><br><span class="line">        <span class="comment">//给浏览器一个返回结果</span></span><br><span class="line">        <span class="comment">//request.getRequestDispatcher("/tips.jsp").forward(request,response);</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="postHandle"><a href="#postHandle" class="headerlink" title="postHandle"></a>postHandle</h1><p>postHandle:后处理方法。<br>参数：Object handle，被拦截的处理器对象MyController。<br>ModelAndView mv，处理器方法的返回值。<br>特点：<br>1.在处理器方法之后执行(MyController.doSome())<br>2.能够获取到处理器方法的返回值ModelAndView,可以修改ModelAndView中的数据和视图，可以影响到最后的执行结果。<br>3.主要是对原来的执行结果做二次修正。    </p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> postHandle(HttpServletRequest request,</span><br><span class="line">                           HttpServletResponse response,</span><br><span class="line">                           Object <span class="keyword">handler</span>, ModelAndView mv) <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        System.out.println(<span class="string">"拦截器的MyInterceptor的postHandle()"</span>);</span><br><span class="line">        <span class="comment">//对原来的doSome执行结果，需要调整。</span></span><br><span class="line">        <span class="keyword">if</span>( mv != <span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="comment">//修改数据</span></span><br><span class="line">            mv.addObject(<span class="string">"mydate"</span>,<span class="keyword">new</span> Date());</span><br><span class="line">            <span class="comment">//修改视图</span></span><br><span class="line">            mv.setViewName(<span class="string">"other"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="afterCompletion"><a href="#afterCompletion" class="headerlink" title="afterCompletion"></a>afterCompletion</h1><p>afterCompletion:最后执行的方法<br>参数: Object handler，被拦截器的处理器对象<br>Exception ex，程序中发生的异常<br>特点:<br>1.在请求处理完成后执行。框架中规定是当你的视图处理完成后，对视图执行了forward。就认为请求处理完成。<br>2.一般做资源回收工作，程序请求过程中创建了一些对象，在这里可以删除，把占用的内存回收。    </p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> afterCompletion(HttpServletRequest request, HttpServletResponse response,</span><br><span class="line">                                Object <span class="keyword">handler</span>, Exception ex) <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        System.out.println(<span class="string">"拦截器的MyInterceptor的afterCompletion()"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> etime = System.currentTimeMillis();</span><br><span class="line">        System.out.println(<span class="string">"计算从preHandle到请求处理完成的时间："</span>+(etime - btime ));</span><br><span class="line">    &#125;	</span><br><span class="line">   <span class="comment">// 执行顺序：</span></span><br><span class="line">   <span class="comment">// 拦截器的MyInterceptor的preHandle()</span></span><br><span class="line">   <span class="comment">// =====执行MyController中的doSome方法=====</span></span><br><span class="line">   <span class="comment">// 拦截器的MyInterceptor的postHandle()</span></span><br><span class="line">   <span class="comment">// 拦截器的MyInterceptor的afterCompletion()</span></span><br></pre></td></tr></table></figure>
+<h1 id="多个拦截器"><a href="#多个拦截器" class="headerlink" title="多个拦截器"></a>多个拦截器</h1><ol>
+<li>第一个拦截器preHandle=true , 第二个拦截器preHandle=true<br>11111-拦截器的MyInterceptor的preHandle()<br>22222-拦截器的MyInterceptor的preHandle()<br>=====执行MyController中的doSome方法=====<br>22222-拦截器的MyInterceptor的postHandle()<br>11111-拦截器的MyInterceptor的postHandle()<br>22222-拦截器的MyInterceptor的afterCompletion()<br>11111-拦截器的MyInterceptor的afterCompletion()    </li>
+<li>第一个拦截器preHandle=true , 第二个拦截器preHandle=false<br>11111-拦截器的MyInterceptor的preHandle()<br>22222-拦截器的MyInterceptor的preHandle()<br>11111-拦截器的MyInterceptor的afterCompletion()        </li>
+<li>第一个拦截器preHandle=false , 第二个拦截器preHandle=true|false<br>11111-拦截器的MyInterceptor的preHandle()        </li>
+</ol>
+<p>拦截器 1————-拦截器 2———-处理器<br>preHandle() –&gt;    preHandle() –&gt;处理器方法<br>postHandle() &lt;–postHandle() &lt;–处理器方法</p>
+<h1 id="拦截器和过滤器的区别"><a href="#拦截器和过滤器的区别" class="headerlink" title="拦截器和过滤器的区别"></a>拦截器和过滤器的区别</h1><ol>
+<li>过滤器是servlet中的对象，拦截器是框架中的对象</li>
+<li>过滤器实现Filter接口的对象，拦截器是实现HandlerInterceptor</li>
+<li>过滤器是用来设置request，response的参数，属性的，侧重对数据过滤的。拦截器是用来验证请求的，能截断请求。    </li>
+<li>过滤器是在拦截器之前先执行的。</li>
+<li>过滤器是tomcat服务器创建的对象，拦截器是springmvc容器中创建的对象。</li>
+<li>过滤器是一个执行时间点。 拦截器有三个执行时间点。</li>
+<li>过滤器可以处理jsp，js，html等等，拦截器是侧重拦截对Controller的对象。 如果你的请求不能被DispatcherServlet接收， 这个请求不会执行拦截器内容。    </li>
+<li>拦截器拦截普通类方法执行，过滤器过滤servlet请求响应。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SpringMVC/" rel="tag"># SpringMVC</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/19/SpringMVC-%E5%BC%82%E5%B8%B8%E5%92%8C%E6%8B%A6%E6%88%AA%E5%99%A8/" rel="prev" title="SpringMVC-异常">
+      <i class="fa fa-chevron-left"></i> SpringMVC-异常
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/19/SpringBoot-%E6%A6%82%E8%BF%B0/" rel="next" title="SpringBoot-概述">
+      SpringBoot-概述 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用步骤"><span class="nav-number">2.</span> <span class="nav-text">使用步骤</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#preHandle"><span class="nav-number">3.</span> <span class="nav-text">preHandle</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#postHandle"><span class="nav-number">4.</span> <span class="nav-text">postHandle</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#afterCompletion"><span class="nav-number">5.</span> <span class="nav-text">afterCompletion</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多个拦截器"><span class="nav-number">6.</span> <span class="nav-text">多个拦截器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#拦截器和过滤器的区别"><span class="nav-number">7.</span> <span class="nav-text">拦截器和过滤器的区别</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>
