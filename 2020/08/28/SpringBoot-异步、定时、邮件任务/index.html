@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="异步任务1、创建一个service包2、创建一个类AsyncService异步处理还是非常常用的，比如我们在网站上发送邮件，后台会去发送邮件，此时前台会造成响应不动，直到邮件发送完毕，响应才会成功，所以我们一般会采用多线程的方式去处理这些任务。编写方法，假装正在处理数据，使用线程设置一些延时，模拟同步等待的情况；">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot-异步、定时、邮件任务 ">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/08/28/SpringBoot-%E5%BC%82%E6%AD%A5%E3%80%81%E5%AE%9A%E6%97%B6%E3%80%81%E9%82%AE%E4%BB%B6%E4%BB%BB%E5%8A%A1/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="异步任务1、创建一个service包2、创建一个类AsyncService异步处理还是非常常用的，比如我们在网站上发送邮件，后台会去发送邮件，此时前台会造成响应不动，直到邮件发送完毕，响应才会成功，所以我们一般会采用多线程的方式去处理这些任务。编写方法，假装正在处理数据，使用线程设置一些延时，模拟同步等待的情况；">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-28T12:32:18.000Z">
+<meta property="article:modified_time" content="2020-08-28T12:41:21.995Z">
+<meta property="article:author" content="fubuking">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/08/28/SpringBoot-%E5%BC%82%E6%AD%A5%E3%80%81%E5%AE%9A%E6%97%B6%E3%80%81%E9%82%AE%E4%BB%B6%E4%BB%BB%E5%8A%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SpringBoot-异步、定时、邮件任务  | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">5</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">5</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">31</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/08/28/SpringBoot-%E5%BC%82%E6%AD%A5%E3%80%81%E5%AE%9A%E6%97%B6%E3%80%81%E9%82%AE%E4%BB%B6%E4%BB%BB%E5%8A%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SpringBoot-异步、定时、邮件任务 
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-08-28 20:32:18 / 修改时间：20:41:21" itemprop="dateCreated datePublished" datetime="2020-08-28T20:32:18+08:00">2020-08-28</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/08/28/SpringBoot-%E5%BC%82%E6%AD%A5%E3%80%81%E5%AE%9A%E6%97%B6%E3%80%81%E9%82%AE%E4%BB%B6%E4%BB%BB%E5%8A%A1/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/28/SpringBoot-%E5%BC%82%E6%AD%A5%E3%80%81%E5%AE%9A%E6%97%B6%E3%80%81%E9%82%AE%E4%BB%B6%E4%BB%BB%E5%8A%A1/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="异步任务"><a href="#异步任务" class="headerlink" title="异步任务"></a>异步任务</h1><p>1、创建一个service包<br>2、创建一个类AsyncService<br>异步处理还是非常常用的，比如我们在网站上发送邮件，后台会去发送邮件，此时前台会造成响应不动，直到邮件发送完毕，响应才会成功，所以我们一般会采用多线程的方式去处理这些任务。<br>编写方法，假装正在处理数据，使用线程设置一些延时，模拟同步等待的情况；</p>
+<a id="more"></a>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@Service</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="symbol">AsyncService</span> &#123;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">public</span> <span class="built_in">void</span> hello()&#123;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           Thread.sleep(<span class="number">3000</span>);</span><br><span class="line">      &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">           e.printStackTrace();</span><br><span class="line">      &#125;</span><br><span class="line">       System.<span class="keyword">out</span>.println(<span class="string">"业务进行中...."</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3、编写controller包<br>4、编写AsyncController类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Autowired</span></span><br><span class="line">   AsyncService asyncService;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@GetMapping(<span class="meta-string">"/hello"</span>)</span></span><br><span class="line">   <span class="keyword">public</span> String hello()&#123;</span><br><span class="line">       asyncService.hello();</span><br><span class="line">       <span class="keyword">return</span> <span class="string">"success"</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>5、访问<a href="http://localhost:8080/hello进行测试，3秒后出现success，这是同步等待的情况。" target="_blank" rel="noopener">http://localhost:8080/hello进行测试，3秒后出现success，这是同步等待的情况。</a><br>我们如果想让用户直接得到消息，就在后台使用多线程的方式进行处理即可，但是每次都需要自己手动去编写多线程的实现的话，太麻烦了，我们只需要用一个简单的办法，在我们的方法上加一个简单的注解即可，如下：<br>6、给hello方法添加@Async注解；</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//告诉Spring这是一个异步方法</span></span><br><span class="line">@Async</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">()</span></span>&#123;</span><br><span class="line">   <span class="keyword">try</span> &#123;</span><br><span class="line">       Thread.sleep(<span class="number">3000</span>);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">       e.printStackTrace();</span><br><span class="line">  &#125;</span><br><span class="line">   System.out.<span class="built_in">println</span>(<span class="string">"业务进行中...."</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>SpringBoot就会自己开一个线程池，进行调用！但是要让这个注解生效，我们还需要在主程序上添加一个注解@EnableAsync ，开启异步注解功能；</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@EnableAsync</span> <span class="comment">//开启异步注解功能</span></span><br><span class="line"><span class="variable">@SpringBootApplication</span></span><br><span class="line">public class SpringbootTaskApplication &#123;</span><br><span class="line"></span><br><span class="line">   <span class="selector-tag">public</span> <span class="selector-tag">static</span> <span class="selector-tag">void</span> <span class="selector-tag">main</span>(String[] args) &#123;</span><br><span class="line">       <span class="selector-tag">SpringApplication</span><span class="selector-class">.run</span>(SpringbootTaskApplication.class, args);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>7、重启测试，网页瞬间响应，后台代码依旧执行！</p>
+<h1 id="定时任务"><a href="#定时任务" class="headerlink" title="定时任务"></a>定时任务</h1><p>项目开发中经常需要执行一些定时任务，比如需要在每天凌晨的时候，分析一次前一天的日志信息，Spring为我们提供了异步执行任务调度的方式，提供了两个接口。    </p>
+<ul>
+<li>TaskExecutor接口</li>
+<li>TaskScheduler接口    </li>
+</ul>
+<p>两个注解：    </p>
+<ul>
+<li>@EnableScheduling</li>
+<li>@Scheduled    </li>
+</ul>
+<p>cron表达式：<a href="https://www.cnblogs.com/yanghj010/p/10875151.html" target="_blank" rel="noopener">https://www.cnblogs.com/yanghj010/p/10875151.html</a>  </p>
+<p><strong>测试步骤：</strong><br>1、创建一个ScheduledService</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ScheduledService</span> </span>&#123;</span><br><span class="line">   </span><br><span class="line">   <span class="comment">//秒   分   时     日   月   周几</span></span><br><span class="line">   <span class="comment">//0 * * * * MON-FRI</span></span><br><span class="line">   <span class="comment">//注意cron表达式的用法；</span></span><br><span class="line">   <span class="meta">@Scheduled</span>(cron = <span class="string">"0 * * * * 0-7"</span>)</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">()</span></span>&#123;</span><br><span class="line">       System.out.println(<span class="string">"hello....."</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2、这里写完定时任务之后，我们需要在主程序上增加@EnableScheduling 开启定时任务功能</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@EnableAsync</span> <span class="comment">//开启异步注解功能</span></span><br><span class="line"><span class="variable">@EnableScheduling</span> <span class="comment">//开启基于注解的定时任务</span></span><br><span class="line"><span class="variable">@SpringBootApplication</span></span><br><span class="line">public class SpringbootTaskApplication &#123;</span><br><span class="line"></span><br><span class="line">   <span class="selector-tag">public</span> <span class="selector-tag">static</span> <span class="selector-tag">void</span> <span class="selector-tag">main</span>(String[] args) &#123;</span><br><span class="line">       <span class="selector-tag">SpringApplication</span><span class="selector-class">.run</span>(SpringbootTaskApplication.class, args);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3、详细了解下cron表达式；<br><a href="http://www.bejson.com/othertools/cron/" target="_blank" rel="noopener">http://www.bejson.com/othertools/cron/</a><br>4、常用的表达式</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">（<span class="number">1</span>）<span class="number">0</span>/<span class="number">2</span> * * * * ?   表示每<span class="number">2</span>秒 执行任务</span><br><span class="line">（<span class="number">1</span>）<span class="number">0</span> <span class="number">0</span>/<span class="number">2</span> * * * ?   表示每<span class="number">2</span>分钟 执行任务</span><br><span class="line">（<span class="number">1</span>）<span class="number">0</span> <span class="number">0</span> <span class="number">2</span> <span class="number">1</span> * ?   表示在每月的<span class="number">1</span>日的凌晨<span class="number">2</span>点调整任务</span><br><span class="line">（<span class="number">2</span>）<span class="number">0</span> <span class="number">15</span> <span class="number">10</span> ? * MON-FRI   表示周一到周五每天上午<span class="number">10</span>:<span class="number">15</span>执行作业</span><br><span class="line">（<span class="number">3</span>）<span class="number">0</span> <span class="number">15</span> <span class="number">10</span> ? <span class="number">6</span>L <span class="number">2002</span><span class="number">-2006</span>   表示<span class="number">2002</span><span class="number">-2006</span>年的每个月的最后一个星期五上午<span class="number">10</span>:<span class="number">15</span>执行作</span><br><span class="line">（<span class="number">4</span>）<span class="number">0</span> <span class="number">0</span> <span class="number">10</span>,<span class="number">14</span>,<span class="number">16</span> * * ?   每天上午<span class="number">10</span>点，下午<span class="number">2</span>点，<span class="number">4</span>点</span><br><span class="line">（<span class="number">5</span>）<span class="number">0</span> <span class="number">0</span>/<span class="number">30</span> <span class="number">9</span><span class="number">-17</span> * * ?   朝九晚五工作时间内每半小时</span><br><span class="line">（<span class="number">6</span>）<span class="number">0</span> <span class="number">0</span> <span class="number">12</span> ? * WED   表示每个星期三中午<span class="number">12</span>点</span><br><span class="line">（<span class="number">7</span>）<span class="number">0</span> <span class="number">0</span> <span class="number">12</span> * * ?   每天中午<span class="number">12</span>点触发</span><br><span class="line">（<span class="number">8</span>）<span class="number">0</span> <span class="number">15</span> <span class="number">10</span> ? * *   每天上午<span class="number">10</span>:<span class="number">15</span>触发</span><br><span class="line">（<span class="number">9</span>）<span class="number">0</span> <span class="number">15</span> <span class="number">10</span> * * ?     每天上午<span class="number">10</span>:<span class="number">15</span>触发</span><br><span class="line">（<span class="number">10</span>）<span class="number">0</span> <span class="number">15</span> <span class="number">10</span> * * ?   每天上午<span class="number">10</span>:<span class="number">15</span>触发</span><br><span class="line">（<span class="number">11</span>）<span class="number">0</span> <span class="number">15</span> <span class="number">10</span> * * ? <span class="number">2005</span>   <span class="number">2005</span>年的每天上午<span class="number">10</span>:<span class="number">15</span>触发</span><br><span class="line">（<span class="number">12</span>）<span class="number">0</span> * <span class="number">14</span> * * ?     在每天下午<span class="number">2</span>点到下午<span class="number">2</span>:<span class="number">59</span>期间的每<span class="number">1</span>分钟触发</span><br><span class="line">（<span class="number">13</span>）<span class="number">0</span> <span class="number">0</span>/<span class="number">5</span> <span class="number">14</span> * * ?   在每天下午<span class="number">2</span>点到下午<span class="number">2</span>:<span class="number">55</span>期间的每<span class="number">5</span>分钟触发</span><br><span class="line">（<span class="number">14</span>）<span class="number">0</span> <span class="number">0</span>/<span class="number">5</span> <span class="number">14</span>,<span class="number">18</span> * * ?     在每天下午<span class="number">2</span>点到<span class="number">2</span>:<span class="number">55</span>期间和下午<span class="number">6</span>点到<span class="number">6</span>:<span class="number">55</span>期间的每<span class="number">5</span>分钟触发</span><br><span class="line">（<span class="number">15</span>）<span class="number">0</span> <span class="number">0</span><span class="number">-5</span> <span class="number">14</span> * * ?   在每天下午<span class="number">2</span>点到下午<span class="number">2</span>:<span class="number">05</span>期间的每<span class="number">1</span>分钟触发</span><br><span class="line">（<span class="number">16</span>）<span class="number">0</span> <span class="number">10</span>,<span class="number">44</span> <span class="number">14</span> ? <span class="number">3</span> WED   每年三月的星期三的下午<span class="number">2</span>:<span class="number">10</span>和<span class="number">2</span>:<span class="number">44</span>触发</span><br><span class="line">（<span class="number">17</span>）<span class="number">0</span> <span class="number">15</span> <span class="number">10</span> ? * MON-FRI   周一至周五的上午<span class="number">10</span>:<span class="number">15</span>触发</span><br><span class="line">（<span class="number">18</span>）<span class="number">0</span> <span class="number">15</span> <span class="number">10</span> <span class="number">15</span> * ?   每月<span class="number">15</span>日上午<span class="number">10</span>:<span class="number">15</span>触发</span><br><span class="line">（<span class="number">19</span>）<span class="number">0</span> <span class="number">15</span> <span class="number">10</span> L * ?   每月最后一日的上午<span class="number">10</span>:<span class="number">15</span>触发</span><br><span class="line">（<span class="number">20</span>）<span class="number">0</span> <span class="number">15</span> <span class="number">10</span> ? * <span class="number">6</span>L   每月的最后一个星期五上午<span class="number">10</span>:<span class="number">15</span>触发</span><br><span class="line">（<span class="number">21</span>）<span class="number">0</span> <span class="number">15</span> <span class="number">10</span> ? * <span class="number">6</span>L <span class="number">2002</span><span class="number">-2005</span>   <span class="number">2002</span>年至<span class="number">2005</span>年的每月的最后一个星期五上午<span class="number">10</span>:<span class="number">15</span>触发</span><br><span class="line">（<span class="number">22</span>）<span class="number">0</span> <span class="number">15</span> <span class="number">10</span> ? * <span class="number">6</span>#<span class="number">3</span>   每月的第三个星期五上午<span class="number">10</span>:<span class="number">15</span>触发</span><br></pre></td></tr></table></figure>
+<h1 id="邮件任务"><a href="#邮件任务" class="headerlink" title="邮件任务"></a>邮件任务</h1><p>邮件发送，在我们的日常开发中，也非常的多，Springboot也帮我们做了支持</p>
+<ul>
+<li>邮件发送需要引入spring-boot-start-mail    </li>
+<li>SpringBoot 自动配置MailSenderAutoConfiguration</li>
+<li>定义MailProperties内容，配置在application.yml中</li>
+<li>自动装配JavaMailSender</li>
+<li>测试邮件发送    </li>
+</ul>
+<p><strong>测试：</strong><br>1、引入pom依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-mail<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>看它引入的依赖，可以看到 jakarta.mail</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.sun.mail<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jakarta.mail<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.6.4<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">scope</span>&gt;</span>compile<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>2、查看自动配置类：MailSenderAutoConfiguration<br>这个类中存在bean，JavaMailSenderImpl<br>然后我们去看下配置文件</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@ConfigurationProperties(</span><br><span class="line">   prefix = <span class="string">"spring.mail"</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MailProperties</span> &#123;</span></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Charset DEFAULT_CHARSET;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">String</span> host;</span><br><span class="line">   <span class="keyword">private</span> Integer port;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">String</span> username;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">String</span> password;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">String</span> protocol = <span class="string">"smtp"</span>;</span><br><span class="line">   <span class="keyword">private</span> Charset defaultEncoding;</span><br><span class="line">   <span class="keyword">private</span> Map&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt; properties;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">String</span> jndiName;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3、配置文件：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring.mail.username</span>=<span class="number">1111</span>@qq.com</span><br><span class="line"><span class="attr">spring.mail.password</span>=你的qq授权码</span><br><span class="line"><span class="attr">spring.mail.host</span>=smtp.qq.com</span><br><span class="line"><span class="comment"># qq需要配置ssl</span></span><br><span class="line"><span class="attr">spring.mail.properties.mail.smtp.ssl.enable</span>=<span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<p>获取授权码：在QQ邮箱中的设置-&gt;账户-&gt;开启pop3和smtp服务<br>4、Spring单元测试</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">@Autowired</span><br><span class="line">JavaMailSenderImpl mailSender;</span><br><span class="line"></span><br><span class="line">@Test</span><br><span class="line">public void context<span class="constructor">Loads()</span> &#123;</span><br><span class="line">   <span class="comment">//邮件设置1：一个简单的邮件</span></span><br><span class="line">   SimpleMailMessage message = <span class="keyword">new</span> <span class="constructor">SimpleMailMessage()</span>;</span><br><span class="line">   message.set<span class="constructor">Subject(<span class="string">"通知"</span>)</span>;</span><br><span class="line">   message.set<span class="constructor">Text(<span class="string">"今晚7:30开会"</span>)</span>;</span><br><span class="line"></span><br><span class="line">   message.set<span class="constructor">To(<span class="string">"1111@qq.com"</span>)</span>;</span><br><span class="line">   message.set<span class="constructor">From(<span class="string">"1111@qq.com"</span>)</span>;</span><br><span class="line">   mailSender.send(message);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@Test</span><br><span class="line">public void context<span class="constructor">Loads2()</span> throws MessagingException &#123;</span><br><span class="line">   <span class="comment">//邮件设置2：一个复杂的邮件</span></span><br><span class="line">   MimeMessage mimeMessage = mailSender.create<span class="constructor">MimeMessage()</span>;</span><br><span class="line">   MimeMessageHelper helper = <span class="keyword">new</span> <span class="constructor">MimeMessageHelper(<span class="params">mimeMessage</span>, <span class="params">true</span>)</span>;</span><br><span class="line"></span><br><span class="line">   helper.set<span class="constructor">Subject(<span class="string">"通知"</span>)</span>;</span><br><span class="line">   helper.set<span class="constructor">Text(<span class="string">"&lt;b style='color:red'&gt;今天 7:30来开会&lt;/b&gt;"</span>,<span class="params">true</span>)</span>;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//发送附件</span></span><br><span class="line">   helper.add<span class="constructor">Attachment(<span class="string">"1.jpg"</span>,<span class="params">new</span> File(<span class="string">""</span>)</span>);</span><br><span class="line">   helper.add<span class="constructor">Attachment(<span class="string">"2.jpg"</span>,<span class="params">new</span> File(<span class="string">""</span>)</span>);</span><br><span class="line"></span><br><span class="line">   helper.set<span class="constructor">To(<span class="string">"1111@qq.com"</span>)</span>;</span><br><span class="line">   helper.set<span class="constructor">From(<span class="string">"1111@qq.com"</span>)</span>;</span><br><span class="line"></span><br><span class="line">   mailSender.send(mimeMessage);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/27/SpringBoot-%E9%9B%86%E6%88%90Swagger/" rel="prev" title="SpringBoot-集成Swagger">
+      <i class="fa fa-chevron-left"></i> SpringBoot-集成Swagger
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#异步任务"><span class="nav-number">1.</span> <span class="nav-text">异步任务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#定时任务"><span class="nav-number">2.</span> <span class="nav-text">定时任务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#邮件任务"><span class="nav-number">3.</span> <span class="nav-text">邮件任务</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">31</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>
