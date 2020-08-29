@@ -404,6 +404,12 @@ Dao:<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class
 <figure class="highlight cs"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addViewControllers</span>(<span class="params">ViewControllerRegistry registry</span>)</span> &#123;</span><br><span class="line">    Iterator var2 = <span class="keyword">this</span>.delegates.iterator();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(var2.hasNext()) &#123;</span><br><span class="line">        <span class="comment">// 将所有的WebMvcConfigurer相关配置来一起调用！包括我们自己配置的和Spring给我们配置的</span></span><br><span class="line">        WebMvcConfigurer <span class="keyword">delegate</span> = (WebMvcConfigurer)var2.next();</span><br><span class="line">        <span class="keyword">delegate</span>.addViewControllers(registry);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>所以得出结论：所有的WebMvcConfiguration都会被作用，不止Spring自己的配置类，我们自己的配置类当然也会被调用；</p>
 ]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
   </entry>
   <entry>
     <title>Spring-集成MyBatis</title>
@@ -481,6 +487,12 @@ Dao:<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class
 <figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line">优先级<span class="number">1</span>：项目路径下的config文件夹配置文件</span><br><span class="line">优先级<span class="number">2</span>：项目路径下配置文件</span><br><span class="line">优先级<span class="number">3</span>：资源路径下的config文件夹配置文件</span><br><span class="line">优先级<span class="number">4</span>：资源路径下配置文件</span><br></pre></td></tr></table></figure>
 <p>优先级由高到底，高优先级的配置会覆盖低优先级的配置；    </p>
 ]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
   </entry>
   <entry>
     <title>SpringBoot-初识原理</title>
@@ -526,6 +538,12 @@ Dao:<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class
 <h1 id="SpringApplication"><a href="#SpringApplication" class="headerlink" title="SpringApplication"></a>SpringApplication</h1><p><strong>这个类主要做了以下四件事情：</strong><br>1、推断应用的类型是普通的项目还是Web项目<br>2、查找并加载所有可用初始化器 ， 设置到initializers属性中<br>3、找出所有的应用程序监听器，设置到listeners属性中<br>4、推断并设置main方法的定义类，找到运行的主类    </p>
 <p>查看构造器：    </p>
 <figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> SpringApplication(ResourceLoader resourceLoader, Class... primarySources) &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">this</span>.webApplicationType = WebApplicationType.deduceFromClasspath();</span><br><span class="line">    <span class="keyword">this</span>.setInitializers(<span class="keyword">this</span>.getSpringFactoriesInstances();</span><br><span class="line">    <span class="keyword">this</span>.setListeners(<span class="keyword">this</span>.getSpringFactoriesInstances(ApplicationListener<span class="class">.<span class="keyword">class</span>));</span></span><br><span class="line">    <span class="keyword">this</span>.mainApplicationClass = <span class="keyword">this</span>.deduceMainApplicationClass();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
   </entry>
   <entry>
     <title>SpringBoot-Web开发静态资源处理</title>
@@ -550,6 +568,12 @@ Dao:<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class
 <figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> Optional&lt;Resource&gt; getWelcomePage() &#123;</span><br><span class="line">    String[] locations = getResourceLocations(<span class="keyword">this</span>.resourceProperties.getStaticLocations());</span><br><span class="line">    <span class="comment">// ::是java8 中新引入的运算符</span></span><br><span class="line">    <span class="comment">// Class::function的时候function是属于Class的，应该是静态方法。</span></span><br><span class="line">    <span class="comment">// this::function的funtion是属于这个对象的。</span></span><br><span class="line">    <span class="comment">// 简而言之，就是一种语法糖而已，是一种简写</span></span><br><span class="line">    <span class="keyword">return</span> Arrays.stream(locations).map(<span class="keyword">this</span>::getIndexHtml).filter(<span class="keyword">this</span>::isReadable).findFirst();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 欢迎页就是一个location下的的 index.html 而已</span></span><br><span class="line"><span class="keyword">private</span> Resource getIndexHtml(String location) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.resourceLoader.getResource(location + <span class="string">"index.html"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>欢迎页，静态资源文件夹下的所有 index.html 页面；被 /** 映射。<br>比如我访问  <a href="http://localhost:8080/" target="_blank" rel="noopener">http://localhost:8080/</a> ，就会找静态资源文件夹下的 index.html</p>
 ]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
   </entry>
   <entry>
     <title>SpringBoot-yaml配置注入 </title>
@@ -612,6 +636,12 @@ Dao:<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class
 <figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">person:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">qinjiang$&#123;random.uuid&#125;</span> <span class="comment"># 随机uuid</span></span><br><span class="line">    <span class="attr">age:</span> <span class="string">$&#123;random.int&#125;</span>  <span class="comment"># 随机int</span></span><br><span class="line">    <span class="attr">happy:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">birth:</span> <span class="number">2000</span><span class="string">/01/01</span></span><br><span class="line">    <span class="attr">maps:</span> <span class="string">&#123;k1:</span> <span class="string">v1,k2:</span> <span class="string">v2&#125;</span></span><br><span class="line">    <span class="attr">lists:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">code</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">girl</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">music</span></span><br><span class="line">    <span class="attr">dog:</span></span><br><span class="line">      <span class="attr">name:</span> <span class="string">$&#123;person.hello:other&#125;_旺财</span></span><br><span class="line">      <span class="attr">age:</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
 <h1 id="对比小结"><a href="#对比小结" class="headerlink" title="对比小结"></a>对比小结</h1><p>1、@ConfigurationProperties只需要写一次即可 ， @Value则需要每个字段都添加。<br>2、松散绑定：这个什么意思呢? 比如我的yml中写的last-name，这个和lastName是一样的， - 后面跟着的字母默认是大写的。这就是松散绑定。<br>3、JSR303数据校验 ， 这个就是我们可以在字段是增加一层过滤器验证 ， 可以保证数据的合法性。<br>4、复杂类型封装，yml中可以封装对象 ， 使用value就不支持。<br><strong>结论：</strong><br>配置yml和配置properties都可以获取到值 ， 强烈推荐 yml；<br>如果我们在某个业务中，只需要获取配置文件中的某个值，可以使用一下 @value；<br>如果说，我们专门编写了一个JavaBean来和配置文件进行一一映射，就直接@configurationProperties，不要犹豫！    </p>
 ]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
   </entry>
   <entry>
     <title>SpringBoot-整合Druid</title>
@@ -638,6 +668,12 @@ Dao:<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class
 <figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line"><span class="comment">//配置 Druid 监控管理后台的Servlet；</span></span><br><span class="line"><span class="comment">//内置 Servlet 容器时没有web.xml文件，所以使用 Spring Boot 的注册 Servlet 方式</span></span><br><span class="line">@Bean</span><br><span class="line"><span class="function"><span class="keyword">public</span> ServletRegistrationBean <span class="title">statViewServlet</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ServletRegistrationBean bean = <span class="keyword">new</span> ServletRegistrationBean(<span class="keyword">new</span> StatViewServlet(), <span class="string">"/druid/*"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这些参数可以在 com.alibaba.druid.support.http.StatViewServlet </span></span><br><span class="line">    <span class="comment">// 的父类 com.alibaba.druid.support.http.ResourceServlet 中找到</span></span><br><span class="line">    Map&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt; initParams = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    initParams.<span class="built_in">put</span>(<span class="string">"loginUsername"</span>, <span class="string">"admin"</span>); <span class="comment">//后台管理界面的登录账号</span></span><br><span class="line">    initParams.<span class="built_in">put</span>(<span class="string">"loginPassword"</span>, <span class="string">"123456"</span>); <span class="comment">//后台管理界面的登录密码</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//后台允许谁可以访问</span></span><br><span class="line">    <span class="comment">//initParams.put("allow", "localhost")：表示只有本机可以访问</span></span><br><span class="line">    <span class="comment">//initParams.put("allow", "")：为空或者为null时，表示允许所有访问</span></span><br><span class="line">    initParams.<span class="built_in">put</span>(<span class="string">"allow"</span>, <span class="string">""</span>);</span><br><span class="line">    <span class="comment">//deny：Druid 后台拒绝谁访问</span></span><br><span class="line">    <span class="comment">//initParams.put("kuangshen", "192.168.1.20");表示禁止此ip访问</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//设置初始化参数</span></span><br><span class="line">    bean.setInitParameters(initParams);</span><br><span class="line">    <span class="keyword">return</span> bean;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>配置完毕后，我们可以选择访问 ：<a href="http://localhost:8080/druid/login.html" target="_blank" rel="noopener">http://localhost:8080/druid/login.html</a></p>
 ]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
   </entry>
   <entry>
     <title>SpringBoot-整合JDBC</title>
@@ -673,6 +709,12 @@ Dao:<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class
 </ol>
 <h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><p>编写一个Controller，注入 jdbcTemplate，编写测试方法进行访问测试；</p>
 <figure class="highlight dart"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.springframework.beans.<span class="keyword">factory</span>.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.jdbc.core.JdbcTemplate;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.GetMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.PathVariable;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RestController;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"><span class="keyword">import</span> java.util.<span class="built_in">List</span>;</span><br><span class="line"><span class="keyword">import</span> java.util.<span class="built_in">Map</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/jdbc"</span>)</span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">JdbcController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment"><span class="markdown">/**</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     * </span>Spring Boot 默认提供了数据源，默认提供了 org.springframework.jdbc.core.JdbcTemplate</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     * </span>JdbcTemplate 中会自己注入数据源，用于简化 JDBC操作</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet">     * </span>还能避免一些常见的错误,使用起来也不用再自己来关闭数据库连接</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="code">     */</span></span></span></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    JdbcTemplate jdbcTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//查询employee表中所有数据</span></span><br><span class="line">    <span class="comment">//List 中的1个 Map 对应数据库的 1行数据</span></span><br><span class="line">    <span class="comment">//Map 中的 key 对应数据库的字段名，value 对应数据库的字段值</span></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/list"</span>)</span><br><span class="line">    public <span class="built_in">List</span>&lt;<span class="built_in">Map</span>&lt;<span class="built_in">String</span>, <span class="built_in">Object</span>&gt;&gt; userList()&#123;</span><br><span class="line">        <span class="built_in">String</span> sql = <span class="string">"select * from employee"</span>;</span><br><span class="line">        <span class="built_in">List</span>&lt;<span class="built_in">Map</span>&lt;<span class="built_in">String</span>, <span class="built_in">Object</span>&gt;&gt; maps = jdbcTemplate.queryForList(sql);</span><br><span class="line">        <span class="keyword">return</span> maps;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//新增一个用户</span></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/add"</span>)</span><br><span class="line">    public <span class="built_in">String</span> addUser()&#123;</span><br><span class="line">        <span class="comment">//插入语句，注意时间问题</span></span><br><span class="line">        <span class="built_in">String</span> sql = <span class="string">"insert into employee(last_name, email,gender,department,birth)"</span> +</span><br><span class="line">                <span class="string">" values ('FBK','123@qq.com',1,101,'"</span>+ <span class="keyword">new</span> Date().toLocaleString() +<span class="string">"')"</span>;</span><br><span class="line">        jdbcTemplate.update(sql);</span><br><span class="line">        <span class="comment">//查询</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"addOk"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//修改用户信息</span></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/update/&#123;id&#125;"</span>)</span><br><span class="line">    public <span class="built_in">String</span> updateUser(<span class="meta">@PathVariable</span>(<span class="string">"id"</span>) <span class="built_in">int</span> id)&#123;</span><br><span class="line">        <span class="comment">//插入语句</span></span><br><span class="line">        <span class="built_in">String</span> sql = <span class="string">"update employee set last_name=?,email=? where id="</span>+id;</span><br><span class="line">        <span class="comment">//数据</span></span><br><span class="line">        <span class="built_in">Object</span>[] objects = <span class="keyword">new</span> <span class="built_in">Object</span>[<span class="number">2</span>];</span><br><span class="line">        objects[<span class="number">0</span>] = <span class="string">"FBK"</span>;</span><br><span class="line">        objects[<span class="number">1</span>] = <span class="string">"123@sina.com"</span>;</span><br><span class="line">        jdbcTemplate.update(sql,objects);</span><br><span class="line">        <span class="comment">//查询</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"updateOk"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//删除用户</span></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/delete/&#123;id&#125;"</span>)</span><br><span class="line">    public <span class="built_in">String</span> delUser(<span class="meta">@PathVariable</span>(<span class="string">"id"</span>) <span class="built_in">int</span> id)&#123;</span><br><span class="line">        <span class="comment">//插入语句</span></span><br><span class="line">        <span class="built_in">String</span> sql = <span class="string">"delete from employee where id=?"</span>;</span><br><span class="line">        jdbcTemplate.update(sql,id);</span><br><span class="line">        <span class="comment">//查询</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"deleteOk"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
   </entry>
   <entry>
     <title>SpringBoot-整合MyBatis</title>
@@ -692,6 +734,12 @@ Dao:<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class
 <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">resource</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">directory</span>&gt;</span>src/main/java<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">include</span>&gt;</span>**/*.xml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">filtering</span>&gt;</span>true<span class="tag">&lt;/<span class="name">filtering</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">resource</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p>8、测试</p>
 <figure class="highlight less"><table><tr><td class="code"><pre><span class="line"><span class="variable">@RestController</span></span><br><span class="line">public class DepartmentController &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="variable">@Autowired</span></span><br><span class="line">    DepartmentMapper departmentMapper;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 查询全部部门</span></span><br><span class="line">    <span class="variable">@GetMapping</span>(<span class="string">"/getDepartments"</span>)</span><br><span class="line">    public List&lt;Department&gt; getDepartments()&#123;</span><br><span class="line">        <span class="selector-tag">return</span> <span class="selector-tag">departmentMapper</span><span class="selector-class">.getDepartments</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 查询全部部门</span></span><br><span class="line">    @<span class="selector-tag">GetMapping</span>(<span class="string">"/getDepartment/&#123;id&#125;"</span>)</span><br><span class="line">    <span class="selector-tag">public</span> <span class="selector-tag">Department</span> <span class="selector-tag">getDepartment</span>(<span class="variable">@PathVariable</span>(<span class="string">"id"</span>) Integer id)&#123;</span><br><span class="line">        <span class="selector-tag">return</span> <span class="selector-tag">departmentMapper</span><span class="selector-class">.getDepartment</span>(id);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
   </entry>
   <entry>
     <title>SpringBoot-概述</title>
@@ -702,6 +750,12 @@ Dao:<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class
 <h1 id="什么是SpringBoot"><a href="#什么是SpringBoot" class="headerlink" title="什么是SpringBoot"></a>什么是SpringBoot</h1><p>&emsp;&emsp;SpringBoot就是一个javaweb的开发框架，和SpringMVC类似，对比其他javaweb框架的好处，官方说是简化开发，约定大于配置，  you can “just run”，能迅速的开发web应用，几行代码开发一个http接口。<br>&emsp;&emsp;Spring Boot 基于 Spring 开发，Spirng Boot 本身并不提供 Spring 框架的核心特性以及扩展功能，只是用于快速、敏捷地开发新一代基于 Spring 框架的应用程序。也就是说，它并不是用来替代 Spring 的解决方案，而是和 Spring 框架紧密结合用于提升 Spring 开发者体验的工具。Spring Boot 以约定大于配置的核心思想，默认帮我们进行了很多设置，多数 Spring Boot 应用只需要很少的 Spring 配置。同时它集成了大量常用的第三方库配置（例如 Redis、MongoDB、Jpa、RabbitMQ、Quartz 等等），Spring Boot 应用中这些第三方库几乎可以零配置的开箱即用。<br>&emsp;&emsp;简单来说就是SpringBoot其实不是什么新的框架，它默认配置了很多框架的使用方式，就像maven整合了所有的jar包，spring boot整合了所有的框架 。</p>
 <h2 id="Spring-Boot的主要优点："><a href="#Spring-Boot的主要优点：" class="headerlink" title="Spring Boot的主要优点："></a>Spring Boot的主要优点：</h2><p>1、为所有Spring开发者更快的入门<br>2、开箱即用，提供各种默认配置来简化项目配置<br>3、内嵌式容器简化Web项目<br>4、没有冗余代码生成和XML配置的要求</p>
 ]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
   </entry>
   <entry>
     <title>SpringBoot-自动配置原理 </title>
@@ -726,6 +780,12 @@ Dao:<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class
 <figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="comment">#开启springboot的调试类</span></span><br><span class="line"><span class="attr">debug</span>=<span class="literal">true</span></span><br></pre></td></tr></table></figure>
 <p>Positive matches:（自动配置类启用的：正匹配）<br>Negative matches:（没有启动，没有匹配成功的自动配置类：负匹配）<br>Unconditional classes: （没有条件的类）</p>
 ]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
   </entry>
   <entry>
     <title>SpringMVC-异常</title>
@@ -831,6 +891,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>6、后端验证处理</p>
 <figure class="highlight less"><table><tr><td class="code"><pre><span class="line"><span class="comment">//定制记住我的参数！</span></span><br><span class="line"><span class="selector-tag">http</span><span class="selector-class">.rememberMe</span>()<span class="selector-class">.rememberMeParameter</span>(<span class="string">"remember"</span>);</span><br></pre></td></tr></table></figure>
 <h1 id="完整配置代码"><a href="#完整配置代码" class="headerlink" title="完整配置代码"></a>完整配置代码</h1><figure class="highlight less"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">org</span><span class="selector-class">.springframework</span><span class="selector-class">.security</span><span class="selector-class">.config</span><span class="selector-class">.annotation</span><span class="selector-class">.authentication</span><span class="selector-class">.builders</span><span class="selector-class">.AuthenticationManagerBuilder</span>;</span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">org</span><span class="selector-class">.springframework</span><span class="selector-class">.security</span><span class="selector-class">.config</span><span class="selector-class">.annotation</span><span class="selector-class">.web</span><span class="selector-class">.builders</span><span class="selector-class">.HttpSecurity</span>;</span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">org</span><span class="selector-class">.springframework</span><span class="selector-class">.security</span><span class="selector-class">.config</span><span class="selector-class">.annotation</span><span class="selector-class">.web</span><span class="selector-class">.configuration</span><span class="selector-class">.EnableWebSecurity</span>;</span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">org</span><span class="selector-class">.springframework</span><span class="selector-class">.security</span><span class="selector-class">.config</span><span class="selector-class">.annotation</span><span class="selector-class">.web</span><span class="selector-class">.configuration</span><span class="selector-class">.WebSecurityConfigurerAdapter</span>;</span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">org</span><span class="selector-class">.springframework</span><span class="selector-class">.security</span><span class="selector-class">.crypto</span><span class="selector-class">.bcrypt</span><span class="selector-class">.BCryptPasswordEncoder</span>;</span><br><span class="line"></span><br><span class="line">@<span class="selector-tag">EnableWebSecurity</span></span><br><span class="line"><span class="selector-tag">public</span> <span class="selector-tag">class</span> <span class="selector-tag">SecurityConfig</span> <span class="selector-tag">extends</span> <span class="selector-tag">WebSecurityConfigurerAdapter</span> &#123;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//定制请求的授权规则</span></span><br><span class="line">   <span class="variable">@Override</span></span><br><span class="line">   protected void configure(HttpSecurity http) throws Exception &#123;</span><br><span class="line"></span><br><span class="line">       <span class="selector-tag">http</span><span class="selector-class">.authorizeRequests</span>()<span class="selector-class">.antMatchers</span>(<span class="string">"/"</span>)<span class="selector-class">.permitAll</span>()</span><br><span class="line">      <span class="selector-class">.antMatchers</span>(<span class="string">"/level1/**"</span>)<span class="selector-class">.hasRole</span>(<span class="string">"vip1"</span>)</span><br><span class="line">      <span class="selector-class">.antMatchers</span>(<span class="string">"/level2/**"</span>)<span class="selector-class">.hasRole</span>(<span class="string">"vip2"</span>)</span><br><span class="line">      <span class="selector-class">.antMatchers</span>(<span class="string">"/level3/**"</span>)<span class="selector-class">.hasRole</span>(<span class="string">"vip3"</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">       <span class="comment">//开启自动配置的登录功能：如果没有权限，就会跳转到登录页面！</span></span><br><span class="line">           <span class="comment">// /login 请求来到登录页</span></span><br><span class="line">           <span class="comment">// /login?error 重定向到这里表示登录失败</span></span><br><span class="line">       <span class="selector-tag">http</span><span class="selector-class">.formLogin</span>()</span><br><span class="line">          <span class="selector-class">.usernameParameter</span>(<span class="string">"username"</span>)</span><br><span class="line">          <span class="selector-class">.passwordParameter</span>(<span class="string">"password"</span>)</span><br><span class="line">          <span class="selector-class">.loginPage</span>(<span class="string">"/toLogin"</span>)</span><br><span class="line">          <span class="selector-class">.loginProcessingUrl</span>(<span class="string">"/login"</span>); <span class="comment">// 登陆表单提交请求</span></span><br><span class="line"></span><br><span class="line">       <span class="comment">//开启自动配置的注销的功能</span></span><br><span class="line">           <span class="comment">// /logout 注销请求</span></span><br><span class="line">           <span class="comment">// .logoutSuccessUrl("/"); 注销成功来到首页</span></span><br><span class="line"></span><br><span class="line">       <span class="selector-tag">http</span><span class="selector-class">.csrf</span>()<span class="selector-class">.disable</span>();<span class="comment">//关闭csrf功能:跨站请求伪造,默认只能通过post方式提交logout请求</span></span><br><span class="line">       <span class="selector-tag">http</span><span class="selector-class">.logout</span>()<span class="selector-class">.logoutSuccessUrl</span>(<span class="string">"/"</span>);</span><br><span class="line"></span><br><span class="line">       <span class="comment">//记住我</span></span><br><span class="line">       <span class="selector-tag">http</span><span class="selector-class">.rememberMe</span>()<span class="selector-class">.rememberMeParameter</span>(<span class="string">"remember"</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//定义认证规则</span></span><br><span class="line">   @<span class="selector-tag">Override</span></span><br><span class="line">   <span class="selector-tag">protected</span> <span class="selector-tag">void</span> <span class="selector-tag">configure</span>(AuthenticationManagerBuilder auth) <span class="selector-tag">throws</span> <span class="selector-tag">Exception</span> &#123;</span><br><span class="line">       <span class="comment">//在内存中定义，也可以在jdbc中去拿....</span></span><br><span class="line">       <span class="comment">//Spring security 5.0中新增了多种加密方式，也改变了密码的格式。</span></span><br><span class="line">       <span class="comment">//要想我们的项目还能够正常登陆，需要修改一下configure中的代码。我们要将前端传过来的密码进行某种方式加密</span></span><br><span class="line">       <span class="comment">//spring security 官方推荐的是使用bcrypt加密方式。</span></span><br><span class="line"></span><br><span class="line">       <span class="selector-tag">auth</span><span class="selector-class">.inMemoryAuthentication</span>()<span class="selector-class">.passwordEncoder</span>(new BCryptPasswordEncoder())</span><br><span class="line">              <span class="selector-class">.withUser</span>(<span class="string">"kuangshen"</span>)<span class="selector-class">.password</span>(new BCryptPasswordEncoder().encode(<span class="string">"123456"</span>))<span class="selector-class">.roles</span>(<span class="string">"vip2"</span>,<span class="string">"vip3"</span>)</span><br><span class="line">              <span class="selector-class">.and</span>()</span><br><span class="line">              <span class="selector-class">.withUser</span>(<span class="string">"root"</span>)<span class="selector-class">.password</span>(new BCryptPasswordEncoder().encode(<span class="string">"123456"</span>))<span class="selector-class">.roles</span>(<span class="string">"vip1"</span>,<span class="string">"vip2"</span>,<span class="string">"vip3"</span>)</span><br><span class="line">              <span class="selector-class">.and</span>()</span><br><span class="line">              <span class="selector-class">.withUser</span>(<span class="string">"guest"</span>)<span class="selector-class">.password</span>(new BCryptPasswordEncoder().encode(<span class="string">"123456"</span>))<span class="selector-class">.roles</span>(<span class="string">"vip1"</span>,<span class="string">"vip2"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
   </entry>
   <entry>
     <title>SpringMVC-接收参数</title>
@@ -1051,6 +1117,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 引入swagger-ui-layer包 /docs.html--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.github.caspar-chen<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>swagger-ui-layer<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.1.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p>4、mg-ui   访问 <a href="http://localhost:8080/document.html" target="_blank" rel="noopener">http://localhost:8080/document.html</a></p>
 <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 引入swagger-ui-layer包 /document.html--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.zyplayer<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>swagger-mg-ui<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
   </entry>
   <entry>
     <title>SpringBoot-异步、定时、邮件任务 </title>
@@ -1100,5 +1172,88 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring.mail.username</span>=<span class="number">1111</span>@qq.com</span><br><span class="line"><span class="attr">spring.mail.password</span>=你的qq授权码</span><br><span class="line"><span class="attr">spring.mail.host</span>=smtp.qq.com</span><br><span class="line"><span class="comment"># qq需要配置ssl</span></span><br><span class="line"><span class="attr">spring.mail.properties.mail.smtp.ssl.enable</span>=<span class="literal">true</span></span><br></pre></td></tr></table></figure>
 <p>获取授权码：在QQ邮箱中的设置-&gt;账户-&gt;开启pop3和smtp服务<br>4、Spring单元测试</p>
 <figure class="highlight reasonml"><table><tr><td class="code"><pre><span class="line">@Autowired</span><br><span class="line">JavaMailSenderImpl mailSender;</span><br><span class="line"></span><br><span class="line">@Test</span><br><span class="line">public void context<span class="constructor">Loads()</span> &#123;</span><br><span class="line">   <span class="comment">//邮件设置1：一个简单的邮件</span></span><br><span class="line">   SimpleMailMessage message = <span class="keyword">new</span> <span class="constructor">SimpleMailMessage()</span>;</span><br><span class="line">   message.set<span class="constructor">Subject(<span class="string">"通知"</span>)</span>;</span><br><span class="line">   message.set<span class="constructor">Text(<span class="string">"今晚7:30开会"</span>)</span>;</span><br><span class="line"></span><br><span class="line">   message.set<span class="constructor">To(<span class="string">"1111@qq.com"</span>)</span>;</span><br><span class="line">   message.set<span class="constructor">From(<span class="string">"1111@qq.com"</span>)</span>;</span><br><span class="line">   mailSender.send(message);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@Test</span><br><span class="line">public void context<span class="constructor">Loads2()</span> throws MessagingException &#123;</span><br><span class="line">   <span class="comment">//邮件设置2：一个复杂的邮件</span></span><br><span class="line">   MimeMessage mimeMessage = mailSender.create<span class="constructor">MimeMessage()</span>;</span><br><span class="line">   MimeMessageHelper helper = <span class="keyword">new</span> <span class="constructor">MimeMessageHelper(<span class="params">mimeMessage</span>, <span class="params">true</span>)</span>;</span><br><span class="line"></span><br><span class="line">   helper.set<span class="constructor">Subject(<span class="string">"通知"</span>)</span>;</span><br><span class="line">   helper.set<span class="constructor">Text(<span class="string">"&lt;b style='color:red'&gt;今天 7:30来开会&lt;/b&gt;"</span>,<span class="params">true</span>)</span>;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//发送附件</span></span><br><span class="line">   helper.add<span class="constructor">Attachment(<span class="string">"1.jpg"</span>,<span class="params">new</span> File(<span class="string">""</span>)</span>);</span><br><span class="line">   helper.add<span class="constructor">Attachment(<span class="string">"2.jpg"</span>,<span class="params">new</span> File(<span class="string">""</span>)</span>);</span><br><span class="line"></span><br><span class="line">   helper.set<span class="constructor">To(<span class="string">"1111@qq.com"</span>)</span>;</span><br><span class="line">   helper.set<span class="constructor">From(<span class="string">"1111@qq.com"</span>)</span>;</span><br><span class="line"></span><br><span class="line">   mailSender.send(mimeMessage);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>SpringBoot</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Git-简单使用</title>
+    <url>/2020/08/29/Git-%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[<h1 id="什么是版本控制"><a href="#什么是版本控制" class="headerlink" title="什么是版本控制"></a>什么是版本控制</h1><p>版本控制（Revision control）是一种在开发的过程中用于管理我们对文件、目录或工程等内容的修改历史，方便查看更改历史记录，备份以便恢复以前的版本的软件工程技术。    </p>
+<ul>
+<li>实现跨区域多人协同开发</li>
+<li>追踪和记载一个或者多个文件的历史记录</li>
+<li>组织和保护你的源代码和文档</li>
+<li>统计工作量</li>
+<li>并行开发、提高开发效率</li>
+<li>跟踪记录整个软件的开发过程</li>
+<li>减轻开发人员的负担，节省时间，同时降低人为错误<a id="more"></a>
+简单说就是用于管理多人协同开发项目的技术。    </li>
+</ul>
+<p>没有进行版本控制或者版本控制本身缺乏正确的流程管理，在软件开发过程中将会引入很多问题，如软件代码的一致性、软件内容的冗余、软件过程的事物性、软件开发过程中的并发性、软件源代码的安全性，以及软件的整合等问题。    </p>
+<p>无论是工作还是学习，或者是自己做笔记，都经历过这样一个阶段！我们就迫切需要一个版本控制工具！    </p>
+<h1 id="常见的版本控制工具"><a href="#常见的版本控制工具" class="headerlink" title="常见的版本控制工具"></a>常见的版本控制工具</h1><ul>
+<li>Git</li>
+<li>SVN（Subversion）</li>
+<li>CVS（Concurrent Versions System）</li>
+<li>VSS（Micorosoft Visual SourceSafe）</li>
+<li>TFS（Team Foundation Server）</li>
+<li>Visual Studio Online</li>
+</ul>
+<p>版本控制产品非常的多（Perforce、Rational ClearCase、RCS（GNU Revision Control System）、Serena Dimention、SVK、BitKeeper、Monotone、Bazaar、Mercurial、SourceGear Vault），现在影响力最大且使用最广泛的是Git与SVN    </p>
+<h1 id="版本控制分类"><a href="#版本控制分类" class="headerlink" title="版本控制分类"></a>版本控制分类</h1><p>1、本地版本控制<br>记录文件每次的更新，可以对每个版本做一个快照，或是记录补丁文件，适合个人用，如RCS。<br>2、集中版本控制  SVN<br>所有的版本数据都保存在服务器上，协同开发者从服务器上同步更新或上传自己的修改<br>所有的版本数据都存在服务器上，用户的本地只有自己以前所同步的版本，如果不连网的话，用户就看不到历史版本，也无法切换版本验证问题，或在不同分支工作。而且，所有数据都保存在单一的服务器上，有很大的风险这个服务器会损坏，这样就会丢失所有的数据，当然可以定期备份。代表产品：SVN、CVS、VSS<br>3、分布式版本控制Git<br>每个人都拥有全部的代码！安全隐患！<br>所有版本信息仓库全部同步到本地的每个用户，这样就可以在本地查看所有版本历史，可以离线在本地提交，只需在连网时push到相应的服务器或其他用户那里。由于每个用户那里保存的都是所有的版本数据，只要有一个用户的设备没有问题就可以恢复所有的数据，但这增加了本地存储空间的占用。<br>不会因为服务器损坏或者网络问题，造成不能工作的情况！    </p>
+<h1 id="Git与SVN的主要区别"><a href="#Git与SVN的主要区别" class="headerlink" title="Git与SVN的主要区别"></a>Git与SVN的主要区别</h1><p>SVN是集中式版本控制系统，版本库是集中放在中央服务器的，而工作的时候，用的都是自己的电脑，所以首先要从中央服务器得到最新的版本，然后工作，完成工作后，需要把自己做完的活推送到中央服务器。集中式版本控制系统是必须联网才能工作，对网络带宽要求较高。    </p>
+<p>Git是分布式版本控制系统，没有中央服务器，每个人的电脑就是一个完整的版本库，工作的时候不需要联网了，因为版本都在自己电脑上。协同的方法是这样的：比如说自己在电脑上改了文件A，其他人也在电脑上改了文件A，这时，你们两之间只需把各自的修改推送给对方，就可以互相看到对方的修改了。Git可以直接看到更新了哪些代码和文件！<br>Git是目前世界上最先进的分布式版本控制系统。    </p>
+<h1 id="Git基本理论"><a href="#Git基本理论" class="headerlink" title="Git基本理论"></a>Git基本理论</h1><h2 id="三个区域"><a href="#三个区域" class="headerlink" title="三个区域"></a>三个区域</h2><p>Git本地有三个工作区域：工作目录（Working Directory）、暂存区(Stage/Index)、资源库(Repository或Git Directory)。如果在加上远程的git仓库(Remote Directory)就可以分为四个工作区域。文件在这四个区域之间的转换关系如下：    </p>
+<ul>
+<li>Workspace：工作区，就是你平时存放项目代码的地方</li>
+<li>Index / Stage：暂存区，用于临时存放你的改动，事实上它只是一个文件，保存即将提交到文件列表信息</li>
+<li>Repository：仓库区（或本地仓库），就是安全存放数据的位置，这里面有你提交到所有版本的数据。其中HEAD指向最新放入仓库的版本</li>
+<li>Remote：远程仓库，托管代码的服务器，可以简单的认为是你项目组中的一台电脑用于远程数据交换</li>
+</ul>
+<p>本地的三个区域确切的说应该是git仓库中HEAD指向的版本：</p>
+<ul>
+<li>Directory：使用Git管理的一个目录，也就是一个仓库，包含我们的工作空间和Git的管理空间。</li>
+<li>WorkSpace：需要通过Git进行版本控制的目录和文件，这些目录和文件组成了工作空间。</li>
+<li>.git：存放Git管理信息的目录，初始化仓库的时候自动创建。</li>
+<li>Index/Stage：暂存区，或者叫待提交更新区，在提交进入repo之前，我们可以把所有的更新放在暂存区。</li>
+<li>Local Repo：本地仓库，一个存放在本地的版本库；HEAD会只是当前的开发分支（branch）。</li>
+<li>Stash：隐藏，是一个工作状态保存栈，用于保存/恢复WorkSpace中的临时状态。    </li>
+</ul>
+<h2 id="工作流程"><a href="#工作流程" class="headerlink" title="工作流程"></a>工作流程</h2><p>git的工作流程一般是这样的：<br>１、在工作目录中添加、修改文件；<br>２、将需要进行版本管理的文件放入暂存区域；<br>３、将暂存区域的文件提交到git仓库。<br>因此，git管理的文件有三种状态：已修改（modified）,已暂存（staged）,已提交(committed)    </p>
+<h1 id="Git项目搭建"><a href="#Git项目搭建" class="headerlink" title="Git项目搭建"></a>Git项目搭建</h1><h2 id="本地仓库搭建"><a href="#本地仓库搭建" class="headerlink" title="本地仓库搭建"></a>本地仓库搭建</h2><p>创建本地仓库的方法有两种：一种是创建全新的仓库，另一种是克隆远程仓库。<br>1、创建全新的仓库，需要用GIT管理的项目的根目录执行：    </p>
+<figure class="highlight elixir"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 在当前目录新建一个Git代码库</span></span><br><span class="line"><span class="variable">$ </span>git init</span><br></pre></td></tr></table></figure>
+<p>2、执行后可以看到，仅仅在项目目录多出了一个.git目录，关于版本等的所有信息都在这个目录里面。</p>
+<h2 id="克隆远程仓库"><a href="#克隆远程仓库" class="headerlink" title="克隆远程仓库"></a>克隆远程仓库</h2><p>1、另一种方式是克隆远程目录，由于是将远程服务器上的仓库完全镜像一份至本地！    </p>
+<figure class="highlight crmsh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 克隆一个项目和它的整个代码历史(版本信息)</span></span><br><span class="line">$ git <span class="keyword">clone</span> <span class="title">[url</span>]  <span class="comment"># https://gitee.com/fubuking/openclass.git</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="Git文件操作"><a href="#Git文件操作" class="headerlink" title="Git文件操作"></a>Git文件操作</h1><h2 id="文件的四种状态"><a href="#文件的四种状态" class="headerlink" title="文件的四种状态"></a>文件的四种状态</h2><p>版本控制就是对文件的版本控制，要对文件进行修改、提交等操作，首先要知道文件当前在什么状态，不然可能会提交了现在还不想提交的文件，或者要提交的文件没提交上。    </p>
+<ul>
+<li>Untracked: 未跟踪, 此文件在文件夹中, 但并没有加入到git库, 不参与版本控制. 通过git add 状态变为Staged.</li>
+<li>Unmodify: 文件已经入库, 未修改, 即版本库中的文件快照内容与文件夹中完全一致. 这种类型的文件有两种去处, 如果它被修改, 而变为Modified. 如果使用git rm移出版本库, 则成为Untracked文件</li>
+<li>Modified: 文件已修改, 仅仅是修改, 并没有进行其他的操作. 这个文件也有两个去处, 通过git add可进入暂存staged状态, 使用git checkout 则丢弃修改过, 返回到unmodify状态, 这个git checkout即从库中取出文件, 覆盖当前修改 !</li>
+<li>Staged: 暂存状态. 执行git commit则将修改同步到库中, 这时库中的文件和本地文件又变为一致, 文件为Unmodify状态. 执行git reset HEAD filename取消暂存, 文件状态为Modified</li>
+</ul>
+<h2 id="查看文件状态"><a href="#查看文件状态" class="headerlink" title="查看文件状态"></a>查看文件状态</h2><p>上面说文件有4种状态，通过如下命令可以查看到文件的状态：</p>
+<figure class="highlight vala"><table><tr><td class="code"><pre><span class="line"><span class="meta">#查看指定文件状态</span></span><br><span class="line">git status [filename]</span><br><span class="line"></span><br><span class="line"><span class="meta">#查看所有文件状态</span></span><br><span class="line">git status</span><br><span class="line"></span><br><span class="line"><span class="meta"># git add .                  添加所有文件到暂存区</span></span><br><span class="line"><span class="meta"># git commit -m "消息内容"    提交暂存区中的内容到本地仓库 -m 提交信息</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="忽略文件"><a href="#忽略文件" class="headerlink" title="忽略文件"></a>忽略文件</h2><p>有些时候我们不想把某些文件纳入版本控制中，比如数据库文件，临时文件，设计文件等<br>在主目录下建立”.gitignore”文件，此文件有如下规则：</p>
+<ol>
+<li>忽略文件中的空行或以井号（#）开始的行将会被忽略。</li>
+<li>可以使用Linux通配符。例如：星号（*）代表任意多个字符，问号（？）代表一个字符，方括号（[abc]）代表可选字符范围，大括号（{string1,string2,…}）代表可选的字符串等。</li>
+<li>如果名称的最前面有一个感叹号（!），表示例外规则，将不被忽略。</li>
+<li>如果名称的最前面是一个路径分隔符（/），表示要忽略的文件在此目录下，而子目录中的文件不忽略。</li>
+<li>如果名称的最后面是一个路径分隔符（/），表示要忽略的是此目录下该名称的子目录，而非文件（默认文件或目录都忽略）。<figure class="highlight crystal"><table><tr><td class="code"><pre><span class="line"><span class="comment">#为注释</span></span><br><span class="line">*.txt        <span class="comment">#忽略所有 .txt结尾的文件,这样的话上传就不会被选中！</span></span><br><span class="line">!<span class="class"><span class="keyword">lib</span>.<span class="title">txt</span>     <span class="comment">#但lib.txt除外</span></span></span><br><span class="line">/temp        <span class="comment">#仅忽略项目根目录下的TODO文件,不包括其它目录temp</span></span><br><span class="line">build/       <span class="comment">#忽略build/目录下的所有文件</span></span><br><span class="line">doc/*.txt    <span class="comment">#会忽略 doc/notes.txt 但不包括 doc/server/arch.txt</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+]]></content>
+      <categories>
+        <category>Git</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
+      </tags>
   </entry>
 </search>
