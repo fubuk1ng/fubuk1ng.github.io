@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="简单工厂模式需求实例披萨项目：要便于披萨种类的扩展，要便于维护     1)    披萨的种类很多(比如 GreekPizz、CheesePizz 等)2)    披萨的制作有 prepare，bake, cut, box3)    完成披萨店订购功能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式-工厂模式">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="简单工厂模式需求实例披萨项目：要便于披萨种类的扩展，要便于维护     1)    披萨的种类很多(比如 GreekPizz、CheesePizz 等)2)    披萨的制作有 prepare，bake, cut, box3)    完成披萨店订购功能">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/1.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/2.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/3.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/4.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/5.jpg">
+<meta property="article:published_time" content="2020-10-12T10:59:27.000Z">
+<meta property="article:modified_time" content="2020-10-12T11:25:13.392Z">
+<meta property="article:author" content="fubuking">
+<meta property="article:tag" content="设计模式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://fubuk1ng.github.io/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/1.jpg">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>设计模式-工厂模式 | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">37</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          设计模式-工厂模式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-10-12 18:59:27 / 修改时间：19:25:13" itemprop="dateCreated datePublished" datetime="2020-10-12T18:59:27+08:00">2020-10-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简单工厂模式"><a href="#简单工厂模式" class="headerlink" title="简单工厂模式"></a>简单工厂模式</h1><h2 id="需求实例"><a href="#需求实例" class="headerlink" title="需求实例"></a>需求实例</h2><p>披萨项目：要便于披萨种类的扩展，要便于维护    </p>
+<p>1)    披萨的种类很多(比如 GreekPizz、CheesePizz 等)<br>2)    披萨的制作有 prepare，bake, cut, box<br>3)    完成披萨店订购功能</p>
+<a id="more"></a>
+<h2 id="使用传统的方式来完成"><a href="#使用传统的方式来完成" class="headerlink" title="使用传统的方式来完成"></a>使用传统的方式来完成</h2><p>1)    思路分析(类图)<br><img src="/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/1.jpg" alt="01"><br>编写 OrderPizza.java 去订购需要的各种 Pizza</p>
+<p>2)    代码演示</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public class OrderPizza &#123;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="regexp">//</span> 构造器</span><br><span class="line"><span class="regexp">//</span>	public OrderPizza() &#123;</span><br><span class="line"><span class="regexp">//</span>	Pizza pizza = null;</span><br><span class="line"><span class="regexp">//</span>	String orderType; <span class="regexp">//</span>  订购披萨的类型</span><br><span class="line"><span class="regexp">//</span>	<span class="keyword">do</span> &#123;</span><br><span class="line"><span class="regexp">//</span>	orderType = getType();</span><br><span class="line"><span class="regexp">//</span>	<span class="keyword">if</span> (orderType.equals(<span class="string">"greek"</span>)) &#123;</span><br><span class="line"><span class="regexp">//</span>	pizza = new GreekPizza();</span><br><span class="line"><span class="regexp">//</span>	pizza.setName(<span class="string">" 希腊披萨 "</span>);</span><br><span class="line"><span class="regexp">//</span>	&#125; <span class="keyword">else</span> <span class="keyword">if</span> (orderType.equals(<span class="string">"cheese"</span>)) &#123;</span><br><span class="line"><span class="regexp">//</span>	pizza = new CheesePizza();</span><br><span class="line"><span class="regexp">//</span>	pizza.setName(<span class="string">" 奶酪披萨 "</span>);</span><br><span class="line"><span class="regexp">//</span>	&#125; <span class="keyword">else</span> <span class="keyword">if</span> (orderType.equals(<span class="string">"pepper"</span>)) &#123;</span><br><span class="line"><span class="regexp">//</span>	pizza = new PepperPizza();</span><br><span class="line"><span class="regexp">//</span>	pizza.setName(<span class="string">"胡椒披萨"</span>);</span><br><span class="line"><span class="regexp">//</span>	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line"><span class="regexp">//</span>	<span class="keyword">break</span>;</span><br><span class="line"><span class="regexp">//</span>	&#125;</span><br><span class="line"><span class="regexp">//</span>	<span class="regexp">//</span>输出 pizza 制作过程</span><br><span class="line"><span class="regexp">//</span>	pizza.prepare();</span><br><span class="line"><span class="regexp">//</span>	pizza.bake();</span><br><span class="line"><span class="regexp">//</span>	pizza.cut();</span><br><span class="line"><span class="regexp">//</span>	pizza.box();</span><br><span class="line"><span class="regexp">//</span></span><br><span class="line"><span class="regexp">//</span>	&#125; <span class="keyword">while</span> (true);</span><br><span class="line"><span class="regexp">//</span>	&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="传统的方式的优缺点"><a href="#传统的方式的优缺点" class="headerlink" title="传统的方式的优缺点"></a>传统的方式的优缺点</h2><p>1)    优点是比较好理解，简单易操作。    </p>
+<p>2)    缺点是违反了设计模式的 ocp 原则，即对扩展开放，对修改关闭。即当我们给类增加新功能的时候，尽量不修改代码，或者尽可能少修改代码.    </p>
+<p>3)    比如我们这时要新增加一个 Pizza 的种类(Pepper 披萨)，我们需要做如下修改. 如果我们增加一个 Pizza 类，只要是订购 Pizza 的代码都需要修改<br><img src="/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/2.jpg" alt="02"><br>4)    改进的思路分析<br>分析：修改代码可以接受，但是如果我们在其它的地方也有创建 Pizza 的代码，就意味着，也需要修改，而创建 Pizza<br>的代码，往往有多处。<br>思路：把创建 Pizza 对象封装到一个类中，这样我们有新的 Pizza 种类时，只需要修改该类就可，其它有创建到 Pizza<br>对象的代码就不需要修改了 -&gt; 简单工厂模式</p>
+<h2 id="基本介绍"><a href="#基本介绍" class="headerlink" title="基本介绍"></a>基本介绍</h2><p>1)    简单工厂模式是属于创建型模式，是工厂模式的一种。简单工厂模式是由一个工厂对象决定创建出哪一种产品类的实例。简单工厂模式是工厂模式家族中最简单实用的模式</p>
+<p>2)    简单工厂模式：定义了一个创建对象的类，由这个类来封装实例化对象的行为(代码)</p>
+<p>3)    在软件开发中，当我们会用到大量的创建某种、某类或者某批对象时，就会使用到工厂模式</p>
+<h2 id="使用简单工厂模式"><a href="#使用简单工厂模式" class="headerlink" title="使用简单工厂模式"></a>使用简单工厂模式</h2><p>1)    简单工厂模式的设计方案: 定义一个可以实例化 Pizaa 对象的类，封装创建对象的代码。<br><img src="/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/3.jpg" alt="03"><br>2)    代码示例</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">//简单工厂类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleFactory</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="comment">//更加 orderType 返回对应的 Pizza 对象</span></span><br><span class="line"><span class="keyword">public</span> Pizza createPizza(<span class="keyword">String</span> orderType) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Pizza pizza = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">System.out.println(<span class="string">"使用简单工厂模式"</span>); <span class="keyword">if</span> (orderType.equals(<span class="string">"greek"</span>)) &#123;</span><br><span class="line">pizza = <span class="keyword">new</span> <span class="type">GreekPizza</span>();</span><br><span class="line">pizza.setName(<span class="string">" 希腊披萨 "</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (orderType.equals(<span class="string">"cheese"</span>)) &#123; pizza = <span class="keyword">new</span> <span class="type">CheesePizza</span>();</span><br><span class="line">pizza.setName(<span class="string">" 奶酪披萨 "</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (orderType.equals(<span class="string">"pepper"</span>)) &#123; pizza = <span class="keyword">new</span> <span class="type">PepperPizza</span>();</span><br><span class="line">pizza.setName(<span class="string">"胡椒披萨"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> pizza;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//简单工厂模式 也叫 静态工厂模式</span></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> Pizza createPizza2(<span class="keyword">String</span> orderType) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Pizza pizza = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">System.out.println(<span class="string">"使用简单工厂模式 2"</span>); <span class="keyword">if</span> (orderType.equals(<span class="string">"greek"</span>)) &#123;</span><br><span class="line">pizza = <span class="keyword">new</span> <span class="type">GreekPizza</span>();</span><br><span class="line">pizza.setName(<span class="string">" 希腊披萨 "</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (orderType.equals(<span class="string">"cheese"</span>)) &#123; pizza = <span class="keyword">new</span> <span class="type">CheesePizza</span>();</span><br><span class="line">pizza.setName(<span class="string">" 奶酪披萨 "</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (orderType.equals(<span class="string">"pepper"</span>)) &#123; pizza = <span class="keyword">new</span> <span class="type">PepperPizza</span>();</span><br><span class="line">pizza.setName(<span class="string">"胡椒披萨"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> pizza;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//OrderPizza.java</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> com.atguigu.factory.simplefactory.pizzastore.order;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.BufferedReader;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException; <span class="keyword">import</span> java.io.InputStreamReader;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.atguigu.factory.simplefactory.pizzastore.pizza.Pizza;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderPizza</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 构造器</span></span><br><span class="line"><span class="comment">//	public OrderPizza() &#123;</span></span><br><span class="line"><span class="comment">//	Pizza pizza = null;</span></span><br><span class="line"><span class="comment">//	String orderType; //  订购披萨的类型</span></span><br><span class="line"><span class="comment">//	do &#123;</span></span><br><span class="line"><span class="comment">//	orderType = getType();</span></span><br><span class="line"><span class="comment">//	if (orderType.equals("greek")) &#123;</span></span><br><span class="line"><span class="comment">//	pizza = new GreekPizza();</span></span><br><span class="line"><span class="comment">//	pizza.setName(" 希腊披萨 ");</span></span><br><span class="line"><span class="comment">//	&#125; else if (orderType.equals("cheese")) &#123;</span></span><br><span class="line"><span class="comment">//	pizza = new CheesePizza();</span></span><br><span class="line"><span class="comment">//	pizza.setName(" 奶酪披萨 ");</span></span><br><span class="line"><span class="comment">//	&#125; else if (orderType.equals("pepper")) &#123;</span></span><br><span class="line"><span class="comment">//	pizza = new PepperPizza();</span></span><br><span class="line"><span class="comment">//	pizza.setName("胡椒披萨");</span></span><br><span class="line"><span class="comment">//	&#125; else &#123;</span></span><br><span class="line"><span class="comment">//	break;</span></span><br><span class="line"><span class="comment">//	&#125;</span></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="comment">//	//输出 pizza 制作过程</span></span><br><span class="line"><span class="comment">//	pizza.prepare();</span></span><br><span class="line"><span class="comment">//	pizza.bake();</span></span><br><span class="line"><span class="comment">//	pizza.cut();</span></span><br><span class="line"><span class="comment">//	pizza.box();</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//	&#125; while (true);</span></span><br><span class="line"><span class="comment">//	&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//定义一个简单工厂对象SimpleFactory simpleFactory; Pizza pizza = null;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//构造器</span></span><br><span class="line"><span class="keyword">public</span> OrderPizza(SimpleFactory simpleFactory) &#123; setFactory(simpleFactory);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> void setFactory(SimpleFactory simpleFactory) &#123;</span><br><span class="line"><span class="keyword">String</span> orderType = <span class="string">""</span>; <span class="comment">//用户输入的</span></span><br><span class="line"><span class="built_in">this</span>.simpleFactory = simpleFactory; <span class="comment">//设置简单工厂对象do &#123;</span></span><br><span class="line">orderType = getType();</span><br><span class="line">pizza = <span class="built_in">this</span>.simpleFactory.createPizza(orderType);</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//输出 pizza</span></span><br><span class="line"><span class="keyword">if</span>(pizza != <span class="literal">null</span>) &#123; <span class="comment">//订购成功</span></span><br><span class="line">pizza.prepare(); pizza.bake();</span><br><span class="line">pizza.cut();</span><br><span class="line">pizza.box();</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">System.out.println(<span class="string">" 订购披萨失败 "</span>); <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br><span class="line">&#125;<span class="keyword">while</span>(<span class="literal">true</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写一个方法，可以获取客户希望订购的披萨种类</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">String</span> getType() &#123; <span class="keyword">try</span> &#123;</span><br><span class="line">BufferedReader strin = <span class="keyword">new</span> <span class="type">BufferedReader</span>(<span class="keyword">new</span> <span class="type">InputStreamReader</span>(System.<span class="keyword">in</span>)); System.out.println(<span class="string">"input pizza 种类:"</span>);</span><br><span class="line"><span class="keyword">String</span> str = strin.readLine();</span><br><span class="line"><span class="keyword">return</span> str;</span><br><span class="line">&#125; <span class="keyword">catch</span> (IOException e) &#123; e.printStackTrace(); <span class="keyword">return</span> <span class="string">""</span>;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="工厂方法模式"><a href="#工厂方法模式" class="headerlink" title="工厂方法模式"></a>工厂方法模式</h1><h2 id="新的需求"><a href="#新的需求" class="headerlink" title="新的需求"></a>新的需求</h2><p>披萨项目新的需求：客户在点披萨时，可以点不同口味的披萨，比如 北京的奶酪 pizza、北京的胡椒 pizza 或者是伦敦的奶酪 pizza、伦敦的胡椒 pizza。</p>
+<h2 id="思路-1"><a href="#思路-1" class="headerlink" title="思路 1"></a>思路 1</h2><p>使用简单工厂模式，创建不同的简单工厂类，比如 BJPizzaSimpleFactory、LDPizzaSimpleFactory 等等.从当前这个案例来说，也是可以的，但是考虑到项目的规模，以及软件的可维护性、可扩展性并不是特别好</p>
+<h2 id="思路-2"><a href="#思路-2" class="headerlink" title="思路 2"></a>思路 2</h2><p>使用工厂方法模式</p>
+<h2 id="工厂方法模式介绍"><a href="#工厂方法模式介绍" class="headerlink" title="工厂方法模式介绍"></a>工厂方法模式介绍</h2><p>1)    工厂方法模式设计方案：将披萨项目的实例化功能抽象成抽象方法，在不同的口味点餐子类中具体实现。    </p>
+<p>2)    工厂方法模式：定义了一个创建对象的抽象方法，由子类决定要实例化的类。工厂方法模式将对象的实例化推迟到子类。</p>
+<h2 id="工厂方法模式应用案例"><a href="#工厂方法模式应用案例" class="headerlink" title="工厂方法模式应用案例"></a>工厂方法模式应用案例</h2><p>1)    披萨项目新的需求：客户在点披萨时，可以点不同口味的披萨，比如 北京的奶酪 pizza、北京的胡椒 pizza 或者是伦敦的奶酪 pizza、伦敦的胡椒 pizza</p>
+<p>2)    思路分析图解<br><img src="/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/4.jpg" alt="04"><br>3)    代码实现</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//OrderPizza.java 类</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> com.atguigu.factory.factorymethod.pizzastore.order;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.<span class="type">BufferedReader</span>; <span class="keyword">import</span> java.io.<span class="type">IOException</span>; <span class="keyword">import</span> java.io.<span class="type">InputStreamReader</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.atguigu.factory.factorymethod.pizzastore.pizza.<span class="type">Pizza</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderPizza</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="comment">//定义一个抽象方法，createPizza ,  让各个工厂子类自己实现</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="type">Pizza</span> createPizza(<span class="type">String</span> orderType);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 构造器</span></span><br><span class="line">public <span class="type">OrderPizza</span>() &#123; <span class="type">Pizza</span> pizza = <span class="literal">null</span>;</span><br><span class="line"><span class="type">String</span> orderType; <span class="comment">//  订购披萨的类型</span></span><br><span class="line">do &#123;</span><br><span class="line">orderType = getType();</span><br><span class="line">pizza = createPizza(orderType); <span class="comment">//抽象方法，由工厂子类完成</span></span><br><span class="line"><span class="comment">//输出 pizza 制作过程</span></span><br><span class="line">pizza.prepare(); pizza.bake();</span><br><span class="line">pizza.cut();</span><br><span class="line">pizza.box();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="literal">true</span>);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="comment">// 写一个方法，可以获取客户希望订购的披萨种类</span></span><br><span class="line"><span class="keyword">private</span> <span class="type">String</span> getType() &#123; <span class="keyword">try</span> &#123;</span><br><span class="line"><span class="type">BufferedReader</span> strin = <span class="keyword">new</span> <span class="type">BufferedReader</span>(<span class="keyword">new</span> <span class="type">InputStreamReader</span>(<span class="type">System</span>.in)); <span class="type">System</span>.out.println(<span class="string">"input pizza 种类:"</span>);</span><br><span class="line"><span class="type">String</span> str = strin.readLine();</span><br><span class="line"><span class="keyword">return</span> str;</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="type">IOException</span> e) &#123; e.printStackTrace(); <span class="keyword">return</span> <span class="string">""</span>;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> com.atguigu.factory.factorymethod.pizzastore.order;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.atguigu.factory.factorymethod.pizzastore.pizza.<span class="type">BJCheesePizza</span>; <span class="keyword">import</span> com.atguigu.factory.factorymethod.pizzastore.pizza.<span class="type">BJPepperPizza</span>; <span class="keyword">import</span> com.atguigu.factory.factorymethod.pizzastore.pizza.<span class="type">Pizza</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">BJOrderPizza</span> <span class="keyword">extends</span> <span class="title">OrderPizza</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="type">Pizza</span> createPizza(<span class="type">String</span> orderType) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">Pizza</span> pizza = <span class="literal">null</span>; <span class="keyword">if</span>(orderType.equals(<span class="string">"cheese"</span>)) &#123;</span><br><span class="line">pizza = <span class="keyword">new</span> <span class="type">BJCheesePizza</span>();</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (orderType.equals(<span class="string">"pepper"</span>)) &#123; pizza = <span class="keyword">new</span> <span class="type">BJPepperPizza</span>();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// TODO Auto-generated method stub return pizza;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">package</span> com.atguigu.factory.factorymethod.pizzastore.order;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.atguigu.factory.factorymethod.pizzastore.pizza.<span class="type">BJCheesePizza</span>; <span class="keyword">import</span> com.atguigu.factory.factorymethod.pizzastore.pizza.<span class="type">BJPepperPizza</span>; <span class="keyword">import</span> com.atguigu.factory.factorymethod.pizzastore.pizza.<span class="type">LDCheesePizza</span>; <span class="keyword">import</span> com.atguigu.factory.factorymethod.pizzastore.pizza.<span class="type">LDPepperPizza</span>; <span class="keyword">import</span> com.atguigu.factory.factorymethod.pizzastore.pizza.<span class="type">Pizza</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">LDOrderPizza</span> <span class="keyword">extends</span> <span class="title">OrderPizza</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="type">Pizza</span> createPizza(<span class="type">String</span> orderType) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">Pizza</span> pizza = <span class="literal">null</span>; <span class="keyword">if</span>(orderType.equals(<span class="string">"cheese"</span>)) &#123;</span><br><span class="line">pizza = <span class="keyword">new</span> <span class="type">LDCheesePizza</span>();</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (orderType.equals(<span class="string">"pepper"</span>)) &#123; pizza = <span class="keyword">new</span> <span class="type">LDPepperPizza</span>();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// TODO Auto-generated method stub return pizza;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="抽象工厂模式"><a href="#抽象工厂模式" class="headerlink" title="抽象工厂模式"></a>抽象工厂模式</h1><h2 id="基本介绍-1"><a href="#基本介绍-1" class="headerlink" title="基本介绍"></a>基本介绍</h2><p>1)    抽象工厂模式：定义了一个 interface 用于创建相关或有依赖关系的<strong>对象簇</strong>，而无需指明具体的类    </p>
+<p>2)    抽象工厂模式可以将简单工厂模式和工厂方法模式进行整合。    </p>
+<p>3)    从设计层面看，抽象工厂模式就是对简单工厂模式的改进(或者称为进一步的抽象)。    </p>
+<p>4)    将工厂抽象成两层，AbsFactory(抽象工厂) 和 具体实现的工厂子类。程序员可以根据创建对象类型使用对应的工厂子类。这样将单个的简单工厂类变成了工厂簇，更利于代码的维护和扩展。</p>
+<p>5)    类图<br><img src="/2020/10/12/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/5.jpg" alt="05"></p>
+<h2 id="抽象工厂模式应用实例"><a href="#抽象工厂模式应用实例" class="headerlink" title="抽象工厂模式应用实例"></a>抽象工厂模式应用实例</h2><p>使用抽象工厂模式来完成披萨项目</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line">package com.atguigu.<span class="keyword">factory</span>.absfactory.pizzastore.order;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.atguigu.<span class="keyword">factory</span>.absfactory.pizzastore.pizza.Pizza;</span><br><span class="line"></span><br><span class="line"><span class="comment">//一个抽象工厂模式的抽象层(接口) public interface AbsFactory &#123;</span></span><br><span class="line"><span class="comment">//让下面的工厂子类来 具体实现</span></span><br><span class="line">public Pizza createPizza(<span class="built_in">String</span> orderType);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">package com.atguigu.<span class="keyword">factory</span>.absfactory.pizzastore.order;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.atguigu.<span class="keyword">factory</span>.absfactory.pizzastore.pizza.BJCheesePizza; <span class="keyword">import</span> com.atguigu.<span class="keyword">factory</span>.absfactory.pizzastore.pizza.BJPepperPizza; <span class="keyword">import</span> com.atguigu.<span class="keyword">factory</span>.absfactory.pizzastore.pizza.Pizza;</span><br><span class="line"></span><br><span class="line"><span class="comment">//这是工厂子类</span></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">BJFactory</span> <span class="keyword">implements</span> <span class="title">AbsFactory</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">public Pizza createPizza(<span class="built_in">String</span> orderType) &#123;</span><br><span class="line">System.out.println(<span class="string">"~使用的是抽象工厂模式~"</span>);</span><br><span class="line"><span class="comment">// TODO Auto-generated method stub Pizza pizza = null; if(orderType.equals("cheese")) &#123;</span></span><br><span class="line">pizza = <span class="keyword">new</span> BJCheesePizza();</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (orderType.equals(<span class="string">"pepper"</span>))&#123; pizza = <span class="keyword">new</span> BJPepperPizza();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> pizza;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">package com.atguigu.<span class="keyword">factory</span>.absfactory.pizzastore.order;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.atguigu.<span class="keyword">factory</span>.absfactory.pizzastore.pizza.LDCheesePizza; <span class="keyword">import</span> com.atguigu.<span class="keyword">factory</span>.absfactory.pizzastore.pizza.LDPepperPizza; <span class="keyword">import</span> com.atguigu.<span class="keyword">factory</span>.absfactory.pizzastore.pizza.Pizza;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">LDFactory</span> <span class="keyword">implements</span> <span class="title">AbsFactory</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">public Pizza createPizza(<span class="built_in">String</span> orderType) &#123;</span><br><span class="line">System.out.println(<span class="string">"~使用的是抽象工厂模式~"</span>); Pizza pizza = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">if</span> (orderType.equals(<span class="string">"cheese"</span>)) &#123; pizza = <span class="keyword">new</span> LDCheesePizza();</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (orderType.equals(<span class="string">"pepper"</span>)) &#123; pizza = <span class="keyword">new</span> LDPepperPizza();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> pizza;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//OrderPizza.java</span></span><br><span class="line">package com.atguigu.<span class="keyword">factory</span>.absfactory.pizzastore.order;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.BufferedReader;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException; <span class="keyword">import</span> java.io.InputStreamReader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.atguigu.<span class="keyword">factory</span>.absfactory.pizzastore.pizza.Pizza;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">OrderPizza</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">AbsFactory <span class="keyword">factory</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 构造器</span></span><br><span class="line">public OrderPizza(AbsFactory <span class="keyword">factory</span>) &#123; setFactory(<span class="keyword">factory</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">private <span class="keyword">void</span> setFactory(AbsFactory <span class="keyword">factory</span>) &#123; Pizza pizza = <span class="keyword">null</span>;</span><br><span class="line"><span class="built_in">String</span> orderType = <span class="string">""</span>; <span class="comment">//  用户输入</span></span><br><span class="line"><span class="keyword">this</span>.<span class="keyword">factory</span> = <span class="keyword">factory</span>; <span class="keyword">do</span> &#123;</span><br><span class="line">orderType = getType();</span><br><span class="line"><span class="comment">// factory  可能是北京的工厂子类，也可能是伦敦的工厂子类</span></span><br><span class="line">pizza = <span class="keyword">factory</span>.createPizza(orderType); <span class="keyword">if</span> (pizza != <span class="keyword">null</span>) &#123; <span class="comment">// 订 购 ok</span></span><br><span class="line">pizza.prepare();</span><br><span class="line">pizza.bake();</span><br><span class="line">pizza.cut();</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">pizza.box();</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">System.out.println(<span class="string">"订购失败"</span>); <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="keyword">true</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写一个方法，可以获取客户希望订购的披萨种类</span></span><br><span class="line">private <span class="built_in">String</span> getType() &#123; <span class="keyword">try</span> &#123;</span><br><span class="line">BufferedReader strin = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(System.<span class="keyword">in</span>)); System.out.println(<span class="string">"input pizza 种类:"</span>);</span><br><span class="line"><span class="built_in">String</span> str = strin.readLine();</span><br><span class="line"><span class="keyword">return</span> str;</span><br><span class="line">&#125; <span class="keyword">catch</span> (IOException e) &#123; e.printStackTrace(); <span class="keyword">return</span> <span class="string">""</span>;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="工厂模式在-JDK-Calendar-应用的源码分析"><a href="#工厂模式在-JDK-Calendar-应用的源码分析" class="headerlink" title="工厂模式在 JDK-Calendar 应用的源码分析"></a>工厂模式在 JDK-Calendar 应用的源码分析</h2><p>1)    JDK 中的 Calendar 类中，就使用了简单工厂模式</p>
+<p>2)    源码分析</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">package com.atguigu.jdk;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Calendar;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Factory</span> &#123;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">String</span>[] args)</span> </span>&#123;</span><br><span class="line"><span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line"><span class="comment">// getInstance 是 Calendar 静态方法</span></span><br><span class="line">Calendar cal = Calendar.getInstance();</span><br><span class="line"><span class="comment">// 注意月份下标从 0 开始，所以取月份要+1</span></span><br><span class="line">System.out.<span class="built_in">println</span>(<span class="string">"年:"</span> + cal.<span class="built_in">get</span>(Calendar.YEAR));</span><br><span class="line">System.out.<span class="built_in">println</span>(<span class="string">" 月 :"</span> + (cal.<span class="built_in">get</span>(Calendar.MONTH) + <span class="number">1</span>)); System.out.<span class="built_in">println</span>(<span class="string">"日:"</span> + cal.<span class="built_in">get</span>(Calendar.DAY_OF_MONTH));</span><br><span class="line">System.out.<span class="built_in">println</span>(<span class="string">"时:"</span> + cal.<span class="built_in">get</span>(Calendar.HOUR_OF_DAY));</span><br><span class="line">System.out.<span class="built_in">println</span>(<span class="string">"分:"</span> + cal.<span class="built_in">get</span>(Calendar.MINUTE));</span><br><span class="line">System.out.<span class="built_in">println</span>(<span class="string">"秒:"</span> + cal.<span class="built_in">get</span>(Calendar.SECOND));</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//Calendar.java</span></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Calendar <span class="title">getInstance</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"><span class="keyword">return</span> createCalendar(TimeZone.getDefault(), Locale.getDefault(Locale.Category.FORMAT));</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Calendar <span class="title">createCalendar</span><span class="params">(TimeZone zone,</span></span></span><br><span class="line"><span class="function"><span class="params">Locale aLocale)</span> <span class="comment">//根据 TimeZone zone, locale 创建对应的实例</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">CalendarProvider provider = LocaleProviderAdapter.getAdapter(CalendarProvider.class, aLocale)</span><br><span class="line">.getCalendarProvider();</span><br><span class="line"><span class="keyword">if</span> (provider != null) &#123; <span class="keyword">try</span> &#123;</span><br><span class="line"><span class="keyword">return</span> provider.getInstance(zone, aLocale);</span><br><span class="line">&#125; <span class="keyword">catch</span> (IllegalArgumentException iae) &#123;</span><br><span class="line"><span class="comment">// fall back to the default instantiation</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Calendar cal = null;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (aLocale.hasExtensions()) &#123;</span><br><span class="line"><span class="keyword">String</span> caltype = aLocale.getUnicodeLocaleType(<span class="string">"ca"</span>); <span class="keyword">if</span> (caltype != null) &#123;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (caltype) &#123; <span class="keyword">case</span> <span class="string">"buddhist"</span>:</span><br><span class="line">cal = <span class="keyword">new</span> BuddhistCalendar(zone, aLocale);</span><br><span class="line"><span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="string">"japanese"</span>:</span><br><span class="line">cal = <span class="keyword">new</span> JapaneseImperialCalendar(zone, aLocale);</span><br><span class="line"><span class="keyword">break</span>; <span class="keyword">case</span> <span class="string">"gregory"</span>:</span><br><span class="line">cal = <span class="keyword">new</span> GregorianCalendar(zone, aLocale);</span><br><span class="line"><span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (cal == null) &#123;</span><br><span class="line"><span class="comment">// If no known calendar type is explicitly specified,</span></span><br><span class="line"><span class="comment">// perform the traditional way to create a Calendar:</span></span><br><span class="line"><span class="comment">// create a BuddhistCalendar for th_TH locale,</span></span><br><span class="line"><span class="comment">// a JapaneseImperialCalendar for ja_JP_JP locale, or</span></span><br><span class="line"><span class="comment">// a GregorianCalendar for any other locales.</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> The language, country and variant strings are interned.</span></span><br><span class="line"><span class="keyword">if</span> (aLocale.getLanguage() == <span class="string">"th"</span> &amp;&amp; aLocale.getCountry() == <span class="string">"TH"</span>) &#123; cal = <span class="keyword">new</span> BuddhistCalendar(zone, aLocale);</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (aLocale.getVariant() == <span class="string">"JP"</span> &amp;&amp; aLocale.getLanguage() == <span class="string">"ja"</span> &amp;&amp; aLocale.getCountry() == <span class="string">"JP"</span>) &#123;</span><br><span class="line">cal = <span class="keyword">new</span> JapaneseImperialCalendar(zone, aLocale);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br></pre></td></tr></table></figure>
+<h1 id="工厂模式小结"><a href="#工厂模式小结" class="headerlink" title="工厂模式小结"></a>工厂模式小结</h1><p>1)    工厂模式的意义<br>将实例化对象的代码提取出来，放到一个类中统一管理和维护，达到和主项目的依赖关系的解耦。从而提高项目的扩展和维护性。    </p>
+<p>2)    三种工厂模式 (简单工厂模式、工厂方法模式、抽象工厂模式)</p>
+<p>3)    设计模式的依赖抽象原则<br>创建对象实例时，不要直接 new 类, 而是把这个 new 类的动作放在一个工厂的方法中，并返回。有的书上说， 变量不要直接持有具体类的引用。</p>
+<p>不要让类继承具体类，而是继承抽象类或者是实现 interface(接口)</p>
+<p>不要覆盖基类中已经实现的方法。</p>
+
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/11/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%8D%95%E4%BE%8B%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="prev" title="设计模式-单例设计模式">
+      <i class="fa fa-chevron-left"></i> 设计模式-单例设计模式
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简单工厂模式"><span class="nav-number">1.</span> <span class="nav-text">简单工厂模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#需求实例"><span class="nav-number">1.1.</span> <span class="nav-text">需求实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用传统的方式来完成"><span class="nav-number">1.2.</span> <span class="nav-text">使用传统的方式来完成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传统的方式的优缺点"><span class="nav-number">1.3.</span> <span class="nav-text">传统的方式的优缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本介绍"><span class="nav-number">1.4.</span> <span class="nav-text">基本介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用简单工厂模式"><span class="nav-number">1.5.</span> <span class="nav-text">使用简单工厂模式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#工厂方法模式"><span class="nav-number">2.</span> <span class="nav-text">工厂方法模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#新的需求"><span class="nav-number">2.1.</span> <span class="nav-text">新的需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#思路-1"><span class="nav-number">2.2.</span> <span class="nav-text">思路 1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#思路-2"><span class="nav-number">2.3.</span> <span class="nav-text">思路 2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工厂方法模式介绍"><span class="nav-number">2.4.</span> <span class="nav-text">工厂方法模式介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工厂方法模式应用案例"><span class="nav-number">2.5.</span> <span class="nav-text">工厂方法模式应用案例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#抽象工厂模式"><span class="nav-number">3.</span> <span class="nav-text">抽象工厂模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本介绍-1"><span class="nav-number">3.1.</span> <span class="nav-text">基本介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抽象工厂模式应用实例"><span class="nav-number">3.2.</span> <span class="nav-text">抽象工厂模式应用实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工厂模式在-JDK-Calendar-应用的源码分析"><span class="nav-number">3.3.</span> <span class="nav-text">工厂模式在 JDK-Calendar 应用的源码分析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#工厂模式小结"><span class="nav-number">4.</span> <span class="nav-text">工厂模式小结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>
