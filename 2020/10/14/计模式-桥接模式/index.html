@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="手机操作问题现在对不同手机类型的不同品牌实现操作编程(比如:开机、关机、上网，打电话等)，如图:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式-桥接模式">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="手机操作问题现在对不同手机类型的不同品牌实现操作编程(比如:开机、关机、上网，打电话等)，如图:">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/1.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/2.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/3.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/4.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/5.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/6.jpg">
+<meta property="article:published_time" content="2020-10-14T12:25:24.000Z">
+<meta property="article:modified_time" content="2020-10-14T12:38:26.837Z">
+<meta property="article:author" content="fubuking">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://fubuk1ng.github.io/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/1.jpg">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>设计模式-桥接模式 | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          设计模式-桥接模式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-10-14 20:25:24 / 修改时间：20:38:26" itemprop="dateCreated datePublished" datetime="2020-10-14T20:25:24+08:00">2020-10-14</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="手机操作问题"><a href="#手机操作问题" class="headerlink" title="手机操作问题"></a>手机操作问题</h1><p>现在对不同手机类型的不同品牌实现操作编程(比如:开机、关机、上网，打电话等)，如图:<br><img src="/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/1.jpg" alt="01"></p>
+<a id="more"></a>
+<h1 id="传统方案解决手机操作问题"><a href="#传统方案解决手机操作问题" class="headerlink" title="传统方案解决手机操作问题"></a>传统方案解决手机操作问题</h1><p>传统方法对应的类图<br><img src="/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/2.jpg" alt="02"></p>
+<h1 id="传统方案解决手机操作问题分析"><a href="#传统方案解决手机操作问题分析" class="headerlink" title="传统方案解决手机操作问题分析"></a>传统方案解决手机操作问题分析</h1><p>1)    扩展性问题(类爆炸)，如果我们再增加手机的样式(旋转式)，就需要增加各个品牌手机的类，同样如果我们增加一个手机品牌，也要在各个手机样式类下增加。</p>
+<p>2)    违反了单一职责原则，当我们增加手机样式时，要同时增加所有品牌的手机，这样增加了代码维护成本。</p>
+<p>3)    解决方案-使用桥接模式。</p>
+<h1 id="桥接模式-Bridge-基本介绍"><a href="#桥接模式-Bridge-基本介绍" class="headerlink" title="桥接模式(Bridge)-基本介绍"></a>桥接模式(Bridge)-基本介绍</h1><p>1)    桥接模式(Bridge 模式)是指：将实现与抽象放在两个不同的类层次中，使两个层次可以独立改变。</p>
+<p>2)    是一种结构型设计模式。</p>
+<p>3)    Bridge 模式基于类的最小设计原则，通过使用封装、聚合及继承等行为让不同的类承担不同的职责。它的主要特点是把抽象(Abstraction)与行为实现(Implementation)分离开来，从而可以保持各部分的独立性以及应对他们的功能扩展。</p>
+<h1 id="桥接模式-Bridge-原理类图"><a href="#桥接模式-Bridge-原理类图" class="headerlink" title="桥接模式(Bridge)-原理类图"></a>桥接模式(Bridge)-原理类图</h1><p><img src="/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/3.jpg" alt="03"></p>
+<p>1)    Client 类：桥接模式的调用者。</p>
+<p>2)    抽象类(Abstraction) :维护了 Implementor / 即它的实现类 ConcreteImplementorA.., 二者是聚合关系, Abstraction充当桥接类。</p>
+<p>3)    RefinedAbstraction :  是 Abstraction  抽象类的子类。</p>
+<p>4)    Implementor :  行为实现类的接口。</p>
+<p>5)    ConcreteImplementorA /B ：行为的具体实现类。</p>
+<p>6)    从 UML 图：这里的抽象类和接口是聚合的关系，其实调用和被调用关系。</p>
+<h1 id="桥接模式解决手机操作问题"><a href="#桥接模式解决手机操作问题" class="headerlink" title="桥接模式解决手机操作问题"></a>桥接模式解决手机操作问题</h1><p>使用桥接模式改进传统方式，让程序具有搞好的扩展性，利用程序维护</p>
+<p>1)    应用实例说明<br>2)    使用桥接模式对应的类图<br><img src="/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/4.jpg" alt="04"><br>3)    代码</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br></pre></td><td class="code"><pre><span class="line">package com.atguigu.bridge;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">//接口</span><br><span class="line"><span class="built_in">public</span> interface Brand &#123; <span class="type">void</span> <span class="keyword">open</span>();</span><br><span class="line"><span class="type">void</span> <span class="keyword">close</span>(); <span class="type">void</span> <span class="keyword">call</span>();</span><br><span class="line">&#125;</span><br><span class="line">package com.atguigu.bridge;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="keyword">class</span> Client &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> static <span class="type">void</span> main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">//获取折叠式手机 (样式 + 品牌 )</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Phone phone1 = <span class="built_in">new</span> FoldedPhone(<span class="built_in">new</span> XiaoMi());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">phone1.<span class="keyword">open</span>(); phone1.<span class="keyword">call</span>(); phone1.<span class="keyword">close</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println("=======================");</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Phone phone2 = <span class="built_in">new</span> FoldedPhone(<span class="built_in">new</span> Vivo());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">phone2.<span class="keyword">open</span>();</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">phone2.<span class="keyword">call</span>(); phone2.<span class="keyword">close</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println("==============");</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">UpRightPhone phone3 = <span class="built_in">new</span> UpRightPhone(<span class="built_in">new</span> XiaoMi());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">phone3.<span class="keyword">open</span>(); phone3.<span class="keyword">call</span>(); phone3.<span class="keyword">close</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println("==============");</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">UpRightPhone phone4 = <span class="built_in">new</span> UpRightPhone(<span class="built_in">new</span> Vivo());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">phone4.<span class="keyword">open</span>(); phone4.<span class="keyword">call</span>(); phone4.<span class="keyword">close</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">package com.atguigu.bridge;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//折叠式手机类，继承 抽象类 Phone</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="keyword">class</span> FoldedPhone extends Phone &#123;</span><br><span class="line"></span><br><span class="line">//构造器</span><br><span class="line"><span class="built_in">public</span> FoldedPhone(Brand brand) &#123; super(brand);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="type">void</span> <span class="keyword">open</span>() &#123; super.<span class="keyword">open</span>();</span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(" 折叠样式手机 ");</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="type">void</span> <span class="keyword">close</span>() &#123; super.<span class="keyword">close</span>();</span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(" 折叠样式手机 ");</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="type">void</span> <span class="keyword">call</span>() &#123; super.<span class="keyword">call</span>();</span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(" 折叠样式手机 ");</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">package com.atguigu.bridge;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> abstract <span class="keyword">class</span> Phone &#123;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//组合品牌</span><br><span class="line">private Brand brand;</span><br><span class="line"></span><br><span class="line">//构造器</span><br><span class="line"><span class="built_in">public</span> Phone(Brand brand) &#123; super();</span><br><span class="line">this.brand = brand;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">protected <span class="type">void</span> <span class="keyword">open</span>() &#123; this.brand.<span class="keyword">open</span>();</span><br><span class="line">&#125;</span><br><span class="line">protected <span class="type">void</span> <span class="keyword">close</span>() &#123; brand.<span class="keyword">close</span>();</span><br><span class="line">&#125;</span><br><span class="line">protected <span class="type">void</span> <span class="keyword">call</span>() &#123; brand.<span class="keyword">call</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">package com.atguigu.bridge;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="keyword">class</span> UpRightPhone extends Phone &#123;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">//构造器</span><br><span class="line"><span class="built_in">public</span> UpRightPhone(Brand brand) &#123; super(brand);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="type">void</span> <span class="keyword">open</span>() &#123; super.<span class="keyword">open</span>();</span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(" 直立样式手机 ");</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="type">void</span> <span class="keyword">close</span>() &#123; super.<span class="keyword">close</span>();</span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(" 直立样式手机 ");</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="type">void</span> <span class="keyword">call</span>() &#123; super.<span class="keyword">call</span>();</span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(" 直立样式手机 ");</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">package com.atguigu.bridge;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="keyword">class</span> Vivo implements Brand &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="type">void</span> <span class="keyword">open</span>() &#123;</span><br><span class="line">// TODO Auto-<span class="keyword">generated</span> <span class="keyword">method</span> stub <span class="keyword">System</span>.<span class="keyword">out</span>.println(" Vivo 手机开机 ");</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line"><span class="built_in">public</span> <span class="type">void</span> <span class="keyword">close</span>() &#123;</span><br><span class="line">// TODO Auto-<span class="keyword">generated</span> <span class="keyword">method</span> stub <span class="keyword">System</span>.<span class="keyword">out</span>.println(" Vivo 手机关机 ");</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line"><span class="built_in">public</span> <span class="type">void</span> <span class="keyword">call</span>() &#123;</span><br><span class="line">// TODO Auto-<span class="keyword">generated</span> <span class="keyword">method</span> stub <span class="keyword">System</span>.<span class="keyword">out</span>.println(" Vivo 手机打电话 ");</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">package com.atguigu.bridge;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="keyword">class</span> XiaoMi implements Brand &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line"><span class="built_in">public</span> <span class="type">void</span> <span class="keyword">open</span>() &#123;</span><br><span class="line">// TODO Auto-<span class="keyword">generated</span> <span class="keyword">method</span> stub</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(" 小米手机开机 ");</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line"><span class="built_in">public</span> <span class="type">void</span> <span class="keyword">close</span>() &#123;</span><br><span class="line">// TODO Auto-<span class="keyword">generated</span> <span class="keyword">method</span> stub</span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(" 小米手机关机 ");</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line"><span class="built_in">public</span> <span class="type">void</span> <span class="keyword">call</span>() &#123;</span><br><span class="line">// TODO Auto-<span class="keyword">generated</span> <span class="keyword">method</span> stub</span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(" 小米手机打电话 ");</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="桥接模式在-JDBC-的源码剖析"><a href="#桥接模式在-JDBC-的源码剖析" class="headerlink" title="桥接模式在 JDBC 的源码剖析"></a>桥接模式在 JDBC 的源码剖析</h1><p>1)    Jdbc 的 Driver 接口，如果从桥接模式来看，Driver 就是一个接口，下面可以有 MySQL 的 Driver，Oracle 的Driver，这些就可以当做实现接口类。</p>
+<p>2)    代码分析+Debug 源码。<br><img src="/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/5.jpg" alt="05"><br><img src="/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/6.jpg" alt="06"></p>
+<h1 id="桥接模式的注意事项和细节"><a href="#桥接模式的注意事项和细节" class="headerlink" title="桥接模式的注意事项和细节"></a>桥接模式的注意事项和细节</h1><p>1)    实现了抽象和实现部分的分离，从而极大的提供了系统的灵活性，让抽象部分和实现部分独立开来，这有助于系统进行分层设计，从而产生更好的结构化系统。</p>
+<p>2)    对于系统的高层部分，只需要知道抽象部分和实现部分的接口就可以了，其它的部分由具体业务来完成。</p>
+<p>3)    桥接模式替代多层继承方案，可以减少子类的个数，降低系统的管理和维护成本。</p>
+<p>4)    桥接模式的引入增加了系统的理解和设计难度，由于聚合关联关系建立在抽象层，要求开发者针对抽象进行设计和编程。</p>
+<p>5)    桥接模式要求正确识别出系统中两个独立变化的维度(抽象、和实现)，因此其使用范围有一定的局限性，即需要有这样的应用场景。</p>
+<p>桥接模式其它应用场景<br>对于那些不希望使用继承或因为多层次继承导致系统类的个数急剧增加的系统，桥接模式尤为适用。</p>
+<h1 id="常见的应用场景"><a href="#常见的应用场景" class="headerlink" title="常见的应用场景"></a>常见的应用场景</h1><p>1)    -JDBC 驱动程序</p>
+<p>2)    -银行转账系统<br>转账分类: 网上转账，柜台转账，AMT 转账<br>转账用户类型：普通用户，银卡用户，金卡用户..</p>
+<p>3)    -消息管理<br>消息类型：即时消息，延时消息<br>消息分类：手机短信，邮件消息，QQ 消息…</p>
+
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F/" rel="prev" title="设计模式-适配器模式">
+      <i class="fa fa-chevron-left"></i> 设计模式-适配器模式
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#手机操作问题"><span class="nav-number">1.</span> <span class="nav-text">手机操作问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#传统方案解决手机操作问题"><span class="nav-number">2.</span> <span class="nav-text">传统方案解决手机操作问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#传统方案解决手机操作问题分析"><span class="nav-number">3.</span> <span class="nav-text">传统方案解决手机操作问题分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#桥接模式-Bridge-基本介绍"><span class="nav-number">4.</span> <span class="nav-text">桥接模式(Bridge)-基本介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#桥接模式-Bridge-原理类图"><span class="nav-number">5.</span> <span class="nav-text">桥接模式(Bridge)-原理类图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#桥接模式解决手机操作问题"><span class="nav-number">6.</span> <span class="nav-text">桥接模式解决手机操作问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#桥接模式在-JDBC-的源码剖析"><span class="nav-number">7.</span> <span class="nav-text">桥接模式在 JDBC 的源码剖析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#桥接模式的注意事项和细节"><span class="nav-number">8.</span> <span class="nav-text">桥接模式的注意事项和细节</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见的应用场景"><span class="nav-number">9.</span> <span class="nav-text">常见的应用场景</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>
