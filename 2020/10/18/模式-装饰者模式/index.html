@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="星巴克咖啡订单项目1)    咖啡种类&#x2F;单品咖啡：Espresso(意大利浓咖啡)、ShortBlack、LongBlack(美式咖啡)、Decaf(无因咖啡)。 2)    调料：Milk、Soy(豆浆)、Chocolate。 3)    要求在扩展新的咖啡种类时，具有良好的扩展性、改动方便、维护方便。 4)    使用 OO 的来计算不同种类咖啡的费用:  客户可以点单品咖啡，也可以单品咖啡+">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式-装饰者模式">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="星巴克咖啡订单项目1)    咖啡种类&#x2F;单品咖啡：Espresso(意大利浓咖啡)、ShortBlack、LongBlack(美式咖啡)、Decaf(无因咖啡)。 2)    调料：Milk、Soy(豆浆)、Chocolate。 3)    要求在扩展新的咖啡种类时，具有良好的扩展性、改动方便、维护方便。 4)    使用 OO 的来计算不同种类咖啡的费用:  客户可以点单品咖啡，也可以单品咖啡+">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/1.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/2.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/3.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/4.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/5.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/6.jpg">
+<meta property="article:published_time" content="2020-10-18T10:35:32.000Z">
+<meta property="article:modified_time" content="2020-10-18T11:14:55.976Z">
+<meta property="article:author" content="fubuking">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://fubuk1ng.github.io/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/1.jpg">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>设计模式-装饰者模式 | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">42</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          设计模式-装饰者模式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-10-18 18:35:32 / 修改时间：19:14:55" itemprop="dateCreated datePublished" datetime="2020-10-18T18:35:32+08:00">2020-10-18</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="星巴克咖啡订单项目"><a href="#星巴克咖啡订单项目" class="headerlink" title="星巴克咖啡订单项目"></a>星巴克咖啡订单项目</h1><p>1)    咖啡种类/单品咖啡：Espresso(意大利浓咖啡)、ShortBlack、LongBlack(美式咖啡)、Decaf(无因咖啡)。</p>
+<p>2)    调料：Milk、Soy(豆浆)、Chocolate。</p>
+<p>3)    要求在扩展新的咖啡种类时，具有良好的扩展性、改动方便、维护方便。</p>
+<p>4)    使用 OO 的来计算不同种类咖啡的费用:  客户可以点单品咖啡，也可以单品咖啡+调料组合。</p>
+<a id="more"></a>
+<h1 id="方案-1-解决星巴克咖啡订单项目"><a href="#方案-1-解决星巴克咖啡订单项目" class="headerlink" title="方案 1 解决星巴克咖啡订单项目"></a>方案 1 解决星巴克咖啡订单项目</h1><p><img src="/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/1.jpg" alt="01"></p>
+<h1 id="方案-1-解决星巴克咖啡订单问题分析"><a href="#方案-1-解决星巴克咖啡订单问题分析" class="headerlink" title="方案 1 解决星巴克咖啡订单问题分析"></a>方案 1 解决星巴克咖啡订单问题分析</h1><p>1)    Drink 是一个抽象类，表示饮料。</p>
+<p>2)    des 就是对咖啡的描述, 比如咖啡的名字。</p>
+<p>3)    cost() 方法就是计算费用，Drink 类中做成一个抽象方法。</p>
+<p>4)    Decaf 就是单品咖啡， 继承 Drink,  并实现 cost。</p>
+<p>5)    Espress &amp;&amp; Milk 就是单品咖啡+调料， 这个组合很多。</p>
+<p>6)    问题：这样设计，会有很多类，当我们增加一个单品咖啡，或者一个新的调料，类的数量就会倍增，就会出现类爆炸。</p>
+<h1 id="方案-2-解决星巴克咖啡订单"><a href="#方案-2-解决星巴克咖啡订单" class="headerlink" title="方案 2 解决星巴克咖啡订单"></a>方案 2 解决星巴克咖啡订单</h1><p>1)    前面分析到方案 1 因为咖啡单品+调料组合会造成类的倍增，因此可以做改进，将调料内置到 Drink 类，这样就不会造成类数量过多。从而提高项目的维护性(如图)。</p>
+<p><img src="/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/2.jpg" alt="02"></p>
+<p>2)    说明: milk,soy,chocolate 可以设计为 Boolean,表示是否要添加相应的调料。</p>
+<h1 id="方案-2-解决星巴克咖啡订单问题分析"><a href="#方案-2-解决星巴克咖啡订单问题分析" class="headerlink" title="方案 2 解决星巴克咖啡订单问题分析"></a>方案 2 解决星巴克咖啡订单问题分析</h1><p>1)    方案 2 可以控制类的数量，不至于造成很多的类。</p>
+<p>2)    在增加或者删除调料种类时，代码的维护量很大。</p>
+<p>3)    考虑到用户可以添加多份 调料时，可以将 hasMilk 返回一个对应 int。</p>
+<p>4)    考虑使用装饰者模式。</p>
+<h1 id="装饰者模式定义"><a href="#装饰者模式定义" class="headerlink" title="装饰者模式定义"></a>装饰者模式定义</h1><p>1)    装饰者模式：动态的将新功能附加到对象上。在对象功能扩展方面，它比继承更有弹性，装饰者模式也体现了开闭原则(ocp)。</p>
+<p>2)    这里提到的动态的将新功能附加到对象和 ocp 原则，在后面的应用实例上会以代码的形式体现。</p>
+<h1 id="装饰者模式原理"><a href="#装饰者模式原理" class="headerlink" title="装饰者模式原理"></a>装饰者模式原理</h1><p>1)    装饰者模式就像打包一个快递<br>主体：比如：陶瓷、衣服 (Component) //  被装饰者<br>包装：比如：报纸填充、塑料泡沫、纸板、木板(Decorator)</p>
+<p>2)    Component 主体：比如类似前面的 Drink。</p>
+<p>3)    ConcreteComponent 和 Decorator。<br>ConcreteComponent：具体的主体， 比如前面的各个单品咖啡</p>
+<p>4)    Decorator: 装饰者，比如各调料。<br>在如图的 Component 与 ConcreteComponent 之间，如果ConcreteComponent 类很多,还可以设计一个缓冲层，将共有的部分提取出来，抽象层一个类。<br><img src="/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/3.jpg" alt="03"></p>
+<h1 id="装饰者模式解决星巴克咖啡订单"><a href="#装饰者模式解决星巴克咖啡订单" class="headerlink" title="装饰者模式解决星巴克咖啡订单"></a>装饰者模式解决星巴克咖啡订单</h1><p><img src="/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/4.jpg" alt="04"></p>
+<h1 id="装饰者模式下的订单：2-份巧克力-一份牛奶的-LongBlack"><a href="#装饰者模式下的订单：2-份巧克力-一份牛奶的-LongBlack" class="headerlink" title="装饰者模式下的订单：2 份巧克力+一份牛奶的 LongBlack"></a>装饰者模式下的订单：2 份巧克力+一份牛奶的 LongBlack</h1><p><img src="/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/5.jpg" alt="05"></p>
+<h1 id="装饰者模式咖啡订单项目应用实例"><a href="#装饰者模式咖啡订单项目应用实例" class="headerlink" title="装饰者模式咖啡订单项目应用实例"></a>装饰者模式咖啡订单项目应用实例</h1><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.atguigu.decorator;</span><br><span class="line"></span><br><span class="line"><span class="comment">//具体的 Decorator， 这里就是调味品</span></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Chocolate</span> <span class="keyword">extends</span> <span class="title">Decorator</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">public <span class="type">Chocolate</span>(<span class="type">Drink</span> obj) &#123; <span class="keyword">super</span>(obj);</span><br><span class="line">setDes(<span class="string">" 巧克力 "</span>);</span><br><span class="line">setPrice(<span class="number">3.0</span>f); <span class="comment">// 调味品 的价格</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">package</span> com.atguigu.decorator;</span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Coffee</span>	<span class="keyword">extends</span> <span class="title">Drink</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">public float cost() &#123;</span><br><span class="line"><span class="comment">// TODO Auto-generated method stub return super.getPrice();</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">package</span> com.atguigu.decorator;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">CoffeeBar</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public static void main(<span class="type">String</span>[] args) &#123;</span><br><span class="line"><span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line"><span class="comment">// 装饰者模式下的订单：2 份巧克力+一份牛奶的 LongBlack</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 1.  点一份 LongBlack</span></span><br><span class="line"><span class="type">Drink</span> order = <span class="keyword">new</span> <span class="type">LongBlack</span>();</span><br><span class="line"><span class="type">System</span>.out.println(<span class="string">"费用 1="</span> + order.cost());</span><br><span class="line"><span class="type">System</span>.out.println(<span class="string">"描述="</span> + order.getDes());</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. order 加入一份牛奶</span></span><br><span class="line">order = <span class="keyword">new</span> <span class="type">Milk</span>(order);</span><br><span class="line"></span><br><span class="line"><span class="type">System</span>.out.println(<span class="string">"order 加入一份牛奶 费用 ="</span> + order.cost());</span><br><span class="line"><span class="type">System</span>.out.println(<span class="string">"order 加入一份牛奶 描述 = "</span> + order.getDes());</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3. order 加入一份巧克力</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">order = <span class="keyword">new</span> <span class="type">Chocolate</span>(order);</span><br><span class="line"></span><br><span class="line"><span class="type">System</span>.out.println(<span class="string">"order 加入一份牛奶  加入一份巧克力	费 用 ="</span> + order.cost());</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="type">System</span>.out.println(<span class="string">"order 加入一份牛奶 加入一份巧克力 描述 = "</span> + order.getDes());</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3. order 加入一份巧克力</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">order = <span class="keyword">new</span> <span class="type">Chocolate</span>(order);</span><br><span class="line"></span><br><span class="line"><span class="type">System</span>.out.println(<span class="string">"order 加入一份牛奶  加入 2 份巧克力	费 用 ="</span> + order.cost());</span><br><span class="line"><span class="type">System</span>.out.println(<span class="string">"order 加入一份牛奶 加入 2 份巧克力 描述 = "</span> + order.getDes());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">System</span>.out.println(<span class="string">"==========================="</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">Drink</span> order2 = <span class="keyword">new</span> <span class="type">DeCaf</span>();</span><br><span class="line"></span><br><span class="line"><span class="type">System</span>.out.println(<span class="string">"order2 无因咖啡	费 用 ="</span> + order2.cost());</span><br><span class="line"><span class="type">System</span>.out.println(<span class="string">"order2 无因咖啡 描述 = "</span> + order2.getDes());</span><br><span class="line">order2               =                <span class="keyword">new</span>                <span class="type">Milk</span>(order2); <span class="type">System</span>.out.println(<span class="string">"order2 无因咖啡  加入一份牛奶	费 用 ="</span> + order2.cost());</span><br><span class="line"><span class="type">System</span>.out.println(<span class="string">"order2 无因咖啡 加入一份牛奶 描述 = "</span> + order2.getDes());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> com.atguigu.decorator;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">DeCaf</span> <span class="keyword">extends</span> <span class="title">Coffee</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="type">DeCaf</span>() &#123;</span><br><span class="line">setDes(<span class="string">" 无因咖啡 "</span>); setPrice(<span class="number">1.0</span>f);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">package</span> com.atguigu.decorator;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Decorator</span> <span class="keyword">extends</span> <span class="title">Drink</span> </span>&#123; <span class="keyword">private</span> <span class="type">Drink</span> obj;</span><br><span class="line"></span><br><span class="line">public <span class="type">Decorator</span>(<span class="type">Drink</span> obj) &#123; <span class="comment">//组合</span></span><br><span class="line"><span class="comment">// TODO Auto-generated constructor stub this.obj = obj;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">public float cost() &#123;</span><br><span class="line"><span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line"><span class="comment">// getPrice 自己价格</span></span><br><span class="line"><span class="keyword">return</span> <span class="keyword">super</span>.getPrice() + obj.cost();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">public <span class="type">String</span> getDes() &#123;</span><br><span class="line"><span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line"><span class="comment">// obj.getDes() 输出被装饰者的信息</span></span><br><span class="line"><span class="keyword">return</span> des + <span class="string">" "</span> + getPrice() + <span class="string">" &amp;&amp; "</span> + obj.getDes();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">package</span> com.atguigu.decorator;</span><br><span class="line">public <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Drink</span> </span>&#123; public <span class="type">String</span> des; <span class="comment">// 描 述</span></span><br><span class="line"><span class="keyword">private</span> float price = <span class="number">0.0</span>f; public <span class="type">String</span> getDes() &#123;</span><br><span class="line"><span class="keyword">return</span> des;</span><br><span class="line">&#125;</span><br><span class="line">public void setDes(<span class="type">String</span> des) &#123; <span class="keyword">this</span>.des = des;</span><br><span class="line">&#125;</span><br><span class="line">public float getPrice() &#123; <span class="keyword">return</span> price;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br><span class="line">public void setPrice(float price) &#123; <span class="keyword">this</span>.price = price;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//计算费用的抽象方法</span></span><br><span class="line"><span class="comment">//子类来实现</span></span><br><span class="line">public <span class="keyword">abstract</span> float cost();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">package</span> com.atguigu.decorator;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Espresso</span> <span class="keyword">extends</span> <span class="title">Coffee</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="type">Espresso</span>() &#123;</span><br><span class="line">setDes(<span class="string">" 意大利咖啡 "</span>); setPrice(<span class="number">6.0</span>f);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">package</span> com.atguigu.decorator;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">LongBlack</span> <span class="keyword">extends</span> <span class="title">Coffee</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="type">LongBlack</span>() &#123;</span><br><span class="line"> </span><br><span class="line">setDes(<span class="string">" longblack "</span>); setPrice(<span class="number">5.0</span>f);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">package</span> com.atguigu.decorator;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Milk</span> <span class="keyword">extends</span> <span class="title">Decorator</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="type">Milk</span>(<span class="type">Drink</span> obj) &#123; <span class="keyword">super</span>(obj);</span><br><span class="line"><span class="comment">// TODO Auto-generated constructor stub</span></span><br><span class="line">setDes(<span class="string">" 牛 奶 "</span>); setPrice(<span class="number">2.0</span>f);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">package</span> com.atguigu.decorator;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">ShortBlack</span> <span class="keyword">extends</span> <span class="title">Coffee</span></span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="type">ShortBlack</span>() &#123; setDes(<span class="string">" shortblack "</span>); setPrice(<span class="number">4.0</span>f);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">package</span> com.atguigu.decorator;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Soy</span> <span class="keyword">extends</span> <span class="title">Decorator</span></span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public <span class="type">Soy</span>(<span class="type">Drink</span> obj) &#123; <span class="keyword">super</span>(obj);</span><br><span class="line"><span class="comment">// TODO Auto-generated constructor stub</span></span><br><span class="line">setDes(<span class="string">" 豆浆	"</span>); setPrice(<span class="number">1.5</span>f);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="装饰者模式在-JDK-应用的源码分析"><a href="#装饰者模式在-JDK-应用的源码分析" class="headerlink" title="装饰者模式在 JDK 应用的源码分析"></a>装饰者模式在 JDK 应用的源码分析</h1><p>Java 的 IO 结构，FilterInputStream 就是一个装饰者<br><img src="/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/6.jpg" alt="06"></p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">package com.atguigu.jdk;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.DataInputStream; <span class="keyword">import</span> java.io.FileInputStream; <span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Decorator</span> &#123;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">String</span>[] args)</span> throws Exception</span>&#123;</span><br><span class="line"><span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//说明</span></span><br><span class="line"><span class="comment">//1. InputStream  是抽象类,  类似我们前面讲的 Drink</span></span><br><span class="line"><span class="comment">//2. FileInputStream 是	InputStream  子类，类似我们前面的 DeCaf, LongBlack</span></span><br><span class="line"><span class="comment">//3. FilterInputStream	是	InputStream 子类：类似我们前面 的 Decorator 修饰者</span></span><br><span class="line"><span class="comment">//4. DataInputStream  是 FilterInputStream  子类，具体的修饰者，类似前面的 Milk, Soy 等</span></span><br><span class="line"><span class="comment">//5. FilterInputStream 类  有	protected volatile InputStream in;  即含被装饰者</span></span><br><span class="line"><span class="comment">//6. 分析得出在 jdk 的 io 体系中，就是使用装饰者模式</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">DataInputStream dis = <span class="keyword">new</span> DataInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"d:\\abc.txt"</span>)); System.out.<span class="built_in">println</span>(dis.<span class="built_in">read</span>());</span><br><span class="line">dis.<span class="built_in">close</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/14/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F/" rel="prev" title="设计模式-桥接模式">
+      <i class="fa fa-chevron-left"></i> 设计模式-桥接模式
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#星巴克咖啡订单项目"><span class="nav-number">1.</span> <span class="nav-text">星巴克咖啡订单项目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#方案-1-解决星巴克咖啡订单项目"><span class="nav-number">2.</span> <span class="nav-text">方案 1 解决星巴克咖啡订单项目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#方案-1-解决星巴克咖啡订单问题分析"><span class="nav-number">3.</span> <span class="nav-text">方案 1 解决星巴克咖啡订单问题分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#方案-2-解决星巴克咖啡订单"><span class="nav-number">4.</span> <span class="nav-text">方案 2 解决星巴克咖啡订单</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#方案-2-解决星巴克咖啡订单问题分析"><span class="nav-number">5.</span> <span class="nav-text">方案 2 解决星巴克咖啡订单问题分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#装饰者模式定义"><span class="nav-number">6.</span> <span class="nav-text">装饰者模式定义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#装饰者模式原理"><span class="nav-number">7.</span> <span class="nav-text">装饰者模式原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#装饰者模式解决星巴克咖啡订单"><span class="nav-number">8.</span> <span class="nav-text">装饰者模式解决星巴克咖啡订单</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#装饰者模式下的订单：2-份巧克力-一份牛奶的-LongBlack"><span class="nav-number">9.</span> <span class="nav-text">装饰者模式下的订单：2 份巧克力+一份牛奶的 LongBlack</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#装饰者模式咖啡订单项目应用实例"><span class="nav-number">10.</span> <span class="nav-text">装饰者模式咖啡订单项目应用实例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#装饰者模式在-JDK-应用的源码分析"><span class="nav-number">11.</span> <span class="nav-text">装饰者模式在 JDK 应用的源码分析</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>
