@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="展示网站项目需求小型的外包项目，给客户 A 做一个产品展示网站，客户 A 的朋友感觉效果不错，也希望做这样的产品展示网站，但是要求都有些不同：     1)    有客户要求以新闻的形式发布。2)    有客户人要求以博客的形式发布。3)    有客户希望以微信公众号的形式发布。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式-享元模式">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="展示网站项目需求小型的外包项目，给客户 A 做一个产品展示网站，客户 A 的朋友感觉效果不错，也希望做这样的产品展示网站，但是要求都有些不同：     1)    有客户要求以新闻的形式发布。2)    有客户人要求以博客的形式发布。3)    有客户希望以微信公众号的形式发布。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/1.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/2.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/3.jpg">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/4.jpg">
+<meta property="article:published_time" content="2020-10-22T06:46:57.000Z">
+<meta property="article:modified_time" content="2020-10-22T07:01:53.217Z">
+<meta property="article:author" content="fubuking">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://fubuk1ng.github.io/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/1.jpg">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>设计模式-享元模式 | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">10</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">47</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          设计模式-享元模式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-10-22 14:46:57 / 修改时间：15:01:53" itemprop="dateCreated datePublished" datetime="2020-10-22T14:46:57+08:00">2020-10-22</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="展示网站项目需求"><a href="#展示网站项目需求" class="headerlink" title="展示网站项目需求"></a>展示网站项目需求</h1><p>小型的外包项目，给客户 A 做一个产品展示网站，客户 A 的朋友感觉效果不错，也希望做这样的产品展示网站，但是要求都有些不同：    </p>
+<p>1)    有客户要求以新闻的形式发布。<br>2)    有客户人要求以博客的形式发布。<br>3)    有客户希望以微信公众号的形式发布。</p>
+<a id="more"></a>
+<h1 id="传统方案解决网站展现项目"><a href="#传统方案解决网站展现项目" class="headerlink" title="传统方案解决网站展现项目"></a>传统方案解决网站展现项目</h1><p>1)    直接复制粘贴一份，然后根据客户不同要求，进行定制修改。<br>2)    给每个网站租用一个空间。<br>3)    方案设计示意图。<br><img src="/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/1.jpg" alt="01"></p>
+<h1 id="传统方案解决网站展现项目-问题分析"><a href="#传统方案解决网站展现项目-问题分析" class="headerlink" title="传统方案解决网站展现项目-问题分析"></a>传统方案解决网站展现项目-问题分析</h1><p>1)    需要的网站结构相似度很高，而且都不是高访问量网站，如果分成多个虚拟空间来处理，相当于一个相同网站的实例对象很多，造成服务器的资源浪费。</p>
+<p>2)    解决思路：整合到一个网站中，共享其相关的代码和数据，对于硬盘、内存、CPU、数据库空间等服务器资源都可以达成共享，减少服务器资源。</p>
+<p>3)    对于代码来说，由于是一份实例，维护和扩展都更加容易。</p>
+<p>4)    上面的解决思路就可以使用享元模式来解决。</p>
+<h1 id="享元模式基本介绍"><a href="#享元模式基本介绍" class="headerlink" title="享元模式基本介绍"></a>享元模式基本介绍</h1><p>1)    享元模式（Flyweight Pattern） 也叫 蝇量模式: 运用共享技术有效地支持大量细粒度的对象。</p>
+<p>2)    常用于系统底层开发，解决系统的性能问题。像数据库连接池，里面都是创建好的连接对象，在这些连接对象中有我们需要的则直接拿来用，避免重新创建，如果没有我们需要的，则创建一个。</p>
+<p>3)    享元模式能够解决重复对象的内存浪费的问题，当系统中有大量相似对象，需要缓冲池时。不需总是创建新对象，可以从缓冲池里拿。这样可以降低系统内存，同时提高效率。</p>
+<p>4)    享元模式经典的应用场景就是池技术了，String 常量池、数据库连接池、缓冲池等等都是享元模式的应用，享元模式是池技术的重要实现方式。<br><img src="/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/2.jpg" alt="02"></p>
+<h1 id="享元模式的原理类图"><a href="#享元模式的原理类图" class="headerlink" title="享元模式的原理类图"></a>享元模式的原理类图</h1><p><img src="/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/3.jpg" alt="03"></p>
+<p>1)    FlyWeight 是抽象的享元角色, 他是产品的抽象类, 同时定义出对象的外部状态和内部状态(后面介绍)  的接口或实现。</p>
+<p>2)    ConcreteFlyWeight 是具体的享元角色，是具体的产品类，实现抽象角色定义相关业务。</p>
+<p>3)    UnSharedConcreteFlyWeight 是不可共享的角色，一般不会出现在享元工厂。</p>
+<p>4)    FlyWeightFactory    享元工厂类，用于构建一个池容器(集合)， 同时提供从池中获取对象方法。</p>
+<h1 id="内部状态和外部状态"><a href="#内部状态和外部状态" class="headerlink" title="内部状态和外部状态"></a>内部状态和外部状态</h1><p>比如围棋、五子棋、跳棋，它们都有大量的棋子对象，围棋和五子棋只有黑白两色，跳棋颜色多一点，所以棋子颜色就是棋子的内部状态；而各个棋子之间的差别就是位置的不同，当我们落子后，落子颜色是定的，但位置是变化的，所以棋子坐标就是棋子的外部状态。</p>
+<p>1)    享元模式提出了两个要求：细粒度和共享对象。这里就涉及到内部状态和外部状态了，即将对象的信息分为两个部分：内部状态和外部状态。</p>
+<p>2)    内部状态指对象共享出来的信息，存储在享元对象内部且不会随环境的改变而改变。</p>
+<p>3)    外部状态指对象得以依赖的一个标记，是随环境改变而改变的、不可共享的状态。</p>
+<p>4)    举个例子：围棋理论上有 361 个空位可以放棋子，每盘棋都有可能有两三百个棋子对象产生，因为内存空间有限，一台服务器很难支持更多的玩家玩围棋游戏，如果用享元模式来处理棋子，那么棋子对象就可以减少到只有两个实例，这样就很好的解决了对象的开销问题。</p>
+<h1 id="享元模式解决网站展现项目"><a href="#享元模式解决网站展现项目" class="headerlink" title="享元模式解决网站展现项目"></a>享元模式解决网站展现项目</h1><p>1)    应用实例要求<br>使用享元模式完成，前面提出的网站外包问题</p>
+<p>2)    思路分析和图解(类图)<br><img src="/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BA%AB%E5%85%83%E6%A8%A1%E5%BC%8F/4.jpg" alt="04"><br>3)    代码实现</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br></pre></td><td class="code"><pre><span class="line">package com.atguigu.flyweight;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span> &#123;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">String</span>[] args)</span> </span>&#123;</span><br><span class="line"><span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个工厂类</span></span><br><span class="line">WebSiteFactory factory = <span class="keyword">new</span> WebSiteFactory();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 客户要一个以新闻形式发布的网站</span></span><br><span class="line">WebSite webSite1 = factory.getWebSiteCategory(<span class="string">"新闻"</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">webSite1.use(<span class="keyword">new</span> User(<span class="string">"tom"</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 客户要一个以博客形式发布的网站</span></span><br><span class="line">WebSite webSite2 = factory.getWebSiteCategory(<span class="string">"博客"</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">webSite2.use(<span class="keyword">new</span> User(<span class="string">"jack"</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 客户要一个以博客形式发布的网站</span></span><br><span class="line">WebSite webSite3 = factory.getWebSiteCategory(<span class="string">"博客"</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">webSite3.use(<span class="keyword">new</span> User(<span class="string">"smith"</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 客户要一个以博客形式发布的网站</span></span><br><span class="line">WebSite webSite4 = factory.getWebSiteCategory(<span class="string">"博客"</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">webSite4.use(<span class="keyword">new</span> User(<span class="string">"king"</span>));</span><br><span class="line"></span><br><span class="line">System.out.<span class="built_in">println</span>(<span class="string">"网站的分类共="</span> + factory.getWebSiteCount());</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">package com.atguigu.flyweight;</span><br><span class="line"></span><br><span class="line"><span class="comment">//具体网站</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConcreteWebSite</span> <span class="title">extends</span> <span class="title">WebSite</span> &#123;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//共享的部分，内部状态</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">String</span> type = <span class="string">""</span>; <span class="comment">//网站发布的形式(类型)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//构造器</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ConcreteWebSite</span><span class="params">(<span class="keyword">String</span> type)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">this</span>.type = type;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">use</span><span class="params">(User user)</span> </span>&#123;</span><br><span class="line"><span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">System.out.<span class="built_in">println</span>(<span class="string">"网站的发布形式为:"</span> + type + <span class="string">" 在使用中 .. 使用者是"</span> + user.getName());</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">package com.atguigu.flyweight;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> &#123;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">String</span> name;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">(<span class="keyword">String</span> name)</span> </span>&#123; super();</span><br><span class="line"><span class="keyword">this</span>.name = name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">String</span> <span class="title">getName</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(<span class="keyword">String</span> name)</span> </span>&#123; <span class="keyword">this</span>.name = name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">package com.atguigu.flyweight;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> abstract <span class="class"><span class="keyword">class</span> <span class="title">WebSite</span> &#123;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> abstract <span class="keyword">void</span> <span class="title">use</span><span class="params">(User user)</span></span>;<span class="comment">//抽象方法</span></span><br><span class="line">&#125;</span><br><span class="line">package com.atguigu.flyweight;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 网站工厂类，根据需要返回压一个网站</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebSiteFactory</span> &#123;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//集合， 充当池的作用</span></span><br><span class="line"><span class="keyword">private</span> HashMap&lt;<span class="keyword">String</span>, ConcreteWebSite&gt; pool = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="comment">//根据网站的类型，返回一个网站, 如果没有就创建一个网站，并放入到池中,并返回</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> WebSite <span class="title">getWebSiteCategory</span><span class="params">(<span class="keyword">String</span> type)</span> </span>&#123; <span class="keyword">if</span>(!pool.containsKey(type)) &#123;</span><br><span class="line"><span class="comment">//就创建一个网站，并放入到池中</span></span><br><span class="line">pool.<span class="built_in">put</span>(type, <span class="keyword">new</span> ConcreteWebSite(type));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> (WebSite)pool.<span class="built_in">get</span>(type);</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取网站分类的总数 (池中有多少个网站类型) public int getWebSiteCount() &#123;</span></span><br><span class="line"><span class="keyword">return</span> pool.<span class="built_in">size</span>();</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="享元模式在-JDK-Interger-的应用源码分析"><a href="#享元模式在-JDK-Interger-的应用源码分析" class="headerlink" title="享元模式在 JDK-Interger 的应用源码分析"></a>享元模式在 JDK-Interger 的应用源码分析</h1><p>1)    Integer 中的享元模式</p>
+<p>2)    代码分析+Debug 源码+说明</p>
+<p>代码说明：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">package com.atguigu.jdk;</span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="keyword">class</span> FlyWeight &#123;</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> static <span class="type">void</span> main(String[] args) &#123;</span><br><span class="line">// TODO Auto-<span class="keyword">generated</span> <span class="keyword">method</span> stub</span><br><span class="line">//如果  <span class="type">Integer</span>.valueOf(x) x 在	<span class="number">-128</span> <span class="comment">--- 127 直接，就是使用享元模式返回,如果不在</span></span><br><span class="line">//范围类，则仍然 <span class="built_in">new</span></span><br><span class="line"></span><br><span class="line">//小结:</span><br><span class="line">//<span class="number">1.</span> 在 valueOf 方法中，先判断值是否在 IntegerCache 中，如果不在，就创建新的 <span class="type">Integer</span>(<span class="built_in">new</span>),  否则，就直接从 缓存池返回</span><br><span class="line">//<span class="number">2.</span> valueOf 方法，就使用到享元模式</span><br><span class="line">//<span class="number">3.</span> 如果使用 valueOf 方法得到一个 <span class="type">Integer</span> 实例，范围在 <span class="number">-128</span> - <span class="number">127</span>  ，执行速度比 <span class="built_in">new</span> 快</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">Integer</span> x = <span class="type">Integer</span>.valueOf(<span class="number">127</span>); // 得到 x 实例，类型 <span class="type">Integer</span> <span class="type">Integer</span> y = <span class="built_in">new</span> <span class="type">Integer</span>(<span class="number">127</span>); // 得 到 y 实 例 ， 类 型 <span class="type">Integer</span> <span class="type">Integer</span> z = <span class="type">Integer</span>.valueOf(<span class="number">127</span>);//..</span><br><span class="line"><span class="type">Integer</span> w = <span class="built_in">new</span> <span class="type">Integer</span>(<span class="number">127</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println(x.equals(y)); // 大小，<span class="keyword">true</span> <span class="keyword">System</span>.<span class="keyword">out</span>.println(x == y ); //	<span class="keyword">false</span> <span class="keyword">System</span>.<span class="keyword">out</span>.println(x == z ); // <span class="keyword">true</span> <span class="keyword">System</span>.<span class="keyword">out</span>.println(w == x ); // <span class="keyword">false</span> <span class="keyword">System</span>.<span class="keyword">out</span>.println(w == y ); // <span class="keyword">false</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">Integer</span> x1 = <span class="type">Integer</span>.valueOf(<span class="number">200</span>); <span class="type">Integer</span> x2 = <span class="type">Integer</span>.valueOf(<span class="number">200</span>);</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="keyword">System</span>.<span class="keyword">out</span>.println("x1==x2" + (x1 == x2)); // <span class="keyword">false</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="享元模式的注意事项和细节"><a href="#享元模式的注意事项和细节" class="headerlink" title="享元模式的注意事项和细节"></a>享元模式的注意事项和细节</h1><p>1)在享元模式这样理解，“享”就表示共享，“元”表示对象。<br>2)系统中有大量对象，这些对象消耗大量内存，并且对象的状态大部分可以外部化时，我们就可以考虑选用享元模式。<br>3)用唯一标识码判断，如果在内存中有，则返回这个唯一标识码所标识的对象，用HashMap/HashTable存储。<br>4)享元模式大大减少了对象的创建，降低了程序内存的占用，提高效率。<br>5)享元模式提高了系统的复杂度。需要分离出内部状态和外部状态，而外部状态具有固化特性，不应该随着内部状态的改变而改变，这是我们使用享元模式需要注意的地方。<br>6)使用享元模式时，注意划分内部状态和外部状态，并且需要有一个工厂类加以控制。<br>7)享元模式经典的应用场景是需要缓冲池的场景，比如 String 常量池、数据库连接池。</p>
+
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F/" rel="prev" title="设计模式-外观模式">
+      <i class="fa fa-chevron-left"></i> 设计模式-外观模式
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/22/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/" rel="next" title="设计模式-代理模式">
+      设计模式-代理模式 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#展示网站项目需求"><span class="nav-number">1.</span> <span class="nav-text">展示网站项目需求</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#传统方案解决网站展现项目"><span class="nav-number">2.</span> <span class="nav-text">传统方案解决网站展现项目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#传统方案解决网站展现项目-问题分析"><span class="nav-number">3.</span> <span class="nav-text">传统方案解决网站展现项目-问题分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#享元模式基本介绍"><span class="nav-number">4.</span> <span class="nav-text">享元模式基本介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#享元模式的原理类图"><span class="nav-number">5.</span> <span class="nav-text">享元模式的原理类图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#内部状态和外部状态"><span class="nav-number">6.</span> <span class="nav-text">内部状态和外部状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#享元模式解决网站展现项目"><span class="nav-number">7.</span> <span class="nav-text">享元模式解决网站展现项目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#享元模式在-JDK-Interger-的应用源码分析"><span class="nav-number">8.</span> <span class="nav-text">享元模式在 JDK-Interger 的应用源码分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#享元模式的注意事项和细节"><span class="nav-number">9.</span> <span class="nav-text">享元模式的注意事项和细节</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>
