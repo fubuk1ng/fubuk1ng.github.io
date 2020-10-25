@@ -1540,6 +1540,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>7.在IDEA控制台中直接执行webpack；如果失败的话，就使用管理员权限运行即可<br>8.运行HTML看效果</p>
 <p>说明</p>
 <figure class="highlight ada"><table><tr><td class="code"><pre><span class="line"># 参数<span class="comment">--watch 用于监听变化</span></span><br><span class="line">webpack <span class="comment">--watch</span></span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
   </entry>
   <entry>
     <title>Start</title>
@@ -1644,6 +1650,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 </ul>
 <h2 id="初始化并运行"><a href="#初始化并运行" class="headerlink" title="初始化并运行"></a>初始化并运行</h2><figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="attr">cd</span> <span class="string">myvue</span></span><br><span class="line"><span class="attr">npm</span> <span class="string">install</span></span><br><span class="line"><span class="attr">npm</span> <span class="string">run dev</span></span><br></pre></td></tr></table></figure>
 ]]></content>
+      <categories>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
   </entry>
   <entry>
     <title>SpringMVC-返回值</title>
@@ -1744,6 +1756,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 </ul>
 <p>CDN</p>
 <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">“https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js”</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
   </entry>
   <entry>
     <title>Vue-router路由</title>
@@ -1776,6 +1794,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <figure class="highlight gradle"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">'vue'</span></span><br><span class="line"><span class="keyword">import</span> App <span class="keyword">from</span> <span class="string">'./App'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//导入上面创建的路由配置目录</span></span><br><span class="line"><span class="keyword">import</span> router <span class="keyword">from</span> <span class="string">'./router'</span><span class="comment">//自动扫描里面的路由配置</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//来关闭生产模式下给出的提示</span></span><br><span class="line">Vue.config.productionTip = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> Vue(&#123;</span><br><span class="line">	el:<span class="string">"#app"</span>,</span><br><span class="line">	<span class="comment">//配置路由</span></span><br><span class="line">	router,</span><br><span class="line">	components:&#123;App&#125;,</span><br><span class="line">	template:<span class="string">'&lt;App/&gt;'</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 <p>6、在App.vue中使用路由</p>
 <figure class="highlight xquery"><table><tr><td class="code"><pre><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span></span><br><span class="line"><span class="xml">	</span><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></span></span><br><span class="line"><span class="xml">		<span class="comment">&lt;!--</span></span></span><br><span class="line"><span class="xml">			router-link：默认会被渲染成一个</span><span class="xml"><span class="tag">&lt;<span class="name">a</span>&gt;</span>标签，to属性为指定链接</span></span><br><span class="line"><span class="xml">			router-view：用于渲染路由匹配到的组件</span></span><br><span class="line"><span class="xml">		--&gt;</span></span><br><span class="line"><span class="xml">		</span><span class="xml"><span class="tag">&lt;<span class="name">router-link</span> <span class="attr">to</span>=<span class="string">"/"</span>&gt;</span>首页<span class="tag">&lt;/<span class="name">router-link</span>&gt;</span></span></span><br><span class="line"><span class="xml">		</span><span class="xml"><span class="tag">&lt;<span class="name">router-link</span> <span class="attr">to</span>=<span class="string">"/content"</span>&gt;</span>内容<span class="tag">&lt;/<span class="name">router-link</span>&gt;</span></span></span><br><span class="line"><span class="xml">		</span><span class="xml"><span class="tag">&lt;<span class="name">router-view</span>&gt;</span><span class="tag">&lt;/<span class="name">router-view</span>&gt;</span></span></span><br><span class="line"><span class="xml">	<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span></span><br><span class="line"><span class="xml">	export default</span><span class="xquery">&#123;</span></span><br><span class="line"><span class="xquery">	<span class="built_in">	name</span>:<span class="string">'App'</span></span></span><br><span class="line"><span class="xquery">	&#125;</span></span><br><span class="line"><span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span></span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
   </entry>
   <entry>
     <title>Vue-实战快速上手</title>
@@ -1809,6 +1833,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>main.js</p>
 <figure class="highlight pgsql"><table><tr><td class="code"><pre><span class="line">// The Vue build <span class="keyword">version</span> <span class="keyword">to</span> <span class="keyword">load</span> <span class="keyword">with</span> the `<span class="keyword">import</span>` command</span><br><span class="line">// (runtime-<span class="keyword">only</span> <span class="keyword">or</span> standalone) has been <span class="keyword">set</span> <span class="keyword">in</span> webpack.base.conf <span class="keyword">with</span> an <span class="keyword">alias</span>.</span><br><span class="line"><span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">'vue'</span></span><br><span class="line"><span class="keyword">import</span> App <span class="keyword">from</span> <span class="string">'./App'</span></span><br><span class="line"><span class="keyword">import</span> router <span class="keyword">from</span> "./router"</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> ElementUI <span class="keyword">from</span> <span class="string">'element-ui'</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">'element-ui/lib/theme-chalk/index.css'</span></span><br><span class="line"></span><br><span class="line">Vue.use(router)</span><br><span class="line">Vue.use(ElementUI)</span><br><span class="line"></span><br><span class="line"><span class="comment">/* eslint-disable no-new */</span></span><br><span class="line"><span class="built_in">new</span> Vue(&#123;</span><br><span class="line">  el: <span class="string">'#app'</span>,</span><br><span class="line">  router,</span><br><span class="line">  render:h=&gt;h(App)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 ]]></content>
+      <categories>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
   </entry>
   <entry>
     <title>Vue-Axios异步通信</title>
@@ -1841,6 +1871,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>Vue实例有一个完整的生命周期，也就是从开始创建初始化数据、编译模板、挂载DOM、渲染一更新一渲染、卸载等一系列过程，我们称这是Vue的生命周期。通俗说就是Vue实例从创建到销毁的过程，就是生命周期。</p>
 <p>在Vue的整个生命周期中，它提供了一系列的事件，可以让我们在事件触发时注册JS方法，可以让我们用自己注册的JS方法控制整个大局，在这些事件响应方法中的this直接指向的是Vue的实例。<br><img src="/2020/10/23/ue-Axios%E5%BC%82%E6%AD%A5%E9%80%9A%E4%BF%A1/1.png" alt="01"></p>
 ]]></content>
+      <categories>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
   </entry>
   <entry>
     <title>Vue-表单双绑和组件</title>
@@ -1873,6 +1909,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Title<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--组件：传递给组件中的值：props--&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">pan</span> <span class="attr">v-for</span>=<span class="string">"item in items"</span> <span class="attr">v-bind:panh</span>=<span class="string">"item"</span>&gt;</span><span class="tag">&lt;/<span class="name">pan</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"../js/vue.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span></span><br><span class="line"><span class="actionscript">    <span class="comment">//定义组件</span></span></span><br><span class="line"><span class="actionscript">    Vue.component(<span class="string">"pan"</span>,&#123;</span></span><br><span class="line"><span class="actionscript">        props:[<span class="string">'panh'</span>],</span></span><br><span class="line"><span class="handlebars"><span class="xml">        template:'<span class="tag">&lt;<span class="name">li</span>&gt;</span></span><span class="template-variable">&#123;&#123;panh&#125;&#125;</span><span class="xml"><span class="tag">&lt;/<span class="name">li</span>&gt;</span>'</span></span></span><br><span class="line"></span><br><span class="line">    &#125;);</span><br><span class="line"><span class="actionscript">    <span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="actionscript">        el:<span class="string">"#app"</span>,</span></span><br><span class="line">        data:&#123;</span><br><span class="line"><span class="actionscript">            items:[<span class="string">"java"</span>,<span class="string">"Linux"</span>,<span class="string">"前端"</span>]</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p>说明：<br>v-for=”item in items”：遍历Vue实例中定义的名为items的数组，并创建同等数量的组件。<br>v-bind:panh=”item”：将遍历的item项绑定到组件中props定义名为item属性上；= 号左边的panh为props定义的属性名，右边的为item in items 中遍历的item项的值。</p>
 ]]></content>
+      <categories>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
   </entry>
   <entry>
     <title>Vue-计算属性、内容分发、自定义事件</title>
@@ -1918,6 +1960,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>遵循SoC关注度分离原则，Vue是纯粹的视图框架，并不包含比如Ajax之类的通信功能，为了解决通信问题，我们需要使用Axios框架做异步通信。</p>
 <p><strong>说明</strong><br>Vue的开发都是要基于NodeJS，实际开发采用Vue-cli脚手架开发，vue-router路由，vuex做状态管理；Vue UI，界面我们一般使用ElementUI（饿了么出品），或者ICE（阿里巴巴出品）来快速搭建前端项目。</p>
 ]]></content>
+      <categories>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
   </entry>
   <entry>
     <title>Vue-基本语法指令</title>
@@ -1937,6 +1985,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>测试：在控制台输入vm.items.push({message：’test’})，尝试追加一条数据，你会发现浏览器中显示的内容会增加一条test。</p>
 <h1 id="v-on"><a href="#v-on" class="headerlink" title="v-on"></a>v-on</h1><p>事件有Vue的事件和前端页面本身的一些事件，这里的click是vue的事件，可以绑定到Vue中的methods中的方法事件。</p>
 <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span> <span class="attr">xmlns:v-on</span>=<span class="string">"http://www.w3.org/1999/xhtml"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Title<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">button</span> <span class="attr">v-on:click</span>=<span class="string">"sayHi"</span>&gt;</span>点我<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"../js/vue.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span></span><br><span class="line"><span class="actionscript">    <span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span></span><br><span class="line"><span class="actionscript">        el:<span class="string">"#app"</span>,</span></span><br><span class="line">        data:&#123;</span><br><span class="line"><span class="actionscript">            message:<span class="string">'Hello World'</span></span></span><br><span class="line">        &#125;,</span><br><span class="line">        methods:&#123;</span><br><span class="line"><span class="actionscript">            sayHi:<span class="function"><span class="keyword">function</span><span class="params">(event)</span></span>&#123;</span></span><br><span class="line"><span class="actionscript">                <span class="comment">//'this'在方法里面指向当前Vue实例</span></span></span><br><span class="line"><span class="actionscript">                alert(<span class="keyword">this</span>.message);</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>Vue</tag>
+      </tags>
   </entry>
   <entry>
     <title>设计模式-组合模式</title>
@@ -1964,6 +2018,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>4)    需要遍历组织机构，或者处理的对象具有树形结构时, 非常适合使用组合模式。</p>
 <p>5)    要求较高的抽象性，如果节点和叶子有很多差异性的话，比如很多方法和属性都不一样，不适合使用组合模式。</p>
 ]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>设计模式</tag>
+      </tags>
   </entry>
   <entry>
     <title>设计模式-装饰者模式</title>
@@ -1999,6 +2059,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 
 <h1 id="装饰者模式在-JDK-应用的源码分析"><a href="#装饰者模式在-JDK-应用的源码分析" class="headerlink" title="装饰者模式在 JDK 应用的源码分析"></a>装饰者模式在 JDK 应用的源码分析</h1><p>Java 的 IO 结构，FilterInputStream 就是一个装饰者<br><img src="/2020/10/18/%E6%A8%A1%E5%BC%8F-%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/6.jpg" alt="06"></p>
 <figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line">package com.atguigu.jdk;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.DataInputStream; <span class="keyword">import</span> java.io.FileInputStream; <span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Decorator</span> &#123;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">String</span>[] args)</span> throws Exception</span>&#123;</span><br><span class="line"><span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//说明</span></span><br><span class="line"><span class="comment">//1. InputStream  是抽象类,  类似我们前面讲的 Drink</span></span><br><span class="line"><span class="comment">//2. FileInputStream 是	InputStream  子类，类似我们前面的 DeCaf, LongBlack</span></span><br><span class="line"><span class="comment">//3. FilterInputStream	是	InputStream 子类：类似我们前面 的 Decorator 修饰者</span></span><br><span class="line"><span class="comment">//4. DataInputStream  是 FilterInputStream  子类，具体的修饰者，类似前面的 Milk, Soy 等</span></span><br><span class="line"><span class="comment">//5. FilterInputStream 类  有	protected volatile InputStream in;  即含被装饰者</span></span><br><span class="line"><span class="comment">//6. 分析得出在 jdk 的 io 体系中，就是使用装饰者模式</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">DataInputStream dis = <span class="keyword">new</span> DataInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"d:\\abc.txt"</span>)); System.out.<span class="built_in">println</span>(dis.<span class="built_in">read</span>());</span><br><span class="line">dis.<span class="built_in">close</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>设计模式</tag>
+      </tags>
   </entry>
   <entry>
     <title>设计模式-享元模式</title>
@@ -2036,6 +2102,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 
 <h1 id="享元模式的注意事项和细节"><a href="#享元模式的注意事项和细节" class="headerlink" title="享元模式的注意事项和细节"></a>享元模式的注意事项和细节</h1><p>1)在享元模式这样理解，“享”就表示共享，“元”表示对象。<br>2)系统中有大量对象，这些对象消耗大量内存，并且对象的状态大部分可以外部化时，我们就可以考虑选用享元模式。<br>3)用唯一标识码判断，如果在内存中有，则返回这个唯一标识码所标识的对象，用HashMap/HashTable存储。<br>4)享元模式大大减少了对象的创建，降低了程序内存的占用，提高效率。<br>5)享元模式提高了系统的复杂度。需要分离出内部状态和外部状态，而外部状态具有固化特性，不应该随着内部状态的改变而改变，这是我们使用享元模式需要注意的地方。<br>6)使用享元模式时，注意划分内部状态和外部状态，并且需要有一个工厂类加以控制。<br>7)享元模式经典的应用场景是需要缓冲池的场景，比如 String 常量池、数据库连接池。</p>
 ]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>设计模式</tag>
+      </tags>
   </entry>
   <entry>
     <title>设计模式-代理模式</title>
@@ -2085,6 +2157,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>3)    远程代理<br>远程对象的本地代表，通过它可以把远程对象当本地对象来调用。远程代理通过网络和真正的远程对象沟通信息。</p>
 <p>4)    同步代理<br>主要使用在多线程编程中，完成多线程间同步工作同步代理：主要使用在多线程编程中，完成多线程间同步工作</p>
 ]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>设计模式</tag>
+      </tags>
   </entry>
   <entry>
     <title>设计模式-原型模式</title>
@@ -2119,6 +2197,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>4)    在实现深克隆的时候可能需要比较复杂的代码</p>
 <p>5)    缺点：需要为每一个类配备一个克隆方法，这对全新的类来说不是很难，但对已有的类进行改造时，需要修改其源代码，违背了 ocp 原则</p>
 ]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>设计模式</tag>
+      </tags>
   </entry>
   <entry>
     <title>设计模式-外观模式</title>
@@ -2164,6 +2248,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>5)    在维护一个遗留的大型系统时，可能这个系统已经变得非常难以维护和扩展，此时可以考虑为新系统开发一个Facade 类，来提供遗留系统的比较清晰简单的接口，让新系统与 Facade 类交互，提高复用性。</p>
 <p>6)    不能过多的或者不合理的使用外观模式，使用外观模式好，还是直接调用模块好。要以让系统有层次，利于维护为目的。</p>
 ]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>设计模式</tag>
+      </tags>
   </entry>
   <entry>
     <title>设计模式-桥接模式</title>
@@ -2199,6 +2289,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>2)    -银行转账系统<br>转账分类: 网上转账，柜台转账，AMT 转账<br>转账用户类型：普通用户，银卡用户，金卡用户..</p>
 <p>3)    -消息管理<br>消息类型：即时消息，延时消息<br>消息分类：手机短信，邮件消息，QQ 消息…</p>
 ]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>设计模式</tag>
+      </tags>
   </entry>
   <entry>
     <title>设计模式-单例设计模式</title>
@@ -2317,6 +2413,12 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>3)    Adapter 模式最大的作用还是将原本不兼容的接口融合在一起工作。</p>
 <p>4)    实际开发中，实现起来不拘泥于我们讲解的三种经典形式</p>
 ]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>设计模式</tag>
+      </tags>
   </entry>
   <entry>
     <title>设计模式-七大设计原则</title>
@@ -2481,5 +2583,11 @@ default这个servlet作用：<br>1)处理静态资源<br>2)处理未映射到其
 <p>6)    如果产品的内部变化复杂，可能会导致需要定义很多具体建造者类来实现这种变化，导致系统变得很庞大，因此在这种情况下，要考虑是否选择建造者模式。</p>
 <p>7)    抽象工厂模式 VS 建造者模式<br>抽象工厂模式实现对产品家族的创建，一个产品家族是这样的一系列产品：具有不同分类维度的产品组合，采用抽象工厂模式不需要关心构建过程，只关心什么产品由什么工厂生产即可。而建造者模式则是要求按照指定的蓝图建造产品，它的主要目的是通过组装零配件而产生一个新产品。</p>
 ]]></content>
+      <categories>
+        <category>设计模式</category>
+      </categories>
+      <tags>
+        <tag>设计模式</tag>
+      </tags>
   </entry>
 </search>
