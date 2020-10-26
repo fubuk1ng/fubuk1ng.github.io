@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="数据链路层的基本概念数据链路层的简单模型数据链路层不关心物理层解决的问题，只关心帧头帧尾和校验。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络-数据链路层">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="数据链路层的基本概念数据链路层的简单模型数据链路层不关心物理层解决的问题，只关心帧头帧尾和校验。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/1.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/2.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/3.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/4.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/5.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/6.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/7.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/8.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/9.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/10.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/11.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/12.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/13.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/14.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/15.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/16.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/17.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/18.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/19.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/20.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/21.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/22.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/23.png">
+<meta property="article:published_time" content="2020-10-25T12:23:57.000Z">
+<meta property="article:modified_time" content="2020-10-26T12:02:54.700Z">
+<meta property="article:author" content="fubuking">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/1.png">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>计算机网络-数据链路层 | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">56</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机网络-数据链路层
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-25 20:23:57" itemprop="dateCreated datePublished" datetime="2020-10-25T20:23:57+08:00">2020-10-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-26 20:02:54" itemprop="dateModified" datetime="2020-10-26T20:02:54+08:00">2020-10-26</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="数据链路层的基本概念"><a href="#数据链路层的基本概念" class="headerlink" title="数据链路层的基本概念"></a>数据链路层的基本概念</h1><h2 id="数据链路层的简单模型"><a href="#数据链路层的简单模型" class="headerlink" title="数据链路层的简单模型"></a>数据链路层的简单模型</h2><p>数据链路层不关心物理层解决的问题，只关心帧头帧尾和校验。</p>
+<p><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/1.png" alt="01"></p>
+<a id="more"></a>
+
+<h2 id="数据链路层的信道类型"><a href="#数据链路层的信道类型" class="headerlink" title="数据链路层的信道类型"></a>数据链路层的信道类型</h2><p>点到点信道：这种信道使用一对一的点对点通信方式。<br>广播信道：广播信道上的主机很多，需要专用的共享信道协议来协调主机的数据发送。</p>
+<h2 id="链路与数字链路"><a href="#链路与数字链路" class="headerlink" title="链路与数字链路"></a>链路与数字链路</h2><p>链路(link)——是一条点到点的物理线路段，中间没有任何其他的交换节点。一条链路只是一条通路的一个组成部分。<br>数据链路(data link)——除了物理线路外，还必须有通信协议来控制这些数据的传输。若把实现这些协议的硬件和软件加到链路上，就构成了数据链路。最常用的方法是使用适配器(网卡)来实现这些协议的硬件和软件。一般的适配器都包括了数据链路层和物理层这两层的功能。</p>
+<h2 id="帧"><a href="#帧" class="headerlink" title="帧"></a>帧</h2><p>在网络层，给数据包增加了接收端和发送端的IP地址。在数据链路层里，增加了帧头帧尾，MAC地址和校验值。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/2.png" alt="02"></p>
+<h1 id="数据链路层解决的基本问题"><a href="#数据链路层解决的基本问题" class="headerlink" title="数据链路层解决的基本问题"></a>数据链路层解决的基本问题</h1><h2 id="封装成帧-framing"><a href="#封装成帧-framing" class="headerlink" title="封装成帧(framing)"></a>封装成帧(framing)</h2><p>就是在一段数据的前后分别添加帧头和帧尾，构成一个帧，确定帧的界限。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/3.png" alt="03"><br>但是，可能会出现以下问题<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/4.png" alt="04"></p>
+<h2 id="透明传输"><a href="#透明传输" class="headerlink" title="透明传输"></a>透明传输</h2><p>用字节填充法解决透明传输问题。发送端的数据链路层在数据中出现控制字符“SOH”或“EOT”的前面插入一个转义字符“ESC”(十六进制数1B)。<br>字节填充(byte stuffing)或字符填充(character stuffing)——接收端的数据链路层在数据送往网络层之前删除插入的转义字符。<br>如果转义字符也出现在数据之中，那么应该在转义字符前插入一个转义字符。当接收端收到连续的两个转义字符时，就删除前面的那一个。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/5.png" alt="05"></p>
+<h2 id="差错校验"><a href="#差错校验" class="headerlink" title="差错校验"></a>差错校验</h2><p>传输过程中可能会产生bit差错：0变成1，1变成0。<br>在一段时间内，传输错误的比特率占所传输比特总数的比率称为误码率BER(bit error rate)。<br>误码率和信噪比的关系很大。<br>为了保证数据传输的可靠性，在计算机网络传输数据时，必须采用各种差错检验措施。<br>-&gt;循环冗余检验CRC:<br>除数必须比后面添加的0的位数多一位，可以是任意的二进制数。每一步运算其实是不进位的加法。下图的001就是FCS帧检验序列。接收端计算101001001(也就是原数据加上FCS)除以1101，如果商为0，意味着传输过程没有差错，就接受，否则丢弃。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/6.png" alt="06"><br>在数据后面添加的冗余码称为帧检验序列FCS(frame check seqeunce)。CRC不是获得FCS的唯一方法。<br>特点：<br>不能确定出错的bit的是哪一位；<br>可能会出错，但只要经过严格的挑选，并且除数位数足够大，就可以极大减少出错概率；<br>CRC只能做到无差错接受(意思是传输过程没有差错，有差错的一律丢弃)；<br>要做到可靠传输，必须加上确认和重传机制。</p>
+<h1 id="两种情况下的数据链路层"><a href="#两种情况下的数据链路层" class="headerlink" title="两种情况下的数据链路层"></a>两种情况下的数据链路层</h1><h2 id="使用点对点信道的数据链路层-广域网"><a href="#使用点对点信道的数据链路层-广域网" class="headerlink" title="使用点对点信道的数据链路层(广域网)"></a>使用点对点信道的数据链路层(广域网)</h2><p>(1)PPP协议(point to point protocol)，是数据链路层协议，例如用户使用拨号上网。<br>(2)PPP协议应该满足：<br>简单；封装成帧；透明性；多种网络层协议；多种类型链路；差错检验；检测连接状态；最大传送单元；网络层地址协商；数据压缩协商；<br>(3)PPP协议不需要满足：<br>纠错；流量控制；序号；多点链接；半双工或单工连接。<br>(4)PPP协议的组层部分：<br>数据链路层协议可以用于异步串行或同步串行介质；<br>使用LCP(链路控制协议)建立并维护数据链路连接，可以实现身份验证和欠费管理；<br>网络控制协议(NCP)允许在点到点连接上使用多种网络层协议，如下图；<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/7.png" alt="07"><br>(5)PPP协议帧格式<br>标志字段F = 0x7E<br>地址字段A = 0xFF，它并不起作用<br>控制字段C = 0x03<br>PPP协议是面向字节的，所以所有的PPP帧的长度都是整数字节。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/8.png" alt="08"><br>(6)字节填充(类似于透明传输)<br>此时，信息部分是以字节为单位的。<br>将信息字段中出现的每个0x7E字节转变成为2字节序列(0x7D,0x5E);<br>将信息字段中出现的每个0x7D字节转变成为2字节序列(0x7D,0x5D);<br>将信息字段中出现的每个ASCII码控制字符(小于0x20字符)，在前面加入一个0x7D；<br>(7)0比特填充(类似于透明传输)<br>此时，信息部分是二进制流。PPP协议在SONET/SDH链路时，是使用同步传输。<br>在发送端，只要发现有5个连续的1，则填充一个0，接收端删掉对应的0。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/9.png" alt="09"><br>(8)PPP协议不使用序号和确认机制的原因<br>在数据链路层出现错误的概率不大时，使用较简单的PPP协议较为合理；<br>在Internet环境下，PPP的信息字段放入的数据是IP数据报。数据链路层的可靠传输并不能保证网络层的传输也是可靠的；<br>帧检验序列FCS字段可以保证无差错接受。<br>(9)PPP协议的工作状态<br>当用户拨号接入ISP(网络运营商)时，路由器的调制解调器对拨号进行确认，建立物理连接；<br>PC机箱路由器发送一些列的LCP(链路控制协议)分组(封装成多个PPP帧)；<br>这些分组及其响应选择一些PPP参数，和进行网络层配置，NCP(网络控制协议)给新接入的PC机分配一个临时的IP地址，使PC机成为Internet上的一个主机；<br>通信完毕后，NCP释放网络层连接，收回原来分配出去的IP地址；<br>接着，LCP释放数据链路层连接；<br>最后释放的是物理层连接。</p>
+<h2 id="使用广播信道的数据链路层-局域网"><a href="#使用广播信道的数据链路层-局域网" class="headerlink" title="使用广播信道的数据链路层(局域网)"></a>使用广播信道的数据链路层(局域网)</h2><p>一般是总线型。<br>(1)局域网的拓扑<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/10.png" alt="10"></p>
+<p>(2)共享通信媒体<br>静态划分信道(麻烦)：<br>频分复用；时分复用；波分复用；码分复用；<br>动态媒体接入控制(多点接入)：<br>随机接入(主要是以太网)；受控接入，如多点线路探询(polling)，轮询(不采用了)。    </p>
+<p>(3)认识以太网<br>最初的以太网是将许多计算机都连接到一根总线上，当初认为这样连接即简单又可靠，因为总线上没有有源器件。<br>总线上每一个主机都能检测到B发送的数据。但是只有D的地址和数据帧首部写入的地址一致，所以只有D接收。其余计算机都能检测到这不是发送给他们的数据帧，所以就丢弃这个数据帧。<br>这是一种具有广播特性的总线上实现了一对一通信。这种方式不安全。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/11.png" alt="11"></p>
+<p>(4)带冲突检测的载波监听/碰撞检测<br>CSMA/CD：<br>Carrier Sense Multiple Access with Collision Detection<br>多点接入：<br>许多计算机以多点接入的方式连接在一根总线上。<br>载波监听：<br>每一个站在发送数据之前都先要用电子技术检测一下总线时候有其它计算机在发送数据信号，如果有则不发送数据，以免发生碰撞；    </p>
+<p>(5)碰撞检测<br>碰撞检测就是计算机边发送数据边检测信道上信号电压的大小。<br>当几个站同时在总线上发送数据时，总线上的信号电压摆动值将会增大；<br>当一个站检测到信号电压摆动值超过一定的门限值时，就认为总线上至少有两个站在同时发送数据，表明产生了碰撞；<br>碰撞就是冲突，碰撞检测也称冲突检测。<br>检测到碰撞后：<br>在发生碰撞时，总线上传输的信号产生了严重的失真，无法从中恢复出有用的信息；<br>每一个正在发送数据的站，一旦发现总线上出现了碰撞，就立即停止发送，避免浪费网络资源，等待一个随机的时间后再次发送。    </p>
+<p>(6)传播时延对载波监听的影响<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/12.png" alt="12"><br>在2t时间内，可能存在碰撞。</p>
+<p>(7)CSMA/CD的重要特性<br>使用CSMA/CD协议的以太网不能进行全双工通信而只能进行双向交替通信(半双工)；<br>每个站在发送数据之后的一小段时间内，存在着遭遇碰撞的可能；<br>这种发送的不确定性使整个以太网的平均通信量远小于以太网的最高数据率。</p>
+<p>(8)争用期<br>最先发送数据帧的站，在发送数据帧后至多经过时间2t(2倍的端到端往返时延)就可知道发送的数据帧是否发生了碰撞。<br>经过争用期这段时间还没有检测到碰撞，就可以肯定不会发生碰撞；<br>以太网的争用期：<br>-&gt;以太网的端到端往返时延2t称为争用期，或碰撞窗口，通常取51.2微秒为争用期的长度；如果网线过长，会导致争用期时间的延长，这也是为什么网线一般不超过100m；<br>-&gt;对于10Mb/s的以太网，在争用期可以发送512bit，也就是64 byte；<br>-&gt;以太网在发送数据的时候，若前64字节没有冲突，后续也不会发生冲突；<br>最短有效帧长：<br>-&gt;如果发生冲突，一定是前64字节；<br>-&gt;由于一旦发生冲突就立刻停止，所以已发送的数据一定小于64字节；<br>-&gt;以太网规定了最短有效帧长为64字节，凡事小于64字节的帧一定是因为冲突而异常终止的无效帧。    </p>
+<p>(9)二进制指数类型退避算法<br>发送碰撞的站在停止发送数据后，要推迟一个随机事件才能发送数据。<br>确定基本退避时间，一般是争用期2t；<br>定义参数k = min(重传次数，10)；<br>从整数集合{0,1,…,2^k-1}中随机取出一个数，记为r，重传所需的时延就是r倍的基本退避时间；<br>当重传达16次时仍不能成功时就丢弃该帧，并向高层报告。    </p>
+<h1 id="以太网"><a href="#以太网" class="headerlink" title="以太网"></a>以太网</h1><h2 id="以太网的两个标准"><a href="#以太网的两个标准" class="headerlink" title="以太网的两个标准"></a>以太网的两个标准</h2><p>DIX Ethernet V2一般是指这个。<br>IEEE 802.3 两个标准差别很小。<br>以太网 是满足DIX Ethernet V2标准的局域网。    </p>
+<h2 id="以太网与数据链路层的2个子层"><a href="#以太网与数据链路层的2个子层" class="headerlink" title="以太网与数据链路层的2个子层"></a>以太网与数据链路层的2个子层</h2><p>为了使数据链路层更好的适应多种局域网标准，802委员会把局域网拆分为：<br>-&gt;逻辑链路控制LLC(Logical Link Control)子层；<br>-&gt;媒体接入控制MAC(Medium Access Control)子层。<br>与接入到传输媒体有关的内容都放在MAC子层上，而LLC子层与传输媒体无关，不管什么协议的局域网对LLC子层都是透明的；<br>由于局域网标准一般是DIX Ethernet V2而不是IEEE 802.3，所以802.2标准的LLC子层作用已经不大了，很多厂商适配器没有LLC协议；    </p>
+<h2 id="以太网提供的服务"><a href="#以太网提供的服务" class="headerlink" title="以太网提供的服务"></a>以太网提供的服务</h2><p>以太网提供服务是不可靠的交付，即最大努力的交付；<br>当接收站收到的有差错的数据帧时就丢弃此帧，其它什么也不做，差错的纠正由高层来处理；<br>如果高层发现丢失了一些数据而进行重传，但以太网并不知道这是一个重传的帧，而是当作一个新帧发送。    </p>
+<h2 id="以太网的星型拓扑结构"><a href="#以太网的星型拓扑结构" class="headerlink" title="以太网的星型拓扑结构"></a>以太网的星型拓扑结构</h2><p>物理上是星型，逻辑上是总线型。<br>为了降低成本，最初由粗的同轴电缆变成细的同轴电缆最后变成无屏蔽双绞线。每个站需要用两对双绞线，分别用于发送和接收；<br>在星形的中心增加了一种可靠性高的设备，为集线器(hub)。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/13.png" alt="13"></p>
+<h2 id="集线器的特点"><a href="#集线器的特点" class="headerlink" title="集线器的特点"></a>集线器的特点</h2><p>集线器使用电子器件来模拟实际电缆线的工作，因此整个系统仍然是像一个传统的以太网那样运行。由于集线器使用了大规模集成电路芯片，所以可靠性更高；<br>使用集线器逻辑上仍然是一个总线网，各工作站使用的还是CSMA/CD协议，共享逻辑网络上的总线；<br>集线器像一个多接口的转发器，工作在物理层。    </p>
+<h2 id="10Base-T-基于集线器的以太网标准"><a href="#10Base-T-基于集线器的以太网标准" class="headerlink" title="10Base-T 基于集线器的以太网标准"></a>10Base-T 基于集线器的以太网标准</h2><p>它的通信距离稍短，每个站到集线器的距离不超过100m。<br>这种10MB/s的无屏蔽双绞线星形网的出现，能降低成本和提高可靠性。<br>10Base-T的出现有很大的意义，类似标准有100Base-FX，10Base-T，100Base-T4。    </p>
+<h2 id="信道利用率"><a href="#信道利用率" class="headerlink" title="信道利用率"></a>信道利用率</h2><p>争用期长度为2t；帧长为L bit，数据发送率为C b/s，帧的发送时间为L/C = T0 秒。<br>一个帧从开始发送，经可能发生的碰撞后，将再次重传多次，直到发送成功且信道转为空闲(即再经过t使得信道上没有信号在传播)时为止，是发送一帧所需的平均时间。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/14.png" alt="14"><br>定义a = t / T0，他是单程端到端时延t与帧发送时间T0的比值。a越小，说明碰撞检测越快，信道利用率高。<br>当数据率(网速)一定时，以太网的连线长度受到限制，否则t会太长；<br>以太网的帧长不能太短，否则T0太小，使a太大。    </p>
+<h2 id="信道利用率的最大值"><a href="#信道利用率的最大值" class="headerlink" title="信道利用率的最大值"></a>信道利用率的最大值</h2><p>假设理想状态下，以太网个展发送的数据都不会碰撞，一旦总线空闲就能有站立即发送数据，所以没有争用期；<br>发送一帧需要占用总线T0+t，而帧本身需要发送时间为T0，于是理想情况下极限信道利用率Smax = T0 / (T0 + t) = 1 / (1 + a)。(发送时间/发送时间+传输时间)</p>
+<h1 id="MAC层"><a href="#MAC层" class="headerlink" title="MAC层"></a>MAC层</h1><h2 id="MAC层的硬件地址-MAC地址"><a href="#MAC层的硬件地址-MAC地址" class="headerlink" title="MAC层的硬件地址(MAC地址)"></a>MAC层的硬件地址(MAC地址)</h2><p>硬件地址 = 物理地址 = MAC地址<br>MAC地址前3个字节(24位)是厂家分配的地址字段，后3个字节(24位)是厂家自定义，称为扩展标识符；<br>一个地址块可以产生2^24个地址，这种48位地址称为MAC-48，通用名为EUI-48，这就是MAC地址；<br>MAC地址实际上是每一个站的名字或标识符。    </p>
+<h2 id="适配器检查MAC地址"><a href="#适配器检查MAC地址" class="headerlink" title="适配器检查MAC地址"></a>适配器检查MAC地址</h2><p>适配器从网络上每收到一个MAC帧就要用硬件检查MAC帧中的MAC地址：<br>-&gt;如果是发往本站的帧就收下，然后进行其它处理；<br>-&gt;否则丢弃。<br>发往本站的帧包括：<br>-&gt;单播帧(unicast)(一对一)<br>-&gt;广播帧(broadcast)(一对全体)<br>-&gt;多播帧(multicast)(一对多)    </p>
+<h2 id="MAC帧的格式"><a href="#MAC帧的格式" class="headerlink" title="MAC帧的格式"></a>MAC帧的格式</h2><p>6 + 6 + 2 + 46 + 4 =64 byte，这就是为什么IP数据报的最短长度为46字节。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/15.png" alt="15"><br>前8个字节的作用是实现比特同步，第一个字段共7个字节，称为前同步码，作用是实现快速MAC帧的比特同步；第二个字段是帧开始定界符，表示后面的信息是MAC帧。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/16.png" alt="16"></p>
+<h2 id="无效的MAC帧"><a href="#无效的MAC帧" class="headerlink" title="无效的MAC帧"></a>无效的MAC帧</h2><p>帧的长度不是整数个字节；<br>用收到的帧检验序列FCS查出有错误；<br>数据字段的长度不在46-1518字节内；<br>对于检查出来的无效MAC帧简单的丢弃。    </p>
+<h2 id="帧间最小间隔"><a href="#帧间最小间隔" class="headerlink" title="帧间最小间隔"></a>帧间最小间隔</h2><p>为9.6微秒。相当于96bit的发送时间。<br>一个站在检测到总线空闲时，还需要等待9.6微秒后才能再次发送数据，这样做是为了使刚刚收到的数据帧的站接收缓存来得及清理，做好接收下一帧的准备。</p>
+<h1 id="扩展以太网"><a href="#扩展以太网" class="headerlink" title="扩展以太网"></a>扩展以太网</h1><h2 id="在物理层考虑扩展"><a href="#在物理层考虑扩展" class="headerlink" title="在物理层考虑扩展"></a>在物理层考虑扩展</h2><p>(1)距离的扩展<br>主机使用光纤和一对光纤调制解调器连接到集线器。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/17.png" alt="17"><br>(2)数量的扩展<br>集线器集联：使网络中计算机增加，变成一个大的冲突域，会造成效率降低。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/18.png" alt="18"></p>
+<h2 id="在数据链路层考虑扩展"><a href="#在数据链路层考虑扩展" class="headerlink" title="在数据链路层考虑扩展"></a>在数据链路层考虑扩展</h2><p>(1)使用网桥<br>网桥工作在数据链路层，他根据MAC帧的目的地址对收到的帧进行转发。网桥具有过滤帧的功能。当网桥收到一个帧时，并不是向所有的接口转发此帧，而是现检查此帧的目的MAC地址，然后再确定将该帧转发到对应的接口。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/19.png" alt="19"></p>
+<p>(2)交换机<br>随着网桥的接口的增加， 后来网桥和集线器合并了，计算机可以直接和交换机连接，这就是交换机。<br>交换机就是网桥和集线器的合并升级版，能全双工，安全通信。<br>端口带宽独享；<br>安全；<br>基于MAC地址转发；<br>通过学习构建MAC地址表。<br>(3)透明网桥(transparent )<br>透明指局域网上的站点不知道所发送的帧将经过几个网桥，因为网桥对于各站点是看不见的。<br>透明网桥是一种即插即用的设备，标准是IEEE 802.1D。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/20.png" alt="20"></p>
+<p>透明网桥使用了生成树算法。避免产生转发的帧在网络中不停的转圈。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/21.png" alt="21"><br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/22.png" alt="22"></p>
+<h2 id="虚拟局域网"><a href="#虚拟局域网" class="headerlink" title="虚拟局域网"></a>虚拟局域网</h2><p>虚拟局域网 VLAN 是由一些局域网网段构成的与物理位置无关的逻辑组。这些网段具有某些共同的需求。每一个 VLAN 的帧都有一个明确的标识符（tag），指明发送这个帧的工作站是属于哪一个 VLAN。<br><img src="/2020/10/25/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/23.png" alt="23"><br>VLAN间的通信只能通过第三层设备实现：路由器，三层交换机<br>VLAN的划分方法：<br>基于端口（静态划分）根据端口号划分<br>基于MAC地址（动态划分），根据用户计算机的MAC地址划分VLAN<br>基于网络地址或网络协议类型（动态），根据用户计算机的IP地址划分VLAN    </p>
+
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/25/Vue-%E5%AE%9E%E6%88%98%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B/" rel="prev" title="Vue-实战快速上手">
+      <i class="fa fa-chevron-left"></i> Vue-实战快速上手
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数据链路层的基本概念"><span class="nav-number">1.</span> <span class="nav-text">数据链路层的基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据链路层的简单模型"><span class="nav-number">1.1.</span> <span class="nav-text">数据链路层的简单模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据链路层的信道类型"><span class="nav-number">1.2.</span> <span class="nav-text">数据链路层的信道类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#链路与数字链路"><span class="nav-number">1.3.</span> <span class="nav-text">链路与数字链路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#帧"><span class="nav-number">1.4.</span> <span class="nav-text">帧</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据链路层解决的基本问题"><span class="nav-number">2.</span> <span class="nav-text">数据链路层解决的基本问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#封装成帧-framing"><span class="nav-number">2.1.</span> <span class="nav-text">封装成帧(framing)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#透明传输"><span class="nav-number">2.2.</span> <span class="nav-text">透明传输</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#差错校验"><span class="nav-number">2.3.</span> <span class="nav-text">差错校验</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#两种情况下的数据链路层"><span class="nav-number">3.</span> <span class="nav-text">两种情况下的数据链路层</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用点对点信道的数据链路层-广域网"><span class="nav-number">3.1.</span> <span class="nav-text">使用点对点信道的数据链路层(广域网)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用广播信道的数据链路层-局域网"><span class="nav-number">3.2.</span> <span class="nav-text">使用广播信道的数据链路层(局域网)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#以太网"><span class="nav-number">4.</span> <span class="nav-text">以太网</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#以太网的两个标准"><span class="nav-number">4.1.</span> <span class="nav-text">以太网的两个标准</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#以太网与数据链路层的2个子层"><span class="nav-number">4.2.</span> <span class="nav-text">以太网与数据链路层的2个子层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#以太网提供的服务"><span class="nav-number">4.3.</span> <span class="nav-text">以太网提供的服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#以太网的星型拓扑结构"><span class="nav-number">4.4.</span> <span class="nav-text">以太网的星型拓扑结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集线器的特点"><span class="nav-number">4.5.</span> <span class="nav-text">集线器的特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10Base-T-基于集线器的以太网标准"><span class="nav-number">4.6.</span> <span class="nav-text">10Base-T 基于集线器的以太网标准</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#信道利用率"><span class="nav-number">4.7.</span> <span class="nav-text">信道利用率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#信道利用率的最大值"><span class="nav-number">4.8.</span> <span class="nav-text">信道利用率的最大值</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MAC层"><span class="nav-number">5.</span> <span class="nav-text">MAC层</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MAC层的硬件地址-MAC地址"><span class="nav-number">5.1.</span> <span class="nav-text">MAC层的硬件地址(MAC地址)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#适配器检查MAC地址"><span class="nav-number">5.2.</span> <span class="nav-text">适配器检查MAC地址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MAC帧的格式"><span class="nav-number">5.3.</span> <span class="nav-text">MAC帧的格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#无效的MAC帧"><span class="nav-number">5.4.</span> <span class="nav-text">无效的MAC帧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#帧间最小间隔"><span class="nav-number">5.5.</span> <span class="nav-text">帧间最小间隔</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#扩展以太网"><span class="nav-number">6.</span> <span class="nav-text">扩展以太网</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#在物理层考虑扩展"><span class="nav-number">6.1.</span> <span class="nav-text">在物理层考虑扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在数据链路层考虑扩展"><span class="nav-number">6.2.</span> <span class="nav-text">在数据链路层考虑扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟局域网"><span class="nav-number">6.3.</span> <span class="nav-text">虚拟局域网</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">56</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>
