@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="IP 地址与MAC硬件地址我们都知道数据通信要使用IP地址加MAC地址，两个地址缺一不可，下为原理图：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络-网络层-3">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="IP 地址与MAC硬件地址我们都知道数据通信要使用IP地址加MAC地址，两个地址缺一不可，下为原理图：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/1.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/2.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/3.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/4.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/5.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/6.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/7.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/8.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/9.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/10.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/11.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/12.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/13.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/14.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/15.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/16.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/17.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/18.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/19.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/20.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/21.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/22.png">
+<meta property="article:published_time" content="2020-11-03T12:21:49.000Z">
+<meta property="article:modified_time" content="2020-11-04T12:07:05.290Z">
+<meta property="article:author" content="fubuking">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/1.png">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>计算机网络-网络层-3 | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">70</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机网络-网络层-3
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-11-03 20:21:49" itemprop="dateCreated datePublished" datetime="2020-11-03T20:21:49+08:00">2020-11-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-11-04 20:07:05" itemprop="dateModified" datetime="2020-11-04T20:07:05+08:00">2020-11-04</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="IP-地址与MAC硬件地址"><a href="#IP-地址与MAC硬件地址" class="headerlink" title="IP 地址与MAC硬件地址"></a>IP 地址与MAC硬件地址</h1><p>我们都知道数据通信要使用IP地址加MAC地址，两个地址缺一不可，下为原理图：<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/1.png" alt="01"></p>
+<a id="more"></a>
+
+<p><strong>下面介绍计算机A与计算机B通信的过程</strong><br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/2.png" alt="02"></p>
+<ul>
+<li>交换机基于数据帧的MAC地址转发数据帧，路由器基于数据包的IP地址转发数据包；</li>
+<li>数据包在传输过程不变，经过网络设备数据帧要用新的物理层（MAC）地址重新包装；</li>
+<li>MAC地址决定了数据帧在网络设备中转过程中下一站由哪个设备接收，而IP地址决定了数据包的起0点和终点。</li>
+</ul>
+<p>例如图中的使用M表示MAC地址，由于计算机A所处的10.0.0.2网段与计算机B所处的12.0.0.2网段不同，所以A与B不能直接通信，需要借助路由器中转。</p>
+<p>首先，计算机发出数据帧1，里面标明了源IP地址与目标IP地址、 源MAC地址与目标MAC地址，这样数据帧1就可以通过交换机准确传输到目标MAC地址M2,即路由器Router1处；</p>
+<p>路由器通过查找路由表确定到12.0.0.2的网段的路径，并把该数据帧发现通向该路径的M3接口处，M3接口再对数据帧1进行封装改变源MAC地址和目标MAC地址，IP地址不变并发出数据帧2；</p>
+<p>以此类推，最终数据帧传输到12.网段的路由器上，该路由器再通过同网段的交换机把数据帧3发送到计算机B处，完成通信。</p>
+<p><strong>注意</strong></p>
+<ul>
+<li>我们把数据传输过程中数据帧中不变的部分：即数据+IP地址（目标地址与源地址）称为数据包；</li>
+<li>数据包加上MAC地址（目标地址与源地址）之后整体称为数据帧，数据帧中的MAC地址过一个网络设备变一次。</li>
+<li>IP地址与MAC地址区别：IP地址决定数据包最终要到达的计算机（终点）；MAC地址决定中转过程中下一站到哪个设备（中转站）去。</li>
+</ul>
+<p><strong>应用</strong><br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/3.png" alt="03"><br>如果在交换机Switch0这个网段中的PC2中安装代理服务器（比如CCProxy）来控制该网段的其他计算机是否能上网；</p>
+<p>当在同一网段中，可以直接通过MAC地址通信，所以PC2中的代理服务器只需要设置本网段中的哪些MAC地址可以上网，就可以实现对本网段中的PC1、 PC2实现上网控制。</p>
+<p>当在不同网段时，比如使用PC2控制Switch1这两个段的所有计算机是否能上网，则在代理服务器中不仅要设置哪些MAC地址能上网，而且还要设置哪些IP地址能上网-。</p>
+<h1 id="ARP-amp-RARP协议"><a href="#ARP-amp-RARP协议" class="headerlink" title="ARP&amp;RARP协议"></a>ARP&amp;RARP协议</h1><h2 id="ARP简介"><a href="#ARP简介" class="headerlink" title="ARP简介"></a>ARP简介</h2><p>不管网络层使用的是什么协议，在实际网络的链路上传送数据帧时，最终还是必须使用硬件地址。</p>
+<p>每一个主机都设有一个 ARP 高速缓存(ARP cache)，里面有所在的局域网上的各主机和路由器的 IP 地址到硬件地址的映射表。</p>
+<p>当主机 A 欲向本局域网上的某个主机 B 发送 IP 数据报时，就先在其 ARP 高速缓存中查看有无主机 B 的 IP 地址。如有，就可查出其对应的硬件地址，再将此硬件地址写入 MAC 帧，然后通过局域网将该 MAC 帧发往此硬件地址。</p>
+<h2 id="ARP-MAC地址欺骗"><a href="#ARP-MAC地址欺骗" class="headerlink" title="ARP MAC地址欺骗"></a>ARP MAC地址欺骗</h2><p>前面说过，网络层一共使用四个协议：IP、 ARP、 ICMP、 IGMP协议。ARP协议负责把IP地址解析成MAC地址，依靠广播作为解析方式。所以说网上的广播时避免不了的。<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/4.png" alt="04"><br>如下图所示：<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/5.png" alt="05"><br>四台计算机PC0<del>PC3通过交换机连接在一起，四台计算机的物理地址分别为M1</del>M4；如果PC0的10.0.0.2地址想ping（访问）PC1的10.0.0.3地址，那么PC0必须知道PC1的MAC地址。</p>
+<p>方法为PC0发布一个同网段所有计算机都能收到的广播，广播内容为询问10.0.0.3地址对应的MAC地址。PC1收到之后就会给PC0发送相应的MAC地址信息，PC0就会把收到的该MAC地址当做10.0.0.3的MAC地址。随后通信发出的数据帧目标MAC地址都为该接收到的MAC地址即M2。</p>
+<p>正因为ARP通过广播解析通信方MAC地址的方式造成了许多的网络安全问题。比如常说的抓包就是利用ARP协议的这种安全漏洞。</p>
+<p><strong>造成安全漏洞的原因为</strong><br>PC1告诉PC0，10.0.0.3对应的MAC地址为M2，PC0收到之后不做验证就直接确信并使用该MAC地址作为目标MAC地址发送数据了。我们都知道交换机在转发数据的时候，只会把数据转发给目标地址不会转发给其他连接交换机的非目标地址，这样其他计算机是无法截获通信信息的。</p>
+<p>如果PC3想截获PC0与PC1之间通信的数据包，当PC0发出广播询问目标MAC地址时，PC3也收到了广播信息，在PC1给PC0发送完正确MAC地址M2后，PC3再向PC0发送错误MAC地址M4，由于PC0并不会检验收到的目标MAC地址是否正确，所以M4会覆盖M2成为PC0确信的目标MAC地址。</p>
+<p>随后PC0开始通讯，就会把数据发送到PC3中，PC3再把数据发送给PC1 。通过这样一个MAC地址欺骗，所有流经MAC地址M1和M2的数据帧都经过了 M4使窃听数据成为可能。</p>
+<h2 id="应用举例：P2P终结者"><a href="#应用举例：P2P终结者" class="headerlink" title="应用举例：P2P终结者"></a>应用举例：P2P终结者</h2><p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/6.png" alt="06"><br>如图所示：四台计算机通过一个交换机连接在一起，再通过一个路由器连接网络，其中PC3的MAC地址为M2，路由器的MAC地址为M1。正常情况下PC0<del>PC2访问网络时，由于网络与它们本身不在同一个网段上，所以需交由路由器的网关进行中转，路由器的网关地址为M1；如果PC3想控制PC0</del>PC2的上网带宽，就可以通过安装P2P终结者类似的软件实现。</p>
+<p>P2P终结者的原理为：当PC0<del>PC2解析路由器网关地址时，路由器告诉它们是M1,PC3通过MAC地址欺骗再告诉它们假的路由器网关地址M2，这样PC0</del>PC2包含上网请求的数据包都会发送到假网关地址M2即PC3处（即PC0<del>PC2所有的流量都会经过M2），PC3知道路由器的真实网关地址为M1，PC3先对PC0</del>PC2发来数据包进行处理再把这些数据包转发给真正的路由器网关地址M1。通过这种方式实现对PC0~PC2上网带宽的管控。</p>
+<p>如果PC0~PC2直接解析路由器网关地址访问网络，无论PC3是无法管控它们的上网，所以P2P终结者这些软件必须配合ARP欺骗来实现。</p>
+<h2 id="网络执法官"><a href="#网络执法官" class="headerlink" title="网络执法官"></a>网络执法官</h2><p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/7.png" alt="07"><br>网络执法官的功能为：同一网段内的一台计算机（比如PC3），可以控制其他计算机（比如PC0~PC2）是否能上网，或者其中一台计算机（如PC0）能与哪些计算机通信，不能与哪些计算机通信。</p>
+<p>实现原理：当PC3中安装了网络执行官软件后，PC0<del>PC2想访问网络并解析路由器网关地址时，PC3告诉它们一个不存在的MAC地址M8；随后PC0向M8发送数据帧时，交换机收到后经过查找发现M8地址不存在，要求PC0重发数据帧，又查询不到M8地址，最后该数据帧被丢弃，于是PC0</del>PC2谁也上不了网。</p>
+<h2 id="解决方案：安装ARP防火墙"><a href="#解决方案：安装ARP防火墙" class="headerlink" title="解决方案：安装ARP防火墙"></a>解决方案：安装ARP防火墙</h2><p>沿用上图在PC0中安装ARP防火墙之后，PC0想访问网络并解析路由器网关时，当接收到第一个由路由器发出的真正的网关地址M1时就在PC0中把该地址写死，之后再接受到其他MAC地址也不覆盖M1，由此实现防止ARP地址欺骗。</p>
+<h1 id="IP-数据报"><a href="#IP-数据报" class="headerlink" title="IP 数据报"></a>IP 数据报</h1><h2 id="IP-数据报的格式"><a href="#IP-数据报的格式" class="headerlink" title="IP 数据报的格式"></a>IP 数据报的格式</h2><p>一个 IP 数据报由首部和数据两部分组成。（数据报也可以说是数据包）<br>首部的前一部分是固定长度，共 20 字节，是所有 IP 数据报必须具有的。<br>在首部的固定部分的后面是一些可选字段，其长度是可变的。<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/8.png" alt="08"></p>
+<h2 id="IP-数据报首部的固定部分中的各字段"><a href="#IP-数据报首部的固定部分中的各字段" class="headerlink" title="IP 数据报首部的固定部分中的各字段"></a>IP 数据报首部的固定部分中的各字段</h2><p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/9.png" alt="09"></p>
+<p>从图中可看到，数据报首部可分为固定部分和可变部分，固定部分为了五行，每行32位即4个字节。<br><strong>版本</strong>——占 4 位（第一行四个字节中0~3位），指 IP 协议的版本该 IP 协议的版本号为 4 (即 IPv4)；</p>
+<p><strong>首部长度</strong>——占 4 位（第一行四个字节中4~7位），表示首部总的长度（固定+可变部分）；可表示的最大数值是 15 个单位(一个单位为 4 字节)因此 IP 的首部长度的最大值是 60 字节。</p>
+<p><strong>区分服务</strong>——占 8 位（第一行四个字节中8~15位），区分服务。即该段设置了数据报的优先程度，若要想实现数据报优先传输还需要在路由器端配置相应的区分服务设置。只有在使用区分服务（DiffServ）时，这个字段才起作用。在一般的情况下都不使用这个字段 。</p>
+<p><strong>总长度</strong>——占 16 位（第一行四个字节中16~31位），指首部和数据之和的长度，单位为字节，因此数据报的最大长度为 65535 字节。总长度必须不超过最大传送单元 MTU。</p>
+<p><strong>标识</strong>(identification)——占 16 位（第二行四个字节中1~15位），它是一个计数器，用来产生数据报的标识，即每产生一个数据报贴上一个标识。</p>
+<p><strong>标志</strong>(flag)——占 3 位（第二行四个字节中16~18位），目前只有前两位有意义。<br>标志字段的最低位是 MF (More Fragment)。MF = 1 表示后面“还有分片”。MF = 0 表示最后一个分片。</p>
+<p>标志字段中间的一位是 DF (Don’t Fragment) 。只有当 DF = 0 时才允许分片。<br>即标志表示该数据报是否分片了？是第几个分片？</p>
+<p><strong>片偏移</strong>——占12 位（第二行四个字节19~31位）指出：较长的分组在分片后某片在原分组中的相对位置。片偏移以 8 个字节为偏移单位。</p>
+<p><strong>IP 数据报分片举例</strong><br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/10.png" alt="10"><br>以太网传输的数据报数据部分一般都是1500个字节。如果有个数据报数据部分为3800字节（数据报总长度超过路由器的对大传送单元MTU） 就需要分为若干个数据报片发送。</p>
+<p>如图中分为三个数据报片发送，在每个数据报片的首部都要写上原数据报首部的信息，包括目标IP 地址等，并编上号。数据报片的数据部分第一个字节表示偏移，每个数据报片的偏移 = 该报片数据部分的第一个字节号 / 8，如图所示。</p>
+<p><strong>生存时间</strong>——占 8 位（第三行四个字节中0~7位）记为 TTL (Time To Live)数据报在网络中可通过的路由器数的最大值。即计算机发出数据时会附带一个TTL值，该值在数据报每经过一个路由器就自减1，等到某路由器接收到该数据报发现其TTL值变为0时不在中转该数据报，而是将其丢弃并向最初发送者返回一个ICMP报文。TTL的设置可以防止数据报无限循环传输。<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/11.png" alt="11"></p>
+<p><strong>TTL简单举例</strong><br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/12.png" alt="12"></p>
+<p>在命令行窗口尝试与本计算机的默认网关地址通信：ping 172.26.104.1，发现TTL值为255，因为访问的是本计算机的网关在同一网段上，不用经过其他路由器中转便可直接访问（Linux默认TTL值为255）；</p>
+<p>于是我尝试与美国的某个IP地址通信：ping 207.226.141.205，会得到IP 地址为63.218.56.150的路由器发来的回复：“TTL传输中过期”。说明在通信数据报在传输到该路由器上时TTL值已为0，随后该路由器将通信数据报自行销毁并给最初发出数据者（即本计算机）一个回复。</p>
+<p>此外，还可以通过指定TTL的值，观察哪个路由器给计算机回复TTL过期信息，以此来跟踪通信数据报传输过程中途经的路由器。</p>
+<p><strong>协议</strong>——占 8 位（第三行四个字节8<del>15位）字段指出此数据报携带的数据使用何种协议。<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/13.png" alt="13"><br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/14.png" alt="14"><br>协议字段里一般使用协议号来标识相关协议，比如其中一部分为：<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/15.png" alt="15"><br><strong>首部校验和</strong>——占 16 位（第三行四个字节16</del>31位）字段只检验数据报的首部不检验数据部分，目的是验证数据报的首部有无错误。<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/16.png" alt="16"></p>
+<p><strong>检验过程</strong><br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/17.png" alt="17"><br>好比寄快递，发件方在快递单上写上收件人、地址、电话，然后根据这些信息得到一个校验和并写在快递单上；快递员收到这个快递之后检查对应的信息是否出错，出错了就不发了，并不在乎快递内的东西是否出错。也就是说该字段仅检查数据报的首部有无错误不关心数据部分。</p>
+<p>第四行的四个字节表示：<strong>源地址</strong>；<br>第五行的四个字节表示：<strong>目的地址</strong>；</p>
+<h2 id="IP-数据报首部的可变部分"><a href="#IP-数据报首部的可变部分" class="headerlink" title="IP 数据报首部的可变部分"></a>IP 数据报首部的可变部分</h2><p>IP 首部的可变部分就是一个选项字段，用来支持排错、测量以及安全等措施，内容很丰富。</p>
+<p>选项字段的长度可变，从 1 个字节到 40 个字节不等，取决于所选择的项目。</p>
+<p>增加首部的可变部分是为了增加 IP 数据报的功能，但这同时也使得 IP 数据报的首部长度成为可变的。这就增加了每一个路由器处理数据报的开销。</p>
+<p>实际上这些选项很少被使用。</p>
+<h1 id="IP-转发分组的流程"><a href="#IP-转发分组的流程" class="headerlink" title="IP 转发分组的流程"></a>IP 转发分组的流程</h1><p><strong>数据路由</strong>：路由器在不同网段转发数据包；<br><strong>网络畅通</strong>的条件：数据包能去能回；</p>
+<ul>
+<li>从源网络发出时，沿途的每一个路由器必须知道到目标网络下一跳给哪个接口；</li>
+<li>从目标网络返回时，沿途的每一个路由器必须知道到源网络下一跳给哪个接口；<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/18.png" alt="18"><blockquote>
+<p>可以看到网段1~5对应的地址主机号都是归零的，即配置路由器端口网段地址时主机号要归零。如端口B连接的网段2地址：172.16.0.0 / 24 。</p>
+</blockquote>
+</li>
+</ul>
+<p>如图所示，计算机PC0 ping PC1，网络要想通，要求沿途的路由器Router0、 Router1、 Router2和Router3都必须有到192.168.1.0/24网络的路由（路由器中存储路径的路由表中的信息），这样数据包才能到达PC1；</p>
+<p>PC1要回应数据包给PC0，沿途所有的路由器必须有到192.168.0.0 /24网络的路由，这样数据包才能回来。</p>
+<p>由于网段1和2直连路由器Router0，所以不用给Router0的路由表手动添加关于网段1和2的路径信息。但是Router0路由表内是没有与Router0非直连网段3 、4 、5的相关路径信息的，需要管理员手动添加。同理Router1直连网段2 、3，非直连网段1 、4 、5，所以需要手动添加网段1 、4 、5路径信息。这叫做静态路由。</p>
+<p>举例：如上图，PC0想要访问Router0的B端口，由于不在同一网段，PC0先把数据包给Router0的A端口（网关），路由器Router0就会自动把数据包转给B端口。B端口收到数据包之后向PC0发出一个回复数据包，Router0直连1网段所以知道到PC0要怎么走，所以Router0自动把回复的数据包通过A端口转给PC0；数据包能去能回，所以PC0访问Router0的B端口时不用手动给Router0添加路径信息，Router0会自动中转数据包；</p>
+<p>如果PC0想要访问Router1的C端口，同样不在同一个网段，PC0先把数据包给Router0的A端口，由于Router0直连1 、2网段，所以Router0知道去Router1的C端口怎么走，然后Router1自动把数据包转给C端口。C端口收到数据包之后向PC0发出一个回复数据包，但是Router1直连的是2 、3网段，与1网段非直连，所以如果不给Router1手动输入关于网段1的相关路径信息，Router1将无法把数据传回PC0，数据包能去不能回，造成通信失败。</p>
+<p>因此，判断两个地址能否通过路由器自动中转数据，要看数据包在两个地址间是否<strong>能去能回</strong>。</p>
+<p><strong>Windows的默认网关就是默认路由。</strong></p>
+<h2 id="现实意义：例子"><a href="#现实意义：例子" class="headerlink" title="现实意义：例子"></a>现实意义：例子</h2><p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/19.png" alt="19"><br><strong>问题：</strong>一个计算机有两个网卡1和2，它们对应的网关分别是A和B；网卡1通过网关A访问网络，网卡2通过网关B访问企业内网；出现的问题为Internet上的其他计算机与该计算机通信时断时通。</p>
+<p><strong>原因：</strong>由于该计算机存在两个网关就意味着存在两个默认路由，也就意味着该计算机认为到其他网段有两条路径，但是却不知道一条路径通Internet，另一条路径通企业内网，而是认为两条路径是等价的，可以随意选择路径访问；</p>
+<p>所以当Internet上的计算机如C “ping” PC-PT的时候时不时会造成丢包。因为计算机C向PC-PT发数据包时只能通过网关A这条路径，但是PC-PT给计算机C发送数据包时却认为通过网关A和B两条路径都可以，都等价；所以PC-PT发出的数据包一部分通过网关A路径正常发送到计算机C，另一部分数据包则通过网关C路径发送到企业内网导致丢包，造成访问速度变慢，这是因为发生丢包时上层协议会要求重传，所以只会导致通信速度变慢，而不会导致无法通信。</p>
+<p><strong>解决方案：</strong>删除网卡2的默认路由，手动添加路由：</p>
+<p><strong>再如：</strong><br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/20.png" alt="20"><br>PC0一个网卡连接Internet把A设为网关，另一网卡连接一个交换机组成的内网，内网内的计算机通过PC0连接Internet，所以内网计算机需要把B作为网关，但是PC0连接内网的网卡不用设置网关，否则会出现路由表错误。</p>
+<p><strong>故障判断规律：</strong>通与断的次数相当很大可能是路由问题；通的次数多，断的次数少很大可能是网络阻塞的问题。</p>
+<h1 id="网络负载均衡"><a href="#网络负载均衡" class="headerlink" title="网络负载均衡"></a>网络负载均衡</h1><h2 id="配置和验证网络负载均衡"><a href="#配置和验证网络负载均衡" class="headerlink" title="配置和验证网络负载均衡"></a>配置和验证网络负载均衡</h2><p>如图所示：192.168.0.0/24网段的PC0到192.168.3.0/24网段的PC1有两条路①和②，可以通过设置网络中路由器的路由来实现：PC0到PC1走线路① / ②，PC1到PC0走线路② / ①。从而实现负载均衡控制。</p>
+<p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/21.png" alt="21"></p>
+<h2 id="最长前缀匹配"><a href="#最长前缀匹配" class="headerlink" title="最长前缀匹配"></a>最长前缀匹配</h2><p>使用 CIDR 时，路由表中的每个项目由“网络前缀”和“下一跳地址”组成。在查找路由表时可能会得到不止一个匹配结果。</p>
+<p>应当从匹配结果中选择具有最长网络前缀的路由：最长前缀匹配(longest-prefix matching)。</p>
+<p>网络前缀越长，其地址块就越小，因而路由就越具体(more specific) 。</p>
+<p>例如：目的地址 D = 206.0.71.128。路由表中的路由：A：206.0.68.0 / 22；B：206.0.71.128 / 25 ；A路由主机位10位，B路由主机位7位，B路由更具体，根据最长前缀匹配原则匹配B路由。</p>
+<h2 id="使用二叉线索查找路由表"><a href="#使用二叉线索查找路由表" class="headerlink" title="使用二叉线索查找路由表"></a>使用二叉线索查找路由表</h2><p>为了进行更加有效的查找，通常是将无分类编址的路由表存放在一种层次的数据结构中，然后自上而下地按层次进行查找。这里最常用的就是二叉线索(binary trie)。</p>
+<p>例：用 5 个前缀构成的二叉线索：<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/22.png" alt="22"><br>先将前缀按相同的位排列好，再按每位逐级分支查找。如现分为01开头和10开头的，在分别每一位分支查找下去，查找深度是5。如果为32位前缀构成的二差线索查找深度为32。</p>
+
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/" rel="prev" title="计算机网络-网络层-2">
+      <i class="fa fa-chevron-left"></i> 计算机网络-网络层-2
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#IP-地址与MAC硬件地址"><span class="nav-number">1.</span> <span class="nav-text">IP 地址与MAC硬件地址</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ARP-amp-RARP协议"><span class="nav-number">2.</span> <span class="nav-text">ARP&amp;RARP协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ARP简介"><span class="nav-number">2.1.</span> <span class="nav-text">ARP简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ARP-MAC地址欺骗"><span class="nav-number">2.2.</span> <span class="nav-text">ARP MAC地址欺骗</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用举例：P2P终结者"><span class="nav-number">2.3.</span> <span class="nav-text">应用举例：P2P终结者</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络执法官"><span class="nav-number">2.4.</span> <span class="nav-text">网络执法官</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案：安装ARP防火墙"><span class="nav-number">2.5.</span> <span class="nav-text">解决方案：安装ARP防火墙</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IP-数据报"><span class="nav-number">3.</span> <span class="nav-text">IP 数据报</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IP-数据报的格式"><span class="nav-number">3.1.</span> <span class="nav-text">IP 数据报的格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IP-数据报首部的固定部分中的各字段"><span class="nav-number">3.2.</span> <span class="nav-text">IP 数据报首部的固定部分中的各字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IP-数据报首部的可变部分"><span class="nav-number">3.3.</span> <span class="nav-text">IP 数据报首部的可变部分</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IP-转发分组的流程"><span class="nav-number">4.</span> <span class="nav-text">IP 转发分组的流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#现实意义：例子"><span class="nav-number">4.1.</span> <span class="nav-text">现实意义：例子</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络负载均衡"><span class="nav-number">5.</span> <span class="nav-text">网络负载均衡</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置和验证网络负载均衡"><span class="nav-number">5.1.</span> <span class="nav-text">配置和验证网络负载均衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最长前缀匹配"><span class="nav-number">5.2.</span> <span class="nav-text">最长前缀匹配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用二叉线索查找路由表"><span class="nav-number">5.3.</span> <span class="nav-text">使用二叉线索查找路由表</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>

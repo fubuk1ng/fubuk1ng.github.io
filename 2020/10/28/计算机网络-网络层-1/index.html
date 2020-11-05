@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="网络层提供的两种服务在计算机网络领域，网络层应该向运输层提供怎样的服务（“面向连接”还是“无连接”）曾引起了长期的争论。 争论焦点的实质就是：在计算机通信中，可靠交付应当由谁来负责？是网络还是端系统？即A、B两端点通过多个路由器连接，数据在每两个路由器之间都要确认可靠交付（传输），还是仅在A、B两端口确认数据是否可靠交付。 显然如果每两个路由器之间都要确认一次数据传输的可靠性就会十分浪费性能，所以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络-网络层-1">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="网络层提供的两种服务在计算机网络领域，网络层应该向运输层提供怎样的服务（“面向连接”还是“无连接”）曾引起了长期的争论。 争论焦点的实质就是：在计算机通信中，可靠交付应当由谁来负责？是网络还是端系统？即A、B两端点通过多个路由器连接，数据在每两个路由器之间都要确认可靠交付（传输），还是仅在A、B两端口确认数据是否可靠交付。 显然如果每两个路由器之间都要确认一次数据传输的可靠性就会十分浪费性能，所以">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/1.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/2.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/3.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/4.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/5.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/6.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/7.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/8.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/9.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/10.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/11.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/12.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/13.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/14.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/15.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/16.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/17.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/18.png">
+<meta property="article:published_time" content="2020-10-28T12:54:58.000Z">
+<meta property="article:modified_time" content="2020-11-03T11:09:31.105Z">
+<meta property="article:author" content="fubuking">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/1.png">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>计算机网络-网络层-1 | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">70</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机网络-网络层-1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-28 20:54:58" itemprop="dateCreated datePublished" datetime="2020-10-28T20:54:58+08:00">2020-10-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-11-03 19:09:31" itemprop="dateModified" datetime="2020-11-03T19:09:31+08:00">2020-11-03</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="网络层提供的两种服务"><a href="#网络层提供的两种服务" class="headerlink" title="网络层提供的两种服务"></a>网络层提供的两种服务</h1><p>在计算机网络领域，网络层应该向运输层提供怎样的服务（“面向连接”还是“无连接”）曾引起了长期的争论。</p>
+<p>争论焦点的实质就是：在计算机通信中，可靠交付应当由谁来负责？是网络还是端系统？<br>即A、B两端点通过多个路由器连接，数据在每两个路由器之间都要确认可靠交付（传输），还是仅在A、B两端口确认数据是否可靠交付。</p>
+<p>显然如果每两个路由器之间都要确认一次数据传输的可靠性就会十分浪费性能，所以，如今数据的可靠交付由端系统负责。</p>
+<a id="more"></a>
+<p><strong>两种服务：网络层应该向运输层提供怎样的服务？</strong></p>
+<ul>
+<li>虚电路服务</li>
+<li>数据包服务</li>
+</ul>
+<h2 id="虚电路服务"><a href="#虚电路服务" class="headerlink" title="虚电路服务"></a>虚电路服务</h2><p>数据包传输前先建立和确认一条虚电路，确认之后数据包不用加地址，直接通过虚电路由一端传送到另一端，这叫做虚电路服务。</p>
+<p><strong>特点</strong><br>虚电路表示这只是一条逻辑上的连接，分组都沿着这条逻辑连接按照存储转发方式传送，而并不是真正建立了一条物理连接。<br>请注意，电路交换的电话通信是先建立了一条真正的连接。因此分组交换的虚连接和电路交换的连接只是类似，但并不完全一样。<br><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/1.png" alt="01"><br>如果该虚电路断了，H1与H2不能通过其他电路传送数据，即只能通过配置好的虚电路传送数据。</p>
+<h2 id="数据报-包-服务"><a href="#数据报-包-服务" class="headerlink" title="数据报(包)服务"></a>数据报(包)服务</h2><p>数据包写上目标地址与原地址，通过路由器识别地址转发到相应目的地，这叫数据报服务。</p>
+<p>网络层向上只提供简单灵活的、无连接的、尽最大努力交付的数据报服务。</p>
+<p>网络在发送分组时不需要先建立连接。每一个分组（即 IP 数据报）独立发送，与其前后的分组无关（不进行编号）。</p>
+<p>网络层不提供服务质量的承诺。即所传送的分组可能出错、丢失、重复和失序（不按序到达终点），当然也不保证分组传送的时限。</p>
+<p><strong>特点</strong><br>数据包的传输路径会根据数据包中的原地址和目的地址动态确定传输路线，有多种可能。即使最佳路径断了，也可以通过其他路径传输，只是速度没那么快，非常可靠。<br>由于传输网络不提供端到端的可靠传输服务，这就使网络中的路由器可以做得比较简单，而且价格低廉（与电信网的交换机相比较）。<br>如果主机（即端系统）中的进程之间的通信需要是可靠的，那么就由网络的主机中的运输层负责（包括差错处理、流量控制（即A发快了，B让停停）等）。<br>采用这种设计思路的好处是：网络的造价大大降低，运行方式灵活，能够适应多种应用。<br>因特网能够发展到今日的规模，充分证明了当初采用这种设计思路的正确性。<br><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/2.png" alt="02"></p>
+<h2 id="虚电路服务与数据报服务的对比"><a href="#虚电路服务与数据报服务的对比" class="headerlink" title="虚电路服务与数据报服务的对比"></a>虚电路服务与数据报服务的对比</h2><p><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/3.png" alt="03"><br><strong>明确现在互联网用的就是数据报服务</strong></p>
+<h1 id="虚拟互联网"><a href="#虚拟互联网" class="headerlink" title="虚拟互联网"></a>虚拟互联网</h1><h2 id="网络互联的设备"><a href="#网络互联的设备" class="headerlink" title="网络互联的设备"></a>网络互联的设备</h2><p>中间设备又称为中间系统或中继（relay）系统。    </p>
+<ul>
+<li>物理层中继系统：转发器（repeater），可以理解为接线器（Hub）；    </li>
+<li>数据链路层中继系统：网桥或桥接器（bridge）；    </li>
+<li>网络层中继系统：路由器（router）；    </li>
+<li>网络层以上的中继系统：网关（gateway）；网关就是到其他网段路由器接口的地址。    </li>
+</ul>
+<h2 id="网络互联设备：路由器"><a href="#网络互联设备：路由器" class="headerlink" title="网络互联设备：路由器"></a>网络互联设备：路由器</h2><p>当中继系统是转发器或网桥时，一般并不称之为网络互连，因为这仅仅是把一个网络扩大了，而这仍然是一个网络；<br>网关由于比较复杂，目前使用得较少；<br>互联网都是指用路由器进行互连的网络；<br>由于历史的原因，许多有关 TCP/IP 的文献将网络层使用的路由器称为网关。<br><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/4.png" alt="04"><br>上图中，三台计算机想要访问互联网等其他网段必须经过网关Router1；但可以访问本网段。同时也可以为计算机设置多个网关，如图所示。<br><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/5.png" alt="05"><br>如图，PC2通过网关Router1访问互联网；也可以通过网关Router4访问互联网。<br><strong>总结：</strong>网关就像一道门，计算机的数据想要出去必须通过这道门；一台计算机可对应多个门。</p>
+<p>某个网段的网关一般设置在连接该网段的路由器上，是路由器的一个端口地址；该网段的计算机通过网关（地址）找到该路由器并通过该路由器访问网络。<br><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/6.png" alt="06"><br>梳理一下PC1上网的过程，上网的实质就是同网段或不同网段内双方的通信。当需要访问的互联网与计算机在同一网段内，可以不经路由器中转直接通信，比如PC1可以不经路由器直接访问PC0；否则需要经过路由器中转才能访问其他网段的互联网，比如PC1想要访问其他网段的Cloud0 。</p>
+<p>而判断通信双方是否在同一网段根据的是网关。某网段的网关一般设置在连接该网段的路由器上，是路由器上一个端口的IP地址，该地址属于路由器连接的网段。如图中PC1的IP地址为192.0.1.5与路由器的网关192.0.1.1同属网段192.0.1；其他的网段也是相同的原理，于是可以通过之前提到过的子网掩码求与运算比较连接各网段的路由器上的网关是否在同一网段。</p>
+<p>所以，图中PC1需要访问Cloud0时，首先通过网关判断出了通信双方处于不同网段，随后PC1把数据报通过网关这个地址发送给Router0，路由器Router0通过查询内部路径表寻找传输的最佳路径，当中转到路由器Router1时，Router1发现数据报中的目标IP地址与自己的网关同属一个网段，最后将数据报传输给该网段下的Cloud0完成通信。这就是访问网络的过程。</p>
+<h2 id="互联网的问题"><a href="#互联网的问题" class="headerlink" title="互联网的问题"></a>互联网的问题</h2><p>互联在一起的网络要进行通信，会遇到许多问题需要解决，如：</p>
+<ul>
+<li>不同的寻址方案；</li>
+<li>不同的最大分组长度；</li>
+<li>不同的网络接入机制；</li>
+<li>不同的超时控制；</li>
+<li>不同的差错恢复方法；</li>
+<li>不同的状态报告方法；</li>
+<li>不同的路由选择技术；</li>
+<li>不同的用户接入控制；</li>
+<li>不同的服务（面向连接服务和无连接服务）；</li>
+<li>不同的管理与控制方式 ；</li>
+</ul>
+<p>分组在互联网中的传送<br><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/7.png" alt="07"><br>这里我们只考虑，各设备的网络层如何在各设备中中转从而到达目的地址。</p>
+<h2 id="互联网络与虚拟互联网络"><a href="#互联网络与虚拟互联网络" class="headerlink" title="互联网络与虚拟互联网络"></a>互联网络与虚拟互联网络</h2><p>互联网络：里面充满了各种网络设备，有着不同的技术。</p>
+<p>虚拟互联网络：计算机访问互联网中其他计算机的时候，不用考虑网络中的其他设备，整个Internet相当于一个大的网络是虚拟的，它屏蔽了网络的复杂性，比如网络中每一个服务器都有IP地址，计算机直接访问该IP地址就行了。这就是虚拟互联网络，我们只需要知道访问的IP地址就可以了，不需要关心网络内部如何连线。</p>
+<h2 id="虚拟互连网络的意义"><a href="#虚拟互连网络的意义" class="headerlink" title="虚拟互连网络的意义"></a>虚拟互连网络的意义</h2><p>所谓虚拟互连网络也就是逻辑互连网络，它的意思就是互连起来的各种物理网络的异构性本来是客观存在的，但是我们利用 IP 协议就可以使这些性能各异的网络从用户看起来好像是一个统一的网络。</p>
+<p>使用 IP 协议的虚拟互连网络可简称为 IP 网。</p>
+<p>使用虚拟互连网络的好处是：当互联网上的主机进行通信时，就好像在一个网络上通信一样，而看不见互连的各具体的网络异构细节。</p>
+<h2 id="IP协议简介"><a href="#IP协议简介" class="headerlink" title="IP协议简介"></a>IP协议简介</h2><p>网际协议 IP 是 TCP/IP 体系中两个最主要的协议之一。与 IP 协议配套使用的还有四个协议：（网络层使用的只有这四个协议）</p>
+<ul>
+<li>地址解析协议 ARP<br>(Address Resolution Protocol)</li>
+<li>逆地址解析协议 RARP<br>(Reverse Address Resolution Protocol)</li>
+<li>网际控制报文协议 ICMP<br>(Internet Control Message Protocol)</li>
+<li>网际组管理协议 IGMP<br>(Internet Group Management Protocol)</li>
+</ul>
+<h2 id="网络层4个协议之间的层次"><a href="#网络层4个协议之间的层次" class="headerlink" title="网络层4个协议之间的层次"></a>网络层4个协议之间的层次</h2><p><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/8.png" alt="08"><br>图中可见，网络层中的四个协议中，ARP协议较为底层，IP协议依赖于ARP协议。ICMP协议依赖于IP协议；IGMP协议依赖于ICMP协议。</p>
+<h1 id="IP-地址"><a href="#IP-地址" class="headerlink" title="IP 地址"></a>IP 地址</h1><h2 id="IP-地址及其表示方法"><a href="#IP-地址及其表示方法" class="headerlink" title="IP 地址及其表示方法"></a>IP 地址及其表示方法</h2><p>我们把整个因特网看成为一个单一的、抽象的网络。IP 地址就是给每个连接在因特网上的主机（或路由器）分配一个在全世界范围是唯一的 32 位的标识符。</p>
+<p>IP 地址现在由因特网名字与号码指派公司ICANN (Internet Corporation for Assigned Names and Numbers)进行分配 。</p>
+<h2 id="IP-层次结构"><a href="#IP-层次结构" class="headerlink" title="IP 层次结构"></a>IP 层次结构</h2><p><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/9.png" alt="09"><br>由于当初美国国防部一开始设计TCP/IP协议的时候，没想过把全球的计算机连接起来，所以当时设计的IP 地址只有32位，发展到如今已显得不够用了。IP地址其实就是一串数字，是一个可以直接访问公网的地址，现在已成为一种资源。所以说开发个人网站要买公网IP地址。这里讲解的是IPv4版本的内容，如今慢慢地往IPv6版本转变。</p>
+<ul>
+<li>IP地址分为网络部分（网络ID）和主机部分（主机ID），每一个网段属于以固定的网络地址，如图中的三个网段的网络ID分别为192.168.1.0、192.168.2.0、192.168.3.0。这样计算机只关心数据发到哪个网段的网络地址上，而不再关心具体发到某一台计算机的主机ID。就好像电话号码分区号是一样的，前面几位号码管地区，后面号码管该地区的特定用户。</li>
+<li>所以同一个网段的计算机网络ID都一样，不同的是跟在网络ID后面的各计算机的主机ID。</li>
+</ul>
+<h2 id="IP-地址的编址方法"><a href="#IP-地址的编址方法" class="headerlink" title="IP 地址的编址方法"></a>IP 地址的编址方法</h2><p>分类的 IP 地址。这是最基本的编址方法，在 1981 年就通过了相应的标准协议。<br>子网的划分。这是对最基本的编址方法的改进，其标准[RFC 950]在 1985 年通过。<br>构成超网。这是比较新的无分类编址方法。1993 年提出后很快就得到推广应用。</p>
+<h2 id="分类IP地址"><a href="#分类IP地址" class="headerlink" title="分类IP地址"></a>分类IP地址</h2><p>每一类地址都由两个固定长度的字段组成，其中一个字段是网络号 net-id，它标志主机（或路由器）所连接到的网络，而另一个字段则是主机号 host-id，它标志该主机（或路由器）。</p>
+<p>两级的 IP 地址可以记为：<br><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/10.png" alt="10"><br>网络地址（也可以成为网络号）唯一指定了每个网络。向一网络中的每台计算机都共享相同的网络地址，并用它作为自己IP的值的一部分。<br><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/11.png" alt="11"><br>为了方便我们把32位IP地址划分为4个字节（每个字节表示8位2进制）表示的地址。即：<br><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/12.png" alt="12"><br>A类地址网络号字段有8位，以0开头，主机号字段有24位，即该网段可以容纳2的24次方台计算机。<br>B类地址网络号地址有16位，以10开头，主机号字段有16位，即该网段可以容纳2的16次方台计算机。<br>C类地址网络号地址有24位，以110开头，主机号字段有8位，即该网段可以容纳2的8次方台计算机。<br>D类地址：多播使用，网络号地址以1110开始；E类地址：研究所用，网络号地址以1111开始；（都是比较少见）    </p>
+<h2 id="点分十进制记法"><a href="#点分十进制记法" class="headerlink" title="点分十进制记法"></a>点分十进制记法</h2><p><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/13.png" alt="13"><br>即每8位二进制数用一个十进制数来表示，每个十进制数之间用点隔开 来表示IP地址。</p>
+<h2 id="常用的三种类别的-IP-地址"><a href="#常用的三种类别的-IP-地址" class="headerlink" title="常用的三种类别的 IP 地址"></a>常用的三种类别的 IP 地址</h2><p><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/14.png" alt="14"><br>A类地址中的127比较特殊，在运行中输入可以访问本电脑的共享资源。一般是不可用的。</p>
+<blockquote>
+<p>127.0.0.1 这个地址通常分配给 loopback 接口。loopback 是一个特殊的网络接口(可理解成虚拟网卡)，用于本机中各个应用之间的网络交互。只要操作系统的网络组件是正常的，loopback 就能工作。Windows 中看不到这个接口。事实上整个 127.* 网段都算能够使用，比如你 ping 127.0.0.2 也是通的。 但是使用127.0.0.1作为loopback接口的默认地址只是一个惯例。并且localhost指向的也是127.0.0.1这个地址。</p>
+</blockquote>
+<p>表中可看出，若为A类 IP 地址，则表示 IP 地址的四个十进制数中的第一个表示网络号，后面三个十进制数表示主机号。比如：126.0.0.1.第一位十进制数在1~126之间表示，所以IP地址的第一位十进制数126表示网络号，后面的三位十进制数：0.0.1表示主机号，即1号主机。</p>
+<p>B与C类 IP 地址同理；    </p>
+<p>如 IP 地址：160.32.32.34；由于第一位十进制数在128<del>191内，故为B类 IP 地址，即前两位数160.32 为网络地址号，后两位数：32.34为主机号。<br>如 IP 地址：221.31.31.23；由于第一位十进制数在192</del>223内，故为C类地址，即前三位数221.31.31 为网络地址号，第四位数：23为主机号。    </p>
+<p><strong>举例</strong><br><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/15.png" alt="15"><br>可见在指定 IP 地址过程中，只要输入IP地址，子网掩码就会根据 IP地址中的第一个十进制数判断出是哪类IP 地址，并自动完善相应地址。比如图中的132开头的 IP 地址被判断为B类地址，前两个十进制数表示网络号。</p>
+<p>实际上 IP 地址是标志一个主机（或路由器）和一条链路的接口。</p>
+<h2 id="互联网中的-IP-地址"><a href="#互联网中的-IP-地址" class="headerlink" title="互联网中的 IP 地址"></a>互联网中的 IP 地址</h2><p>在同一个局域网上的主机或路由器的IP 地址中的网络号必须是一样的。（一个路由器与若干接线器和若干计算机连接形成的网络就是一个局域网）<br>图中的网络号就是 IP 地址中的 net-id，可见同一个局域网内它们 IP 地址的网络号都为222.1.2（由开头的222可知是C类 IP 地址，所以前三位数是网络号）。<br><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/16.png" alt="16"><br>由于路由器每个端口连接不同的网段，所以路由器总是具有两个或两个以上的 IP 地址。<br>路由器的每一个接口都有一个不同网络号的 IP 地址。<br><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/17.png" alt="17"><br>两个路由器直接相连的接口处，可指明也可不指明 IP 地址。如指明 IP 地址，则这一段连线就构成了一种只包含一段线路的特殊“网络” 。常不指明 IP 地址。</p>
+<h2 id="特殊的几个地址"><a href="#特殊的几个地址" class="headerlink" title="特殊的几个地址"></a>特殊的几个地址</h2><p>127.0.0.1：本地环回地址，localhost地址。</p>
+<p>169.254.0.0：（169.254*）改地址为没有人给Windows分配IP地址，或者Windows请求不到地址后，自动给自己生成的凑合着用IP 地址。虽然显示能上网，但是这个网是指由多台一样申请不到IP地址，使用自分配的，以169.254开头的IP地址的计算机组成的网段，该网段内可以通信，但是无法访问公网。</p>
+<p>保留的私网地址：在互联网上这些地址没有给服务器用，可以给企业或学校来用。    </p>
+<ul>
+<li>保留的A类地址：10.0.0.0；</li>
+<li>保留的B类地址：172.16.0.0——172.31.0.0；（由于为B类 IP 地址，前两位为网络号，即保留了16个B类 IP 地址）；例如本机的学校IPv4地址就是172.26.105.78；即供学校等用的保留地址。</li>
+<li>保留的C类地址：192.168.0.0——192.168.255.0；（由于为C类 IP 地址，前三位为网络号，即保留了256个C类 IP 地址）；</li>
+<li>由于保留的私有地址不在互联网上公开，这些地址属于校园网或企业内网，所以用户无法通过互联网访问这些 IP 地址。（因为这些地址不存在于互联网，互联网上的路由器不知道怎么走，所以无法访问）</li>
+</ul>
+<p><strong>公网地址：存在于互联网上，并且被统一规划的地址，任何地方的任何用户都能访问。</strong></p>
+<h2 id="子网掩码"><a href="#子网掩码" class="headerlink" title="子网掩码"></a>子网掩码</h2><p>子网掩码（subnet mask）又叫做网络掩码、地址掩码，它是一种用来指明一个IP地址的哪些位标识的是主机所在的子网以及哪些位标识的是主机的位掩码。子网掩码不能单独存在，它必须结合IP地址一起使用。</p>
+<p>子网掩码只有一个作用，就是将某个IP地址划分成网络地址和主机地址两部分。</p>
+<p>如果一台计算机的IP地址配置为172.16.122.204，子网掩码为255.255.0.0（例子见上）。将其IP地址和子网掩码都写陈二进制，进行与（&amp;&amp;）操作，即只有1和1运算才得1，其余得0.这样经过IP地址和子网掩码做完与运算后。主机位不管是什么值都归零，网络位的值保持不变，这样就得到该计算机所处的网段为：172.16.0.0。</p>
+<p>例如计算机A：<br>IP地址：192.168.80.123；<br>子网掩码为：255.255.255.0；<br>网关地址为：192.168.80.1；<br>计算机B IP地址为：192.168.90.123；    </p>
+<p>A的子网掩码与B 进行与运算，并主机位归零得：192.168.90.0与A的192.168.80.0不在一个网段，A向B发数据会交由网关192.168.80.1处，由网关寻求其他路径传输到B。<br>若A的子网掩码改为255.255.0.0（子网掩码可以自动分配也可以手动指定），再进行上述操作，得到192.168.0.0与A在一个网段。则A可不经网关直接给B发送数据。    </p>
+<h2 id="与运算如下"><a href="#与运算如下" class="headerlink" title="与运算如下"></a>与运算如下</h2><p><img src="/2020/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-1/18.png" alt="18"></p>
+<p>由于子网掩码四个十进制数中若不为0就是255，而255二进制表示全是1，所以255与任何数的二进制做与运算都能使原数不变。</p>
+<p>如果子网掩码写错了，会导致与运算出错，从而导致通信故障。因此子网掩码也需要正确地配置。</p>
+
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/28/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/" rel="prev" title="设计模式-观察者模式">
+      <i class="fa fa-chevron-left"></i> 设计模式-观察者模式
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/31/%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F/" rel="next" title="设计模式-中介者模式">
+      设计模式-中介者模式 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#网络层提供的两种服务"><span class="nav-number">1.</span> <span class="nav-text">网络层提供的两种服务</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#虚电路服务"><span class="nav-number">1.1.</span> <span class="nav-text">虚电路服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据报-包-服务"><span class="nav-number">1.2.</span> <span class="nav-text">数据报(包)服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚电路服务与数据报服务的对比"><span class="nav-number">1.3.</span> <span class="nav-text">虚电路服务与数据报服务的对比</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#虚拟互联网"><span class="nav-number">2.</span> <span class="nav-text">虚拟互联网</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#网络互联的设备"><span class="nav-number">2.1.</span> <span class="nav-text">网络互联的设备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络互联设备：路由器"><span class="nav-number">2.2.</span> <span class="nav-text">网络互联设备：路由器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#互联网的问题"><span class="nav-number">2.3.</span> <span class="nav-text">互联网的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#互联网络与虚拟互联网络"><span class="nav-number">2.4.</span> <span class="nav-text">互联网络与虚拟互联网络</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟互连网络的意义"><span class="nav-number">2.5.</span> <span class="nav-text">虚拟互连网络的意义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IP协议简介"><span class="nav-number">2.6.</span> <span class="nav-text">IP协议简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络层4个协议之间的层次"><span class="nav-number">2.7.</span> <span class="nav-text">网络层4个协议之间的层次</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IP-地址"><span class="nav-number">3.</span> <span class="nav-text">IP 地址</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IP-地址及其表示方法"><span class="nav-number">3.1.</span> <span class="nav-text">IP 地址及其表示方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IP-层次结构"><span class="nav-number">3.2.</span> <span class="nav-text">IP 层次结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IP-地址的编址方法"><span class="nav-number">3.3.</span> <span class="nav-text">IP 地址的编址方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分类IP地址"><span class="nav-number">3.4.</span> <span class="nav-text">分类IP地址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#点分十进制记法"><span class="nav-number">3.5.</span> <span class="nav-text">点分十进制记法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常用的三种类别的-IP-地址"><span class="nav-number">3.6.</span> <span class="nav-text">常用的三种类别的 IP 地址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#互联网中的-IP-地址"><span class="nav-number">3.7.</span> <span class="nav-text">互联网中的 IP 地址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特殊的几个地址"><span class="nav-number">3.8.</span> <span class="nav-text">特殊的几个地址</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#子网掩码"><span class="nav-number">3.9.</span> <span class="nav-text">子网掩码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#与运算如下"><span class="nav-number">3.10.</span> <span class="nav-text">与运算如下</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>

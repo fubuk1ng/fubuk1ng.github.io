@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="子网划分下面讨论的例子都以C类网络为基础下面提到的网络位与主机位、网络号与主机号、网络ID与主机ID是等同的一组概念">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络-网络层-2">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="子网划分下面讨论的例子都以C类网络为基础下面提到的网络位与主机位、网络号与主机号、网络ID与主机ID是等同的一组概念">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/1.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/2.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/3.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/4.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/5.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/7.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/8.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/9.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/10.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/11.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/12.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/13.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/14.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/15.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/16.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/17.png">
+<meta property="article:published_time" content="2020-11-03T11:17:21.000Z">
+<meta property="article:modified_time" content="2020-11-03T12:08:56.460Z">
+<meta property="article:author" content="fubuking">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/1.png">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>计算机网络-网络层-2 | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">70</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机网络-网络层-2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-11-03 19:17:21 / 修改时间：20:08:56" itemprop="dateCreated datePublished" datetime="2020-11-03T19:17:21+08:00">2020-11-03</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="子网划分"><a href="#子网划分" class="headerlink" title="子网划分"></a>子网划分</h1><p>下面讨论的例子都以C类网络为基础<br>下面提到的网络位与主机位、网络号与主机号、网络ID与主机ID是等同的一组概念</p>
+<a id="more"></a>
+<h2 id="一个网段的情况"><a href="#一个网段的情况" class="headerlink" title="一个网段的情况"></a>一个网段的情况</h2><p>某公司有两个部门，每个部门100台计算机，通过交换机连接，组成局域网，通过路由器连接Internet。这两个部门的200台计算机使用192.168.0.0的C类网络，该网段的子网掩码为255.255.255.0，连局域网的路由器接口配置使用该网段的第一个可用IP地址：192.168.0.1</p>
+<blockquote>
+<p>注意：虽然路由器可以使用该网段的任何可用IP地址，为了避免该网段计算机的地址和路由器的地址冲突，一般将路由器设置为该网段的第一个可用的IP地址或最后一个可用的IP地址。    </p>
+</blockquote>
+<p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/1.png" alt="01"><br>如果交换机接了200台计算机，由于该网段可用地址为2~254（1位路由器所用地址），所以使用该网段地址给200台计算机分配主机号并不浪费。</p>
+<h2 id="等分成两个子网"><a href="#等分成两个子网" class="headerlink" title="等分成两个子网"></a>等分成两个子网</h2><p>为了安全考虑，打算将这两个部门的计算机分为两个网段，中间使用路由器隔开。</p>
+<p>现在将192.168.0.0 、255.255.255.0这个C类地址划分成两个网段：<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/2.png" alt="02"><br>要把IP地址：192.168.0.0，划分为两个子网段。由于该C类IP地址前三位网络位已固定，所以我们可以通过将IP地址的第四位即主机位右移一位（子网掩码右移一位），并把这一位二进制数划分给该IP地址的第三位网络号，如图所示：该二进制位有两种可能0或1，所以可以区分为两个子网。（用一个十进制数表示八位二进制数只是个习惯，实际可以IP地址的第三位十进制数可以表示多于8位的二进制数，比如上面的9位）；</p>
+<p>原本第四位主机位是8位二进制数，最大为1111 1111，右移一位，并把该为归为网络位，即在主机位中仍然是8位，但是第8位归属网络位，固定变为0或1；</p>
+<ul>
+<li>当第8位为0时，加上固定位的8位二进制数范围为：0000 0000 ~ 0111 1111，即0<del>127；所以该子网，即A子网范围为192.168.0.1</del>192.168.0.126（因为主机位不能全为0或1，所以0与127不能用）；</li>
+<li>当第8位为1时，加上固定位的8位二进制数范围为：1000 0000 ~ 1111 1111，即128<del>255；所以该子网，即B子网范围为192.168.0.129</del>192.168.0.254（同样，主机位不能全为0或1，所以128与255不能用）；</li>
+</ul>
+<p>划分子网之后，子网掩码的第四位变为1000 0000即十进制表示为128；</p>
+<p>主机号（主机地址）不能全为0，也不能全为1；当主机地址全为1是即为255，该地址是一个广播地址，会向所有计算机发送数据，不能作为计算机的IP地址。</p>
+<p><strong>划分两个子网后网络规划如图所示</strong><br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/3.png" alt="03"><br>配地址时，A子网与B子网分别属于两个不同的网段。A子网网段地址范围为192.168.0.0<del>192.168.0.126；B子网网段地址范围为192.168.0.128</del>192.168.0.255；并且A、B子网的子网掩码都为255.255.255.128</p>
+<blockquote>
+<p>注意了8个1组成的二进制数:1111 1111，对应的十进制数为2的1个数次方-1；如1111 1111表示十进制数：2的8次方-1，即255</p>
+</blockquote>
+<p>根据习惯连接A或B子网的路由器，使用的是A或B子网网段中的第一个有效IP地址，即192.168.0.1或192.168.0.129；它们的子网掩码也都为255.255.255.128。</p>
+<p>并且计算机的网关地址同样也为相应子网网段中的第一个有效IP地址。如图中的计算机网关地址为B子网中的第一个有效IP地址：192.169.0.129；</p>
+<p><strong>通过划分子网掌握两个常识</strong><br>子网掩码不一定都是255.255.255.0，也可能是255.255.255.128；<br>网段中的第一个有效地址不一定是1（即192.168.0.1），也可能是129（即192。168.0.129）；    </p>
+<p><strong>总结：等分子网其实是将主机位的8位二进制数表示的0~255线段，等分为所需份数</strong><br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/4.png" alt="04"></p>
+<h2 id="等分为4个子网"><a href="#等分为4个子网" class="headerlink" title="等分为4个子网"></a>等分为4个子网</h2><p>加入公司有4个部门，每个部门有50台计算机，现在使用192.168.0.0/24这个C类网段，从安全考虑你打算每个部门的计算机放置到独立的网段，这就要求你将192.168.0.0/24这个C类网络划分为4个网段，如何划分子网呢？<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/5.png" alt="05"><br>与二等分子网的分析过程一样，通过将子网掩码的最后8位二进制数右移两位，划分两位给网络位，从而实现子网划分。<br>划分给网络位的两位二进制数相对于右移的两位掩码位有四种可能取值：00、01、10、11。分别对应划分的四个子网A<del>D。<br>A子网有效IP（网段）地址为：192.168.0.1 ~ 192.168.0.62（0与63不能作为计算机地址，0为主机位全0地址，63为主机位全1地址，即广播地址）；<br>B子网有效IP（网段）地址为：192.168.0.65 ~ 192.168.0.126（64与127不能作为计算机地址，64为主机位全0地址，127为主机位全1地址，即广播地址）；<br>C子网有效IP（网段）地址为：192.168.0.129 ~ 192.168.0.190（128与191不能作为计算机地址，128为主机位全0地址，191为主机位全1地址，即广播地址）；<br>D子网有效IP（网段）地址为：192.168.0.193 ~ 192.168.0.254（192与255不能作为计算机地址，192为主机位全0地址，255为主机位全1地址，即广播地址）；<br>二进制数1000 0000中1在第8位，表示的十进制数为2的7次方。<br>可以观察出：每个网段第一个能用的地址为网段起始等分节点（2的相应次方）+1；最后一个能用的地址为该网段结尾等分节点-2。例如A子网，起始和结尾等分节点分比为0与64，所以A网段可用地址为1</del>62；<br>A~D的子网掩码统一变为255.255.255.192;规律为：整个网段等分为2的x次方段，那么子网掩码右移x位。比如2等分，子网掩码右移1位：1000 0000 即128；四等分，子网掩码右移2位：1100 0000 即192；（1100 0000 =1000 0000 +128/2）。<br><strong>总结：网段除一次2，子网掩码右移1位</strong></p>
+<h2 id="等分为8个网段"><a href="#等分为8个网段" class="headerlink" title="等分为8个网段"></a>等分为8个网段</h2><p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/7.png" alt="07"><br>分析方法同上，要把一个C类网络等分成8个子网，子网掩码需要往右移3位，才能划分出8个子网，第8位、第7位和第6位都变成网络位。<br>各子网有效地址与统一的子网掩码，可根据上文所推导规律自行得出。</p>
+<p><strong>当为点对点网络时，子网掩码右移6位，子网掩码最好为255.255.255.252</strong></p>
+<blockquote>
+<p>注意：子网划分是有规律的，比如划分为两个网段放200台计算机，一段放150台，另一段放50台，显然无论把150台计算机放在哪个网段都超过了128，这样是不行的，必须是逐次除2地划分。</p>
+</blockquote>
+<h2 id="不等分网段时"><a href="#不等分网段时" class="headerlink" title="不等分网段时"></a>不等分网段时</h2><p>若要求把180台计算机分为100、50、30台，放入不同的网段<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/8.png" alt="08"></p>
+<p>原理一样，先把总网段划分为符合计算机数量的相应长度。如这里有100 、50 、30台计算机，则需要的网段长度分别为128 、64 、32。<br>划分之后如图中A~C段所示，然后分别把100、 50 、30台计算机放在A、 B 、C网段。<br>与等分网段区别在于：不等分网段时，各段的子网掩码不在统一。如本例：A 、B 、C网段的子网掩码分别为128、192 、224；（这里考虑的是C类地址的情况，即该地址为子网掩码地址中的第四位）    </p>
+<h2 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h2><p>IP 地址：192.168.0.101<br>子网掩码：255.255.255.192<br>判断该IP 地址属于哪一个网段。    </p>
+<p><strong>解题思路：</strong>首先我们并不知道整个网段是否是等分的，所以我们可以通过IP 地址的主机位归零，并结合子网掩码最后一位来判断。子网掩码最后一位为192转换为2进制数为：1100 0000；即子网掩码右移了两位。也就是把第7~8位（11）划分给了网络位。</p>
+<blockquote>
+<p>注意：这里所指的划分是指：对内这两位属于网络位，主机位的操作不影响这两位，如主机位归零并不会影响这两位；对外仍然用一个十进制数表示这个由2位网络位和6位主机位组成的8位二进制数。</p>
+</blockquote>
+<p>第一步：通过子网掩码右移两位可判断出：划分的最小网段为总网段的1/4；<br>第二步：再通过IP地址主机号归零：192.168.0.101 中101属于64<del>128这一网段，所以主机号归零为–&gt;192.168.0.64（归零的只是6位主机位与划分给网络位的2位二进制数无关，所以对外表现出是64）下为图解；<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/9.png" alt="09"><br>由以上结论可以得出：该IP地址所属网段的第1个地址为64；再结合子网掩码位移数可得出：该网段为从地址64开始，长度为1/4总网段的网段。总网段长度为256,1/4为64，则所求地址属于的网段为：64</del>128（实际可用地址为65~126）。</p>
+<p><strong>总结：</strong>判断一台计算机所属网段，方法为两步走。</p>
+<h2 id="补充说明"><a href="#补充说明" class="headerlink" title="补充说明"></a>补充说明</h2><p><strong>子网掩码有两种写法。</strong><br>第一种：IP地址：192.168.201.167；子网掩码：255.255.255.224.<br>第二种：IP地址与子网掩码：192.168.201.167 / 28；这里的/ 28 表示原子网掩码右移了（28-3X8）即4位（由于是C类网络子网掩码前个十进制数固定，这三个十进制数一共表示24位二进制数，最终子网掩码的位数要在24基础上加上子网掩码右移的位数）。</p>
+<p><strong>选择非全0或1的主机号</strong><br>例如：192.168.201.168 / 30 与 192.168.201.169 / 30；哪个是主机号非全0或1的，符合要求的地址？<br>首先根据根据子网掩码可判断出：子网掩码右移了6位，即IP地址最后一个十进制数表示的8位二进制数为：1111 1100。其中前6位划分给了网络位，后2位：00为该IP地址主机位；<br>再把168化为二进制数为：1010 1000 ，即主机位为00，全为0不符合要求；169化为二进制为：1010 1001，即主机位为01，符合要求。所以应该选择192.168.201.169 / 30作为地址。    </p>
+<p><strong>另一种方法：</strong>子网掩码位数为30，则对应的IP地址主机位为32-30=2位，有：00,01,10,11四种可能所以168和169分别除4，可见当余数为00，或11（3）时都不满足要求。168除4余0,169除4余1，所以169满足要求。    </p>
+<p>若IP地址为192.168.201.252 / 29 与 192.168.201.253 / 29，子网掩码位数为29，则对应IP地址主机位为3位，有8种可能，则252和253相应除8得余数分别为4与5，二进制表示：100与101都不为全0或1，即两个地址都符合要求（252:1111 1100；253:1111 1101按照第一种方法也可验证两个地址符合要求）；其他位数的主机位以此类推。主机位数少时采用该方法更简单。</p>
+<h2 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h2><p>将B类地址：172.16.0.0；子网掩码为255.255.0.0 划分为两个子网    </p>
+<ul>
+<li>与C类地址的划分规则一样，只不过C类网络划分的是IP地址的第4个十进制数表示的8位二进制数，划分B类网络划分它的第三个十进制数表示的8位二进制数就可以了。</li>
+<li>结果为：172.16.0.1——172.16.127.254；与172.16.128.1——172.16.255.254；子网掩码都为255.255.128.0。</li>
+</ul>
+<h2 id="无分类编址-CIDR（无分类域间路由选择-）"><a href="#无分类编址-CIDR（无分类域间路由选择-）" class="headerlink" title="无分类编址 CIDR（无分类域间路由选择 ）"></a>无分类编址 CIDR（无分类域间路由选择 ）</h2><blockquote>
+<p>CIDR即为上述划分子网方法和规律的总结</p>
+</blockquote>
+<p><strong>CIDR 最主要的特点</strong><br>CIDR 消除了传统的 A 类、B 类和 C 类地址以及划分子网的概念，因而可以更加有效地分配 IPv4 的地址空间。<br>CIDR使用各种长度的“网络前缀”(network-prefix)来代替分类地址中的网络号和子网号。<br>无分类的两级编址的记法是：<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/10.png" alt="10"><br>CIDR 还使用“斜线记法”(slash notation)，它又称为CIDR记法，即在 IP 地址面加上一个斜线“/”，然后写上网络前缀所占的位数。例如：192.168.0.0/24，表示该IP地址网络号占24位，主机号占8位。</p>
+<h2 id="CIDR-地址块"><a href="#CIDR-地址块" class="headerlink" title="CIDR 地址块"></a>CIDR 地址块</h2><p>CIDR 把网络前缀都相同的连续的 IP 地址组成“CIDR 地址块”。<br>128.14.32.0/20 表示的地址块共有 212 个地址（因为斜线后面的 20 是网络前缀的位数，所以这个地址的主机号是 12 位）。<br>在不需要指出地址块的起始地址时，也可将这样的地址块简称为“/20 地址块”。<br>128.14.32.0/20 地址块的最小地址：128.14.32.0；128.14.32.0/20 地址块的最大地址：128.14.47.255；<br>全 0 和全 1 的主机号地址一般不使用。所以有效主机号为1~254。    </p>
+<p>2019 年 11 月 25 日，全球五大区域互联网注册管理机构之一的欧洲网络协调中心（RIPE NCC）宣布 IPv4 地址已全部用完。    </p>
+<h1 id="子网合并：构造超网"><a href="#子网合并：构造超网" class="headerlink" title="子网合并：构造超网"></a>子网合并：构造超网</h1><h2 id="超网"><a href="#超网" class="headerlink" title="超网"></a>超网</h2><p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/11.png" alt="11"><br>假设图中的交换机C接200台计算机，则正好给其分配一个C类网络：192.168.0（一个C类网络地址容量为254）；若计算机数量增加到400台，就需要在交换机C上接上交换机D，D再接上另外200台计算机。这时一个C类网路就不够分配了需要再拿一个C类网络分配给交换机D这个网段，即图中的192.168.1；    </p>
+<p>这种情况下，A计算机的IP地址与B计算机的子网掩码做与运算得：192.168.1，与B计算机的网关192.168.0不在一个网段。所以A与B不能直接通信。</p>
+<p>有一种解决方法：在连接两个网段的路由器接口上设置两个地址，如图所示：192.168.1.1与192.168.0.1；（通常采用网段的第一个有效地址作为路由器网关地址）；这样让这个路由器的接口当两个网段的网关，这样A发出的数据包可经由路由器传给B。但是，这样效率低，因为本来两台计算机就存在通过交换机连接的物理连接。</p>
+<p>更好的方法是合并子网，<strong>构造超网</strong>。如何构造呢？如图所示，将192.168。0.0和192.168.1.0两个C类网络合并。将IP地址的第3个字节和第四个字节写成二进制，可以看到将子网掩码往左移1位，网络部分就一样了，这两个网段就是一个网段了。<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/12.png" alt="12"></p>
+<p>合并后的网段子网掩码往前移动了一位变为：255.255.254.0；可用地址为192.168.0.1-192.168.1.254（这里的第三个字节表示与划分子网时一样，对内网络位减少了一位，对外仍用一个字节表示，即该字节由7位网络位和1位主机位组成，虽然写成192.168.1与192.168.0，但是在同一网段），IP地址的配置如图所示，这样A与B就可以不经路由器直接通过交换机通信了。<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/13.png" alt="13"></p>
+<p>那么192.168.0与192.168.1合并之后总的网段是192.168.0还是192.168.1呢？合并后计算机A的IP地址为192.168.1.2对应子网掩码为255.255.254.0，则IP地址主机位归零后变为192.169.0.0，如图所示：子网掩码左移一位之后主机位变为9位，两个IP地址主机位归零都为192.168.0；所以总的网段为192.168.0；<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/14.png" alt="14"></p>
+<blockquote>
+<p>以上讲解了合并两个C类网络192.168.0.0 ，255.255.255.0和192.168.1.0，255.255.255.0子网掩码往左移一位，可以合并为192.168.0.0,255.255.254.0。下面详细讲解合并规律。</p>
+</blockquote>
+<p>如下图所示，192.168.2.0，255.255.255.0和192.168.3.0，255.255.255.0字网掩码往左移1位，也可以合并为一个网段，IP地址主机位归零得192.168.2，即总网段为192.168.2.0，255.255.254.0。<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/15.png" alt="15"></p>
+<p><strong>那么如果要合并四个网段：</strong><br>192.168.0.0 、192.168.1.0 、192.168.2.0 、192.168.3.0 呢？<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/16.png" alt="16"><br>如上图所示将子网掩码往左移2位，四个子网的网络部分就一样了，这四个网段就是一个网段了。合并后的掩码地址为255.255.252.0，通过IP地址主机位归零得：192.168.0，即四个子网合并成的总网段为192.168.0。</p>
+<p>那么192.168.1.0与192.168.2.0可以合并吗？按照上述方法，可知：1与2化位二进制表示分别为：0000 0001 、0000 0010，可以看到子网掩码要左移两位二者的网络位才相同，但是子网掩码左移两位是把 192.168.0~3.0这四个网段都合并了，不符合要求，所以192.168.1.0与182.168.2.0不能合并。符合什么条件才能合并呢？</p>
+<p>合并网络的规律总结：如图所示<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/17.png" alt="17"><br>向左移动1位子网掩码可以合并0 、1网段；也可以合并2 、3网段；也可以合并4 、5网段；也可以合并6 、7网段。</p>
+<p>通过向左移动2位子网掩码可以将连续的0 、1 、2 、3网段合并成一个网段；也可以将连续的4 、5 、6 、7网段合并成一个网段。</p>
+<p>通过向左移动3位子网掩码，可以将0 、 1、 2、 3、 4、 5、 6、 7网段合并成一个网段。</p>
+<p>上述只是表面规律，真正规律为：若要合并2的n次方个网段，在子网掩码往左移n位的情况下，能使需要合并的n个网段的网络位相同即可合并，否则不能合并。例如合并2个网段，在子网掩码左移1位的情况下，能使两个网段的网络位相同的只有0和1、 2和3符合要求，所以1与2、1与3等都不能合并。</p>
+<p>简单判断法：判断192.168.117.0与192.168.118.0能否合并？让117与118都除以4，得余数分别为1与2；由于1与2不能合并所以这两个网段不能合并；也可以采用上面的规律来判断：117与118化为2进制分比为：0111 0101与0111 0110，可见子网掩码需要左移2位才能使二者的网路位相同，但是根据上面规律合并两个网段时子网掩码只能左移一位，所以两个子网不能合并。</p>
+<h2 id="路由聚合-route-aggregation"><a href="#路由聚合-route-aggregation" class="headerlink" title="路由聚合(route aggregation)"></a>路由聚合(route aggregation)</h2><p>一个 CIDR 地址块可以表示很多地址，这种地址的聚合常称为路由聚合，它使得路由表中的一个项目可以表示很多个（例如上千个）原来传统分类地址的路由。</p>
+<p>路由聚合也称为构成超网(supernetting)。</p>
+<p>在这种定义中，CIDR 虽然不使用子网了，但仍然使用“掩码”这一名词（但不叫子网掩码）。</p>
+<p>构成超网原理同上，只不过这里换了个说法。</p>
+
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/02/%E6%A8%A1%E5%BC%8F-%E8%81%8C%E8%B4%A3%E9%93%BE%E6%A8%A1%E5%BC%8F/" rel="prev" title="设计模式-职责链模式">
+      <i class="fa fa-chevron-left"></i> 设计模式-职责链模式
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/" rel="next" title="计算机网络-网络层-3">
+      计算机网络-网络层-3 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#子网划分"><span class="nav-number">1.</span> <span class="nav-text">子网划分</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一个网段的情况"><span class="nav-number">1.1.</span> <span class="nav-text">一个网段的情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#等分成两个子网"><span class="nav-number">1.2.</span> <span class="nav-text">等分成两个子网</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#等分为4个子网"><span class="nav-number">1.3.</span> <span class="nav-text">等分为4个子网</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#等分为8个网段"><span class="nav-number">1.4.</span> <span class="nav-text">等分为8个网段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不等分网段时"><span class="nav-number">1.5.</span> <span class="nav-text">不等分网段时</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#练习"><span class="nav-number">1.6.</span> <span class="nav-text">练习</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#补充说明"><span class="nav-number">1.7.</span> <span class="nav-text">补充说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拓展"><span class="nav-number">1.8.</span> <span class="nav-text">拓展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#无分类编址-CIDR（无分类域间路由选择-）"><span class="nav-number">1.9.</span> <span class="nav-text">无分类编址 CIDR（无分类域间路由选择 ）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CIDR-地址块"><span class="nav-number">1.10.</span> <span class="nav-text">CIDR 地址块</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#子网合并：构造超网"><span class="nav-number">2.</span> <span class="nav-text">子网合并：构造超网</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#超网"><span class="nav-number">2.1.</span> <span class="nav-text">超网</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#路由聚合-route-aggregation"><span class="nav-number">2.2.</span> <span class="nav-text">路由聚合(route aggregation)</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>
