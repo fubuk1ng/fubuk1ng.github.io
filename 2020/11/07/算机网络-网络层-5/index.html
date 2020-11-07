@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css"/
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fubuk1ng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="IP 多播IP 多播的基本概念简介不使用多播时需要发送 90 次单播：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络-网络层-5">
+<meta property="og:url" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/index.html">
+<meta property="og:site_name" content="fubuking&#39;s blog">
+<meta property="og:description" content="IP 多播IP 多播的基本概念简介不使用多播时需要发送 90 次单播：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/1.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/2.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/3.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/4.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/5.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/6.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/7.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/8.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/9.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/10.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/11.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/12.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/13.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/14.png">
+<meta property="og:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/15.png">
+<meta property="article:published_time" content="2020-11-07T09:18:33.000Z">
+<meta property="article:modified_time" content="2020-11-07T09:36:06.818Z">
+<meta property="article:author" content="fubuking">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/1.png">
+
+<link rel="canonical" href="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>计算机网络-网络层-5 | fubuking's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+<script src="/live2d-widget/autoload.js"></script>
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">fubuking's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">72</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://fubuk1ng.github.io/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/black.jpg">
+      <meta itemprop="name" content="fubuking">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="fubuking's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机网络-网络层-5
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-11-07 17:18:33 / 修改时间：17:36:06" itemprop="dateCreated datePublished" datetime="2020-11-07T17:18:33+08:00">2020-11-07</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="IP-多播"><a href="#IP-多播" class="headerlink" title="IP 多播"></a>IP 多播</h1><h2 id="IP-多播的基本概念"><a href="#IP-多播的基本概念" class="headerlink" title="IP 多播的基本概念"></a>IP 多播的基本概念</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>不使用多播时需要发送 90 次单播：<br><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/1.png" alt="01"></p>
+<a id="more"></a>
+<p>使用多播时只需要发送 1 次多播：<br><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/2.png" alt="02"></p>
+<h3 id="IP-多播的一些特点"><a href="#IP-多播的一些特点" class="headerlink" title="IP 多播的一些特点"></a>IP 多播的一些特点</h3><p>多播使用组地址：D 类IP地址支持多播。多播地址只能用于目的地址，而不能用于源地址。<br>永久组地址：由因特网号码指派管理局 IANA 负责指派。<br>多播的组成员是动态的。<br>可以使用硬件进行多播。    </p>
+<h3 id="在局域网上进行硬件多播"><a href="#在局域网上进行硬件多播" class="headerlink" title="在局域网上进行硬件多播"></a>在局域网上进行硬件多播</h3><p>因特网号码指派管理局 IANA 拥有的以太网地址块的高 24 位为 00-00-5E。<br>因此 TCP/IP 协议使用的以太网多播地址块的范围是：    </p>
+<ul>
+<li>从 00-00-5E-00-00-00</li>
+<li>到 00-00-5E-FF-FF-FF</li>
+</ul>
+<p>D 类 IP 地址可供分配的有 28 位，在这 28 位中的前 5 位不能用来构成以太网硬件地址。</p>
+<h3 id="D-类-IP-地址与以太网多播地址的映射关系"><a href="#D-类-IP-地址与以太网多播地址的映射关系" class="headerlink" title="D 类 IP 地址与以太网多播地址的映射关系"></a>D 类 IP 地址与以太网多播地址的映射关系</h3><p><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/3.png" alt="03"></p>
+<h2 id="网际组管理协议-IGMP-和多播路由选择协议"><a href="#网际组管理协议-IGMP-和多播路由选择协议" class="headerlink" title="网际组管理协议 IGMP 和多播路由选择协议"></a>网际组管理协议 IGMP 和多播路由选择协议</h2><h3 id="IP多播需要两种协议"><a href="#IP多播需要两种协议" class="headerlink" title="IP多播需要两种协议"></a>IP多播需要两种协议</h3><p>为了使路由器知道多播组成员的信息，需要利用网际组管理协议 IGMP (Internet Group Management Protocol)。</p>
+<p>连接在局域网上的多播路由器还必须和因特网上的其他多播路由器协同工作，以便把多播数据报用最小代价传送给所有的组成员。这就需要使用多播路由选择协议。</p>
+<blockquote>
+<p>IGMP 使多播路由器知道多播组成员信息</p>
+</blockquote>
+<p><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/4.png" alt="04"></p>
+<blockquote>
+<p>IGMP 的本地使用范围</p>
+</blockquote>
+<p>IGMP 并非在因特网范围内对所有多播组成员进行管理的协议。<br>IGMP 不知道 IP 多播组包含的成员数，也不知道这些成员都分布在哪些网络上。<br>IGMP 协议是让连接在本地局域网上的多播路由器知道本局域网上是否有主机（严格讲，是主机上的某个进程）参加或退出了某个多播组。    </p>
+<blockquote>
+<p>多播路由选择协议比单播路由选择协议复杂得多</p>
+</blockquote>
+<p>多播转发必须动态地适应多播组成员的变化（这时网络拓扑并未发生变化）。请注意，单播路由选择通常是在网络拓扑发生变化时才需要更新路由。<br>多播路由器在转发多播数据报时，不能仅仅根据多播数据报中的目的地址，而是还要考虑这个多播数据报从什么地方来和要到什么地方去。<br>多播数据报可以由没有加入多播组的主机发出，也可以通过没有组成员接入的网络。</p>
+<h3 id="网际组管理协议-IGMP"><a href="#网际组管理协议-IGMP" class="headerlink" title="网际组管理协议 IGMP"></a>网际组管理协议 IGMP</h3><p>IGMP 是整个网际协议 IP 的一个组成部分。</p>
+<ul>
+<li>和 ICMP 相似，IGMP 使用 IP 数据报传递其报文（即 IGMP 报文加上 IP 首部构成 IP 数据报），但它也向 IP 提供服务。</li>
+<li>因此，我们不把 IGMP 看成是一个单独的协议，而是属于整个网际协议 IP 的一个组成部分。</li>
+</ul>
+<blockquote>
+<p>IGMP 可分为两个阶段</p>
+</blockquote>
+<p>第一阶段：当某个主机加入新的多播组时，该主机应向多播组的多播地址发送IGMP 报文，声明自己要成为该组的成员。本地的多播路由器收到 IGMP 报文后，将组成员关系转发给因特网上的其他多播路由器。</p>
+<p>第二阶段：因为组成员关系是动态的，因此本地多播路由器要周期性地探询本地局域网上的主机，以便知道这些主机是否还继续是组的成员。</p>
+<p>只要对某个组有一个主机响应，那么多播路由器就认为这个组是活跃的。但一个组在经过几次的探询后仍然没有一个主机响应，则不再将该组的成员关系转发给其他的多播路由器。</p>
+<blockquote>
+<p>IGMP 采用的一些具体措施</p>
+</blockquote>
+<p>在主机和多播路由器之间的所有通信都是使用 IP 多播。<br>多播路由器在探询组成员关系时，只需要对所有的组发送一个请求信息的询问报文，而不需要对每一个组发送一个询问报文。默认的询问速率是每 125 秒发送一次。<br>当同一个网络上连接有几个多播路由器时，它们能够迅速和有效地选择其中的一个来探询主机的成员关系。<br>在 IGMP 的询问报文中有一个数值 N，它指明一个最长响应时间（默认值为 10秒）。当收到询问时，主机在 0 到 N 之间随机选择发送响应所需经过的时延。对应于最小时延的响应最先发送。<br>同一个组内的每一个主机都要监听响应，只要有本组的其他主机先发送了响应，自己就可以不再发送响应了。    </p>
+<blockquote>
+<p>IGMP应用举例</p>
+</blockquote>
+<p><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/5.png" alt="05"></p>
+<p>如图，三个城市的用户通过路由器连接。当城市A的老板要给城市B和C的员工开会时，包含城市A老板声音和图像的一个多播数据包通过路由器中转发往指定的多播地址。如有需要，多播数据包会在路由器D处复制成多份分别发往城市B和C的路由器。</p>
+<p>连接城市C的路由器C需要扫描城市C的网段，看看有没有计算机属于该多播地址。只要该网段有一台计算机属于该多播地址（只要有一个员工参加会议），那么路由器C都会向上一级路由器D请求一份多播数据包。若没有，那么路由器C就会告诉路由器D不用发送多播数据包过来了。</p>
+<h3 id="多播路由选择协议"><a href="#多播路由选择协议" class="headerlink" title="多播路由选择协议"></a>多播路由选择协议</h3><p>多播路由选择协议尚未标准化。<br>一个多播组中的成员是动态变化的，随时会有主机加入或离开这个多播组。<br>多播路由选择实际上就是要找出以源主机为根结点的多播转发树。<br>在多播转发树上的路由器不会收到重复的多播数据报。<br>对不同的多播组对应于不同的多播转发树。同一个多播组，对不同的源点也会有不同的多播转发树。    </p>
+<blockquote>
+<p>转发多播数据报使用的方法</p>
+</blockquote>
+<p>洪泛与剪除：</p>
+<p>这种方法适合于较小的多播组，而所有的组成员接入的局域网也是相邻接的。</p>
+<p>隧道技术;<br><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/6.png" alt="06"></p>
+<p>基于核心的发现技术：<br>这种方法对于多播组的大小在较大范围内变化时都适合。</p>
+<blockquote>
+<p>几种多播路由选择协议</p>
+</blockquote>
+<p>距离向量多播路由选择协议 DVMRP；<br>基于核心的转发树 CBT；<br>开放最短通路优先的多播扩展 MOSPF；<br>协议无关多播-稀疏方式 PIM-SM；<br>协议无关多播-密集方式 PIM-DM；    </p>
+<h1 id="虚拟专用网VPN"><a href="#虚拟专用网VPN" class="headerlink" title="虚拟专用网VPN"></a>虚拟专用网VPN</h1><h2 id="虚拟专用网VPN-1"><a href="#虚拟专用网VPN-1" class="headerlink" title="虚拟专用网VPN"></a>虚拟专用网VPN</h2><p>本地地址——仅在机构内部使用的 IP 地址，可以由本机构自行分配，而不需要向因特网的管理机构申请。<br>全球地址——全球唯一的IP地址，必须向因特网的管理机构申请。</p>
+<h2 id="RFC-1918-指明的专用地址-private-address"><a href="#RFC-1918-指明的专用地址-private-address" class="headerlink" title="RFC 1918 指明的专用地址 (private address)"></a>RFC 1918 指明的专用地址 (private address)</h2><p>10.0.0.0 到 10.255.255.255<br>172.16.0.0 到 172.31.255.255<br>192.168.0.0 到 192.168.255.255<br>这些地址只能用于一个机构的内部通信，而不能用于和因特网上的主机通信。<br>专用地址只能用作本地地址而不能用作全球地址。在因特网中的所有路由器对目的地址是专用地址的数据报一律不进行转发。    </p>
+<p>而虚拟专用网VPN技术实现的功能就是使全球地址也能访问本地地址。例如：</p>
+<p>学生放假回家想要直接通过公网地址访问属于私网地址的校园网是不行的，而借助于VPN技术可以实现无障碍访问内网。使用了VPN技术，无论学生用户身处何处，都相当于把计算机搬到了学校内，可以无障碍访问校园网。</p>
+<h2 id="远程访问VPN"><a href="#远程访问VPN" class="headerlink" title="远程访问VPN"></a>远程访问VPN</h2><p>一个用户出差在外，它的计算机公网地址为23.23.2.20。在企业内部有一个远程访问服务器(RAS)，上面有两个网卡，分别连接企业内网和外部因特网。企业内部有一台IP地址为10.0.0.2的WebServer。（RAS表示远程访问服务器，即VPN服务器）</p>
+<p>若远程用户想要访问WebServer，先要向公司内部配置好的远程访问服务器拨号，拨号拨通之后，远程访问服务器就会给远程用户一个私网地址：10.0.0.8。即远程用户获得了两个IP地址：一个公网地址23.23.2.20，拨号后获得的一个私网地址10.0.0.8。然后该用户就有能力访问企业内网的WebServer了。</p>
+<blockquote>
+<p>VPN技术的实现过程为：</p>
+</blockquote>
+<p>当远程用户与企业内网WebServer通信时，数据包中的源地址和目标地址都为私网地址，但是互联网上的路由器不转私网数据包。解决方法为：</p>
+<ul>
+<li>远程用户在公网上访问企业内部服务器RAS时，先使用RAS服务器分配的私网地址作为数据包的源地址，企业内网的WebServer地址作为目标地址组成局域网数据包。然后远程用户再使用自己的公网地址作为源地址，RAS服务器的公网地址作为目标地址对局域网数据包进行封装，组成广域网数据包。由于广域网数据包的目标地址和源地址都为公网地址，所以数据包可以通过互联网顺利中转到企业内的RAS服务器上。</li>
+<li>收到广域网数据包后，RAS服务器再去掉其中的公网目标地址和源地址，把数据包还原为局域网数据包，最后中转给WebServer。</li>
+<li>同样的，从WebServer发出的数据包，经过远程访问服务器RAS中转至公网前，先对数据包进行封装，加上一层公网的目标地址和源地址</li>
+<li>即远程用户和企业内配置好的远程访问服务器RAS都拥有一个私网地址和一个公网地址，在公网上通信时使用广域网数据包，在私网内通信时使用局域网数据包。</li>
+</ul>
+<p>VPN技术的实质就是在互联网上传输私有数据，但是使用Internet传输私有数据是不安全的。可以通过采取一定的安全措施使得这个传输过程变得安全，比如采用PPTP 或 L2TP等传输协议对数据进行加密和拨号前进行身份验证等。通过这些手段相当于建立了一段安全的专线，可以不安全的环境安全地传输私有数据，这就叫做虚拟专用网络。</p>
+<h2 id="用隧道技术实现虚拟专用网"><a href="#用隧道技术实现虚拟专用网" class="headerlink" title="用隧道技术实现虚拟专用网"></a>用隧道技术实现虚拟专用网</h2><p>隧道技术是基于上述地VPN原理，实现数据在互联网上的安全传输的技术。</p>
+<h2 id="内联网-intranet-和外联网-extranet"><a href="#内联网-intranet-和外联网-extranet" class="headerlink" title="内联网 intranet 和外联网 extranet"></a>内联网 intranet 和外联网 extranet</h2><p>由部门 A 和 B 的内部网络所构成的虚拟专用网 VPN 又称为内联网(intranet)，表示部门 A 和 B 都是在同一个机构的内部。<br>一个机构和某些外部机构共同建立的虚拟专用网 VPN 又称为外联网(extranet)。</p>
+<p>两种网络的实现都是基于 TCP/IP 协议。</p>
+<h2 id="VPN技术的实际应用"><a href="#VPN技术的实际应用" class="headerlink" title="VPN技术的实际应用"></a>VPN技术的实际应用</h2><p>内网互联：    </p>
+<blockquote>
+<p>情况一：</p>
+</blockquote>
+<p>分公司A与分公司B两个企业内网通过Internet连接在一起，两个分公司只要配置好各自的VPN(远程访问)服务器，就可以通过VPN隧道技术实现两企业内网间的无障碍访问，且企业内网用户无需拨号申请公网地址，相当于两个分公司的员工同在一个局域网下，只不过速度慢了点。</p>
+<p>这种VPN技术在许多连锁店铺中经常用到，因为全国的连锁店每日的账目都需要通过网络来传输汇总。</p>
+<blockquote>
+<p>情况二：</p>
+</blockquote>
+<p>只要分公司A或B中的一方有配置VPN服务器，另一方就可以通过VPN服务器访问该分公司的内网。比如在上图中，分公司B配置了VPN服务器，那么分公司A的员工1就能通过该VPN服务器远程连接分公司B内网中的员工2 。</p>
+<blockquote>
+<p>情况三：</p>
+</blockquote>
+<p>分公司A和B双方都没有配置VPN服务器，分公司C配置了VPN服务器，那么分公司A和B都可以通过该VPN服务器访问其他分公司的内网用户。</p>
+<p>访问外网：    </p>
+<p>访问外网，即所谓的翻墙，由于防火墙的限制，国内用户无法访问大多数的国外网站，而使用VPN技术可以实现无障碍访问外网。</p>
+<p>大多数外国网站都会拦截来自国内网段的数据包，国内的用户A想要访问Internet上的外国网站，可以通过向布置在外国某内网里的VPN服务器拨号，以此来获得外国网段的公网地址，相当于把用户A搬到了外国的内网A里面。由此实现了对外国网站的访问。</p>
+<p>我们平常使用的VPN软件，其原理就是向位于世界各地的VPN服务器拨号，以此获得外国网段的公网地址，实现外网访问。</p>
+<h1 id="网络地址转换-NAT-Network-Address-Translation"><a href="#网络地址转换-NAT-Network-Address-Translation" class="headerlink" title="网络地址转换 NAT (Network Address Translation)"></a>网络地址转换 NAT (Network Address Translation)</h1><h2 id="网络地址转换简介"><a href="#网络地址转换简介" class="headerlink" title="网络地址转换简介"></a>网络地址转换简介</h2><p>需要在专用网（内网）连接到因特网的路由器上安装 NAT 软件。装有 NAT 软件的路由器叫做 NAT路由器，它至少有一个有效的外部全球地址 IPG。<br>所有使用本地地址的主机在和外界通信时都要在 NAT 路由器上将其本地地址转换成 IPG 才能和因特网连接。</p>
+<h2 id="网络地址转换的过程"><a href="#网络地址转换的过程" class="headerlink" title="网络地址转换的过程"></a>网络地址转换的过程</h2><p>内部主机 X 用本地地址 IPX 和因特网上主机 Y 通信所发送的数据报必须经过 NAT 路由器。<br>NAT 路由器将数据报的源地址 IPX 转换成全球地址 IPG，但目的地址 IPY 保持不变，然后发送到因特网。<br>NAT 路由器收到主机 Y 发回的数据报时，知道数据报中的源地址是 IPY 而目的地址是 IPG。<br>根据 NAT 转换表，NAT 路由器将目的地址 IPG 转换为 IPX，转发给最终的内部主机 X。    </p>
+<blockquote>
+<p>举例</p>
+</blockquote>
+<p>如图：<br><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/7.png" alt="07"></p>
+<p>如图，当位于内网10网段的用户A想要访问Internet上的网站时，数据包可以出去，但是数据包返回时目标地址为内网地址，Internet中的路由器无法中转，所以内网的用户A无法访问Interner，并且可能存在多个相同的内网10网段。</p>
+<p>那么我们平时是如何顺利访问Internet的呢？</p>
+<ul>
+<li>连接内网的路由器至少有一个公网地址，如图中路由器X的公网地址111.24.0.1。用户A访问Internet上的网站时，数据包在内网传输时源地址为10.12.4.2目标地址为168.12.4.202，当数据包传输到路由器X处时，路由器将数据包的源地址改为了公网地址111.24.0.1 。</li>
+<li>这样数据包的目标地址和源地址都是公网地址能去能回，当目标地址为111.24.0.1的返回数据包到达路由器X时，路由器再将数据包的目标地址改为10.12.4.2，最后转发给用户A。由此用户A能够顺利访问Intenet。</li>
+<li>也就是说，连接内网与外网的路由器上的一个公网地址可以代表整个内网用户。比如一公网地址代表某学院内网的全部用户，该学院有人在网上干了坏事，根据公网IP地址查到的源头就是整个学院，学院内网里的全部用户都是嫌疑人。</li>
+</ul>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>严格意义上的NAT不会进行端口地址转换，因此并不节省公网IP地址。而通过端口地址转换PAT，能够节省公网IP地址。</p>
+<p><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/8.png" alt="08"></p>
+<p>如图，内网中有5位用户，但是只在路由器上配置了3个公网IP地址，那么只有先访问公网的3位用户能够替换到公网地址。由于没有公网地址替换，剩下的2位用户无法访问公网。</p>
+<p>即：使用NAT内网的用户可以主动访问公网，但是公网用户不能主动访问内网。利用此特点有以下应用（包含NAT和PAT）：</p>
+<blockquote>
+<p>应用举例</p>
+</blockquote>
+<p>场景一：<br>某公司有这样的需求，由于技术部有不能泄露的机密资料，现要求：技术部可以访问市场部网段，但市场部不能访问技术部网段，两个网段网管都可以访问。</p>
+<p><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/9.png" alt="09"></p>
+<p>解决方法为：</p>
+<ul>
+<li>在网管的计算机上安装两个网卡A和B，网卡A连接及技术部网段，网卡B连接市场部网段。当技术部的用户访问市场部时先经过网管的计算机，使用网卡B地址做替换。这样一来，在市场部用户看来，来访的只是网管的计算机，而实际上是技术部的用户来访。</li>
+<li>计算机间能够通信要求数据包有去有回，当技术部的用户向市场部发出的数据包经网管计算机的网卡B地址替换发向市场部后，网管的计算机上会留下这样的记录：哪个端口对应着技术部的哪个用户。当市场部的数据包返回时，网管的计算机就会按照之前保留的对应关系把数据包转给技术部的对应用户。由此实现数据包的有去有回。</li>
+<li>另一方面，当市场部用户想要主动访问技术部时，由于网管计算机上没有相关的端口对应关系（端口映射），所以无法将数据包中转给技术部用户。可以这样想：网管相当于小区保安，小区的住户相当于技术部用户发出的数据包。由于保安处有每位住户对应的门牌信息，所以住户可以自由出入。但是，小区外的人保安不认识，所以不让进。</li>
+</ul>
+<p>由此实现了：技术部能主动访问市场部，而市场部不能主动访问技术部。</p>
+<p>场景二：<br>学校网管分配给教师一个IP地址，满足教师上课时的上网需求。如果学生也要上网那该怎么办呢？<br><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/10.png" alt="10"></p>
+<p>解决方案为：在教师计算机上配置NAT和PAT，学生上网经过教师的计算机进行地址和端口转换。在网管看来只有教师在上网，其实教师和学生都在上网。</p>
+<h1 id="端口地址转换-PAT"><a href="#端口地址转换-PAT" class="headerlink" title="端口地址转换 PAT"></a>端口地址转换 PAT</h1><h2 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h2><p>当我们上网打开网页的时候，可以在命令行窗口通过以下命令查看建立的会话：</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">netstat -n</span></span><br></pre></td></tr></table></figure>
+<p><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/11.png" alt="11"></p>
+<p>如图所示，红色框内为建立的TCP连接的源地址及其使用的端口，蓝色框为TCP连接的目标地址和端口。可以看到建立的每一个连接中源地址使用的端口都是不同的。</p>
+<p>那么内网用户访问Internet是会不会出现以下情况呢？</p>
+<p><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/12.png" alt="12"></p>
+<p>如图，内网用户1和2访问公网网站时使用路由器的公网地址111.10.0.1替换，数据包可以顺利发出去，等到数据包返回时，源地址和端口为168.20.1.202：80，目标地址和端口为111.10.0.1：1234。但是，内网用户1和2可能都使用了1234端口，数据包可能是用户1发出的，也有可能是用户2发出的，此时路由器就不知道要把返回数据包转发给谁了。</p>
+<p>解决该问题的方法为，当内网用户访问公网时，不仅要进行地址替换（NAT）也要进行端口替换（PAT），如下图所示：</p>
+<p><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/13.png" alt="13"></p>
+<p>如图，用户1或2访问公网网站时，无论源地址和端口是什么都统一替换为路由器分配的地址和端口。即用户1使用地址：111.10.0.1，端口：4000；用户2使用地址：111.10.0.1，端口：4001；</p>
+<p>这样，如果返回的数据包目标端口为4000，那么路由器就知道要转给用户1；目标端口为4001，路由器就转给用户2；即使用户1和2原来使用的端口号一样路由器也知道该把数据包转给谁。</p>
+<p>也就是说：端口地址转换就是由路由器为内网用户统一分配端口。</p>
+<h2 id="端口地址转换的好处"><a href="#端口地址转换的好处" class="headerlink" title="端口地址转换的好处"></a>端口地址转换的好处</h2><p>能够大量节省公网IP地址。只需要一个公网IP地址就可以供整个内网的用户使用，内网中配置了公网地址的路由器负责给内网的所有用户统一分配端口，这样便能区分不同的内网用户。</p>
+<h2 id="NAT的端口映射"><a href="#NAT的端口映射" class="headerlink" title="NAT的端口映射"></a>NAT的端口映射</h2><blockquote>
+<p>什么是端口映射？</p>
+</blockquote>
+<p><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/14.png" alt="14"></p>
+<p>如图，内网中有个地址为10.0.2.1的Web站点服务器，它的80端口提供Web服务，内网路由器上的公网地址为111.0.2.1，能让外网用户也能访问内网Web站点服务器的技术就是端口映射。</p>
+<blockquote>
+<p>端口映射的作用</p>
+</blockquote>
+<p><img src="/2020/11/07/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-5/15.png" alt="15"></p>
+<p>可以配置内网路由器公网地址的80端口映射内网Web站点服务器的80端口，当公网用户A访问路由器公网地址的80端口服务时，路由器自动映射到内网的Web站点服务器的80端口上，这样公网用户就能访问内网Web站点服务器80端口提供的Web服务了。</p>
+<p>如果，公网用户A想要通过远程桌面管理内网的计算机B和C，那么用户A就需要访问计算机B和C的3389端口（远程桌面使用3389端口）。但是内网路由器只有一个3389端口，只能映射一台计算机的3389端口，那该怎么办呢？其实并不要求内网路由器上的端口与所映射端口相同，只要不重复即可。即可以使用内网路由器的4000端口映射计算机B的3389端口，使用内网路由器的4001端口映射计算机C的3389端口。由此，用户A可以通过远程桌面管理内网的计算机B和C了。</p>
+<p>解决公网访问私网的问题，使用端口映射是一种解决方案，前面讲到的VPN技术同样是一种可行的解决方案。</p>
+
+    </div>
+
+    
+    
+    
+
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束-------------</div>
+    
+</div>
+
+  
+</div>
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/04/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-4/" rel="prev" title="计算机网络-网络层-4">
+      <i class="fa fa-chevron-left"></i> 计算机网络-网络层-4
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>	
+  
+<aside class="sidebar">
+    <div class="sidebar-inner">
+	
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#IP-多播"><span class="nav-number">1.</span> <span class="nav-text">IP 多播</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IP-多播的基本概念"><span class="nav-number">1.1.</span> <span class="nav-text">IP 多播的基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#简介"><span class="nav-number">1.1.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IP-多播的一些特点"><span class="nav-number">1.1.2.</span> <span class="nav-text">IP 多播的一些特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在局域网上进行硬件多播"><span class="nav-number">1.1.3.</span> <span class="nav-text">在局域网上进行硬件多播</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#D-类-IP-地址与以太网多播地址的映射关系"><span class="nav-number">1.1.4.</span> <span class="nav-text">D 类 IP 地址与以太网多播地址的映射关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网际组管理协议-IGMP-和多播路由选择协议"><span class="nav-number">1.2.</span> <span class="nav-text">网际组管理协议 IGMP 和多播路由选择协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IP多播需要两种协议"><span class="nav-number">1.2.1.</span> <span class="nav-text">IP多播需要两种协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网际组管理协议-IGMP"><span class="nav-number">1.2.2.</span> <span class="nav-text">网际组管理协议 IGMP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多播路由选择协议"><span class="nav-number">1.2.3.</span> <span class="nav-text">多播路由选择协议</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#虚拟专用网VPN"><span class="nav-number">2.</span> <span class="nav-text">虚拟专用网VPN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟专用网VPN-1"><span class="nav-number">2.1.</span> <span class="nav-text">虚拟专用网VPN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RFC-1918-指明的专用地址-private-address"><span class="nav-number">2.2.</span> <span class="nav-text">RFC 1918 指明的专用地址 (private address)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#远程访问VPN"><span class="nav-number">2.3.</span> <span class="nav-text">远程访问VPN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用隧道技术实现虚拟专用网"><span class="nav-number">2.4.</span> <span class="nav-text">用隧道技术实现虚拟专用网</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内联网-intranet-和外联网-extranet"><span class="nav-number">2.5.</span> <span class="nav-text">内联网 intranet 和外联网 extranet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VPN技术的实际应用"><span class="nav-number">2.6.</span> <span class="nav-text">VPN技术的实际应用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络地址转换-NAT-Network-Address-Translation"><span class="nav-number">3.</span> <span class="nav-text">网络地址转换 NAT (Network Address Translation)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#网络地址转换简介"><span class="nav-number">3.1.</span> <span class="nav-text">网络地址转换简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络地址转换的过程"><span class="nav-number">3.2.</span> <span class="nav-text">网络地址转换的过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注意"><span class="nav-number">3.3.</span> <span class="nav-text">注意</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#端口地址转换-PAT"><span class="nav-number">4.</span> <span class="nav-text">端口地址转换 PAT</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介-1"><span class="nav-number">4.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#端口地址转换的好处"><span class="nav-number">4.2.</span> <span class="nav-text">端口地址转换的好处</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NAT的端口映射"><span class="nav-number">4.3.</span> <span class="nav-text">NAT的端口映射</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="fubuking"
+      src="/images/black.jpg">
+  <p class="site-author-name" itemprop="name">fubuking</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">72</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fubuk1ng" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fubuk1ng" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:904131218@qq.com" title="E-Mail → mailto:904131218@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">fubuking</span>
+</div>
+  <div class="powered-by">
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ivli9y7rdKWvTfdYoIKGT98s-MdYXbMMI',
+      appKey     : 'dGjPi00gVXfETJxqLbYROVsf',
+      placeholder: "(○ °△ °)っ来啊，快活啊！",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>

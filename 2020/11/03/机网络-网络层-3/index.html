@@ -52,7 +52,7 @@
 <meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/21.png">
 <meta property="og:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/22.png">
 <meta property="article:published_time" content="2020-11-03T12:21:49.000Z">
-<meta property="article:modified_time" content="2020-11-04T12:07:05.290Z">
+<meta property="article:modified_time" content="2020-11-06T12:06:11.616Z">
 <meta property="article:author" content="fubuking">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://fubuk1ng.github.io/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/1.png">
@@ -162,7 +162,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">70</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">72</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -250,7 +250,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-11-04 20:07:05" itemprop="dateModified" datetime="2020-11-04T20:07:05+08:00">2020-11-04</time>
+                <time title="修改时间：2020-11-06 20:06:11" itemprop="dateModified" datetime="2020-11-06T20:06:11+08:00">2020-11-06</time>
               </span>
 
           
@@ -310,17 +310,19 @@
 <h1 id="ARP-amp-RARP协议"><a href="#ARP-amp-RARP协议" class="headerlink" title="ARP&amp;RARP协议"></a>ARP&amp;RARP协议</h1><h2 id="ARP简介"><a href="#ARP简介" class="headerlink" title="ARP简介"></a>ARP简介</h2><p>不管网络层使用的是什么协议，在实际网络的链路上传送数据帧时，最终还是必须使用硬件地址。</p>
 <p>每一个主机都设有一个 ARP 高速缓存(ARP cache)，里面有所在的局域网上的各主机和路由器的 IP 地址到硬件地址的映射表。</p>
 <p>当主机 A 欲向本局域网上的某个主机 B 发送 IP 数据报时，就先在其 ARP 高速缓存中查看有无主机 B 的 IP 地址。如有，就可查出其对应的硬件地址，再将此硬件地址写入 MAC 帧，然后通过局域网将该 MAC 帧发往此硬件地址。</p>
-<h2 id="ARP-MAC地址欺骗"><a href="#ARP-MAC地址欺骗" class="headerlink" title="ARP MAC地址欺骗"></a>ARP MAC地址欺骗</h2><p>前面说过，网络层一共使用四个协议：IP、 ARP、 ICMP、 IGMP协议。ARP协议负责把IP地址解析成MAC地址，依靠广播作为解析方式。所以说网上的广播时避免不了的。<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/4.png" alt="04"><br>如下图所示：<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/5.png" alt="05"><br>四台计算机PC0<del>PC3通过交换机连接在一起，四台计算机的物理地址分别为M1</del>M4；如果PC0的10.0.0.2地址想ping（访问）PC1的10.0.0.3地址，那么PC0必须知道PC1的MAC地址。</p>
+<h2 id="ARP-MAC地址欺骗"><a href="#ARP-MAC地址欺骗" class="headerlink" title="ARP MAC地址欺骗"></a>ARP MAC地址欺骗</h2><p>前面说过，网络层一共使用四个协议：IP、 ARP、 ICMP、 IGMP协议。ARP协议负责把IP地址解析成MAC地址，依靠广播作为解析方式。所以说网上的广播时避免不了的。<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/4.png" alt="04"><br>如下图所示：<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/5.png" alt="05"></p>
+<p>四台计算机PC0 ~ PC3通过交换机连接在一起，四台计算机的物理地址分别为M1 ~ M4；如果PC0的10.0.0.2地址想ping（访问）PC1的10.0.0.3地址，那么PC0必须知道PC1的MAC地址。</p>
 <p>方法为PC0发布一个同网段所有计算机都能收到的广播，广播内容为询问10.0.0.3地址对应的MAC地址。PC1收到之后就会给PC0发送相应的MAC地址信息，PC0就会把收到的该MAC地址当做10.0.0.3的MAC地址。随后通信发出的数据帧目标MAC地址都为该接收到的MAC地址即M2。</p>
 <p>正因为ARP通过广播解析通信方MAC地址的方式造成了许多的网络安全问题。比如常说的抓包就是利用ARP协议的这种安全漏洞。</p>
 <p><strong>造成安全漏洞的原因为</strong><br>PC1告诉PC0，10.0.0.3对应的MAC地址为M2，PC0收到之后不做验证就直接确信并使用该MAC地址作为目标MAC地址发送数据了。我们都知道交换机在转发数据的时候，只会把数据转发给目标地址不会转发给其他连接交换机的非目标地址，这样其他计算机是无法截获通信信息的。</p>
 <p>如果PC3想截获PC0与PC1之间通信的数据包，当PC0发出广播询问目标MAC地址时，PC3也收到了广播信息，在PC1给PC0发送完正确MAC地址M2后，PC3再向PC0发送错误MAC地址M4，由于PC0并不会检验收到的目标MAC地址是否正确，所以M4会覆盖M2成为PC0确信的目标MAC地址。</p>
 <p>随后PC0开始通讯，就会把数据发送到PC3中，PC3再把数据发送给PC1 。通过这样一个MAC地址欺骗，所有流经MAC地址M1和M2的数据帧都经过了 M4使窃听数据成为可能。</p>
-<h2 id="应用举例：P2P终结者"><a href="#应用举例：P2P终结者" class="headerlink" title="应用举例：P2P终结者"></a>应用举例：P2P终结者</h2><p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/6.png" alt="06"><br>如图所示：四台计算机通过一个交换机连接在一起，再通过一个路由器连接网络，其中PC3的MAC地址为M2，路由器的MAC地址为M1。正常情况下PC0<del>PC2访问网络时，由于网络与它们本身不在同一个网段上，所以需交由路由器的网关进行中转，路由器的网关地址为M1；如果PC3想控制PC0</del>PC2的上网带宽，就可以通过安装P2P终结者类似的软件实现。</p>
-<p>P2P终结者的原理为：当PC0<del>PC2解析路由器网关地址时，路由器告诉它们是M1,PC3通过MAC地址欺骗再告诉它们假的路由器网关地址M2，这样PC0</del>PC2包含上网请求的数据包都会发送到假网关地址M2即PC3处（即PC0<del>PC2所有的流量都会经过M2），PC3知道路由器的真实网关地址为M1，PC3先对PC0</del>PC2发来数据包进行处理再把这些数据包转发给真正的路由器网关地址M1。通过这种方式实现对PC0~PC2上网带宽的管控。</p>
-<p>如果PC0~PC2直接解析路由器网关地址访问网络，无论PC3是无法管控它们的上网，所以P2P终结者这些软件必须配合ARP欺骗来实现。</p>
-<h2 id="网络执法官"><a href="#网络执法官" class="headerlink" title="网络执法官"></a>网络执法官</h2><p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/7.png" alt="07"><br>网络执法官的功能为：同一网段内的一台计算机（比如PC3），可以控制其他计算机（比如PC0~PC2）是否能上网，或者其中一台计算机（如PC0）能与哪些计算机通信，不能与哪些计算机通信。</p>
-<p>实现原理：当PC3中安装了网络执行官软件后，PC0<del>PC2想访问网络并解析路由器网关地址时，PC3告诉它们一个不存在的MAC地址M8；随后PC0向M8发送数据帧时，交换机收到后经过查找发现M8地址不存在，要求PC0重发数据帧，又查询不到M8地址，最后该数据帧被丢弃，于是PC0</del>PC2谁也上不了网。</p>
+<h2 id="应用举例：P2P终结者"><a href="#应用举例：P2P终结者" class="headerlink" title="应用举例：P2P终结者"></a>应用举例：P2P终结者</h2><p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/6.png" alt="06"></p>
+<p>如图所示：四台计算机通过一个交换机连接在一起，再通过一个路由器连接网络，其中PC3的MAC地址为M2，路由器的MAC地址为M1。正常情况下PC0 ~ PC2访问网络时，由于网络与它们本身不在同一个网段上，所以需交由路由器的网关进行中转，路由器的网关地址为M1；如果PC3想控制PC0 ~ PC2的上网带宽，就可以通过安装P2P终结者类似的软件实现。</p>
+<p>P2P终结者的原理为：当PC0 ~ PC2解析路由器网关地址时，路由器告诉它们是M1,PC3通过MAC地址欺骗再告诉它们假的路由器网关地址M2，这样PC0 ~ PC2包含上网请求的数据包都会发送到假网关地址M2即PC3处（即PC0 ~ PC2所有的流量都会经过M2），PC3知道路由器的真实网关地址为M1，PC3先对PC0 ~ PC2发来数据包进行处理再把这些数据包转发给真正的路由器网关地址M1。通过这种方式实现对PC0 ~ PC2上网带宽的管控。</p>
+<p>如果PC0 ~ PC2直接解析路由器网关地址访问网络，无论PC3是无法管控它们的上网，所以P2P终结者这些软件必须配合ARP欺骗来实现。</p>
+<h2 id="网络执法官"><a href="#网络执法官" class="headerlink" title="网络执法官"></a>网络执法官</h2><p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/7.png" alt="07"><br>网络执法官的功能为：同一网段内的一台计算机（比如PC3），可以控制其他计算机（比如PC0 ~ PC2）是否能上网，或者其中一台计算机（如PC0）能与哪些计算机通信，不能与哪些计算机通信。</p>
+<p>实现原理：当PC3中安装了网络执行官软件后，PC0 ~ PC2想访问网络并解析路由器网关地址时，PC3告诉它们一个不存在的MAC地址M8；随后PC0向M8发送数据帧时，交换机收到后经过查找发现M8地址不存在，要求PC0重发数据帧，又查询不到M8地址，最后该数据帧被丢弃，于是PC0~PC2谁也上不了网。</p>
 <h2 id="解决方案：安装ARP防火墙"><a href="#解决方案：安装ARP防火墙" class="headerlink" title="解决方案：安装ARP防火墙"></a>解决方案：安装ARP防火墙</h2><p>沿用上图在PC0中安装ARP防火墙之后，PC0想访问网络并解析路由器网关时，当接收到第一个由路由器发出的真正的网关地址M1时就在PC0中把该地址写死，之后再接受到其他MAC地址也不覆盖M1，由此实现防止ARP地址欺骗。</p>
 <h1 id="IP-数据报"><a href="#IP-数据报" class="headerlink" title="IP 数据报"></a>IP 数据报</h1><h2 id="IP-数据报的格式"><a href="#IP-数据报的格式" class="headerlink" title="IP 数据报的格式"></a>IP 数据报的格式</h2><p>一个 IP 数据报由首部和数据两部分组成。（数据报也可以说是数据包）<br>首部的前一部分是固定长度，共 20 字节，是所有 IP 数据报必须具有的。<br>在首部的固定部分的后面是一些可选字段，其长度是可变的。<br><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/8.png" alt="08"></p>
 <h2 id="IP-数据报首部的固定部分中的各字段"><a href="#IP-数据报首部的固定部分中的各字段" class="headerlink" title="IP 数据报首部的固定部分中的各字段"></a>IP 数据报首部的固定部分中的各字段</h2><p><img src="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-3/9.png" alt="09"></p>
@@ -404,7 +406,10 @@
     <a href="/2020/11/03/%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-2/" rel="prev" title="计算机网络-网络层-2">
       <i class="fa fa-chevron-left"></i> 计算机网络-网络层-2
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/04/%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E7%BD%91%E7%BB%9C%E5%B1%82-4/" rel="next" title="计算机网络-网络层-4">
+      计算机网络-网络层-4 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -479,7 +484,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-count">72</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
